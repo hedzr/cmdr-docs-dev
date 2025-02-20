@@ -1,5 +1,77 @@
-@import 'tailwindcss';
-@import 'fumadocs-ui/css/neutral.css';
-@import 'fumadocs-ui/css/preset.css';
+@import "tailwindcss";
+@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/preset.css";
 
 @source '../node_modules/fumadocs-ui/dist/**/*.js';
+
+@source '../node_modules/fumadocs-openapi/dist/**/*.js';
+
+body {
+  line-height: 1.65;
+  counter-reset: h2;
+  /* counter-reset: h3counter;
+     counter-reset: h4counter;
+     counter-reset: h5counter;
+     */
+}
+
+.nocount:before {
+  content: none;
+  counter-increment: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 2em 0 1.67em;
+  line-height: 1.2;
+}
+
+article h2 {
+  counter-reset: h3;
+}
+article h3 {
+  counter-reset: h4;
+}
+article h4 {
+  counter-reset: h5;
+}
+article h5 {
+  counter-reset: h6;
+}
+
+article h2:before {
+  counter-increment: h2;
+  content: counter(h2) ". ";
+}
+article h3:before {
+  counter-increment: h3;
+  content: counter(h2) "." counter(h3) ". ";
+}
+article h4:before {
+  counter-increment: h4;
+  content: counter(h2) "." counter(h3) "." counter(h4) ". ";
+}
+article h5:before {
+  counter-increment: h5;
+  content: counter(h2) "." counter(h3) "." counter(h4) "." counter(h5) ". ";
+}
+article h6:before {
+  counter-increment: h6;
+  content: counter(h2) "." counter(h3) "." counter(h4) "." counter(h5) "."
+    counter(h6) ". ";
+}
+
+article h2.nocount:before,
+article h3.nocount:before,
+article h4.nocount:before,
+article h5.nocount:before,
+article h6.nocount:before {
+  content: "";
+  counter-increment: none;
+}
+
+/* [data-radix-scroll-area-viewport] */

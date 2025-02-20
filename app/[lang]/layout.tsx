@@ -1,23 +1,45 @@
-import '../global.css';
-import { RootProvider } from 'fumadocs-ui/provider';
-import { Inter } from 'next/font/google';
-import type { ReactNode } from 'react';
-import { I18nProvider } from "fumadocs-ui/i18n";
+import "../global.css";
+import { RootProvider } from "fumadocs-ui/provider";
+import { Inter } from "next/font/google";
+import type { ReactNode } from "react";
+import { I18nProvider, Translations } from "fumadocs-ui/i18n";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({
-  subsets: ['latin'],
+  subsets: ["latin"],
 });
 
-export default async function Layout({ params, children }: { params: Promise<{ lang: string }>, children: ReactNode }) {
+// internationalization --------------------------------
+
+const cn: Partial<Translations> = {
+  search: "Search", // "Translated Content",
+  // other translations
+};
+
+export default async function Layout({
+  params,
+  children,
+}: {
+  params: Promise<{ lang: string }>;
+  children: ReactNode;
+}) {
+  const lang = (await params).lang;
   return (
-    <html lang="en" className={inter.className} suppressHydrationWarning>
+    <html lang="{lang}" className={inter.className} suppressHydrationWarning>
       <body className="flex flex-col min-h-screen">
-              <I18nProvider locale={(await params).lang} locales={[
-                  { locale: 'en', name: 'English' }
-              ]}>
-                <RootProvider>{children}</RootProvider>
-              </I18nProvider>
-          </body>
+        <I18nProvider
+          locale={(await params).lang}
+          locales={[
+            { locale: "en", name: "English" },
+            { locale: "cn", name: "Chinese" },
+            { locale: "tw", name: "Chinese TW" },
+          ]}
+          translations={{ cn }[lang]}
+        >
+          <RootProvider>{children}</RootProvider>
+        </I18nProvider>
+        <SpeedInsights />
+      </body>
     </html>
   );
 }
