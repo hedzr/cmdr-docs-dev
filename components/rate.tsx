@@ -10,6 +10,7 @@ import {
 } from "fumadocs-ui/components/ui/collapsible";
 import { cva } from "class-variance-authority";
 import { usePathname } from "next/navigation";
+import { usePostHog } from "posthog-js/react";
 
 const rateButtonVariants = cva(
   "inline-flex items-center gap-2 px-3 py-2 rounded-full font-medium border text-sm [&_svg]:size-4 disabled:cursor-not-allowed",
@@ -51,6 +52,7 @@ export function Rate({
   const [previous, setPrevious] = useState<Feedback | null>(null);
   const [opinion, setOpinion] = useState<"good" | "bad" | null>(null);
   const [message, setMessage] = useState("");
+  const posthog = usePostHog();
 
   useEffect(() => {
     setPrevious(get(url));
@@ -66,6 +68,8 @@ export function Rate({
     };
 
     void onRateAction(url, feedback);
+
+    posthog.capture('on_rate_docs', feedback)
 
     set(url, feedback);
     setPrevious(feedback);

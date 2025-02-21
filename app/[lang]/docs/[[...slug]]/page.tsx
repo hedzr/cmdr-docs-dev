@@ -28,7 +28,10 @@ import { Wrapper } from "@/components/preview/wrapper";
 import { ImageZoom } from "fumadocs-ui/components/image-zoom";
 import { Step, Steps } from "fumadocs-ui/components/steps";
 import { Mermaid } from "@theguild/remark-mermaid/mermaid"; // pnpm install @theguild/remark-mermaid remark-math fumadocs-twoslash fumadocs-docgen rehype-katex
+
 import { Rate } from "@/components/rate";
+
+// import { usePostHog } from "posthog-js/react";
 import posthog from "posthog-js";
 
 import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
@@ -91,6 +94,10 @@ export default async function Page(props: {
             // Popup,
             // PopupContent,
             // PopupTrigger,
+            Popover,
+            PopoverTrigger,
+            PopoverContent,
+            PopoverClose,
             TypeTable,
             // AutoTypeTable,
             Accordion,
@@ -115,12 +122,13 @@ export default async function Page(props: {
         />
         {/*{page.data.index ? <DocsCategory page={page} from={source} /> : null}*/}
       </DocsBody>
-      <Rate
-        onRateAction={async (url, feedback) => {
-          "use server";
-
-          await posthog.capture("on_rate_docs", feedback);
-        }}
+      <Rate onRateAction={async (url, feedback) => {"use server";}}
+        // onRateAction={async (url, feedback) => {
+        //   "use server";
+        //   // const posthog = usePostHog();
+        //   posthog.capture("rate_docs", feedback);
+        //   // see also: https://us.posthog.com/project/130354/onboarding/web_analytics?step=install
+        // }}
       />
       <HandlingKeyboardLeftAndRight />
     </DocsPage>
