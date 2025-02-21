@@ -1,4 +1,4 @@
-import { source } from "../../../../lib/source";
+import { source } from "@/lib/source";
 import {
   DocsPage,
   DocsBody,
@@ -159,5 +159,6 @@ export async function generateMetadata(props: {
   return metadataImage.withImage(page.slugs, {
     title: page.data.title,
     description: page.data.description,
+    // icons:[page.data.icon,],
   });
 }

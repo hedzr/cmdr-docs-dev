@@ -7,7 +7,7 @@
 @source '../node_modules/fumadocs-openapi/dist/**/*.js';
 
 body {
-  line-height: 1.65;
+  /*line-height: 1.65;*/
   counter-reset: h2;
   /* counter-reset: h3counter;
      counter-reset: h4counter;
@@ -26,7 +26,7 @@ h3,
 h4,
 h5,
 h6 {
-  margin: 2em 0 1.67em;
+  /*margin: 2em 0 1.67em;*/
   line-height: 1.2;
 }
 

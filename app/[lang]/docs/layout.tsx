@@ -1,8 +1,36 @@
-import { DocsLayout } from "fumadocs-ui/layouts/docs";
+import { DocsLayout, type DocsLayoutProps } from "fumadocs-ui/layouts/docs";
 import type { ReactNode } from "react";
-import { baseOptions } from "../../layout.config";
-import { source } from "../../../lib/source";
-import "katex/dist/katex.css";
+import { baseOptions, linkItems } from "../../layout.config";
+import { source } from "@/lib/source";
+import { baseUrl, createMetadata, site } from "@/lib/metadata";
+import "katex/dist/katex.min.css";
+
+export const metadata = createMetadata({
+  title: {
+    template: "%s | " + site.title,
+    default: site.title,
+  },
+  description: site.desc,
+  // "a command-line arguments parser and app framework with hierarchical settings supporting",
+  metadataBase: baseUrl,
+
+  // metadataBase: new URL('https://acme.com'),
+  alternates: {
+    canonical: "/",
+    languages: {
+      // "en-US": "/en-US",
+      // // "de-DE": "/de-DE",
+      // "zh-CN": "/zh-CN",
+      // "zh-TW": "/zh-TW",
+      en: "/en",
+      zh: "/cn",
+      "zh-TW": "/tw",
+    },
+  },
+  openGraph: {
+    images: "/og-image.png",
+  },
+});
 
 export default async function Layout({
   params,
@@ -11,9 +39,42 @@ export default async function Layout({
   params: Promise<{ lang: string }>;
   children: ReactNode;
 }) {
-  return (
-    <DocsLayout tree={source.pageTree[(await params).lang]} {...baseOptions}>
-      {children}
-    </DocsLayout>
-  );
+  // return (
+  //   <DocsLayout tree={source.pageTree[(await params).lang]} {...baseOptions}>
+  //     {children}
+  //   </DocsLayout>
+  // );
+
+  const tree = source.pageTree[(await params).lang];
+
+  const docsOptions: DocsLayoutProps = {
+    ...baseOptions,
+    tree: tree, // source.pageTree['zh'],
+    links: [linkItems[linkItems.length - 1]],
+    sidebar: {
+      tabs: {
+        transform(option, node) {
+          const meta = source.getNodeMeta(node);
+          if (!meta) return option;
+
+          return {
+            ...option,
+            icon: (
+              <div
+                className="rounded-md border bg-gradient-to-t from-fd-background/80 p-1 shadow-md [&_svg]:size-5"
+                style={{
+                  color: `var(--${meta.file.dirname}-color)`,
+                  backgroundColor: `color-mix(in oklab, var(--${meta.file.dirname}-color) 40%, transparent)`,
+                }}
+              >
+                {node.icon}
+              </div>
+            ),
+          };
+        },
+      },
+    },
+  };
+
+  return <DocsLayout {...docsOptions}>{children}</DocsLayout>;
 }

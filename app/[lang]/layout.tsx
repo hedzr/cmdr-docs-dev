@@ -44,8 +44,8 @@ export default async function Layout({
           locale={(await params).lang}
           locales={[
             { locale: "en", name: "English" },
-            { locale: "cn", name: "Chinese" },
-            { locale: "tw", name: "Chinese TW" },
+            { locale: "cn", name: "Simplified Chinese" },
+            { locale: "tw", name: "Traditional Chinese" },
           ]}
           translations={{ cn }[lang]}
         >
