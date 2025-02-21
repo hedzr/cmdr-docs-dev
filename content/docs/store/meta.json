@@ -1,0 +1,25 @@
+{
+  "title": "Store(-go)",
+  "description": "高性能、高可定制的配置管理包，内存键值对管理器",
+  "icon": "MonitorCog",
+  "root": true,
+  "defaultOpen": true,
+  "pages": [
+    "index",
+    "concepts",
+
+    "---Guide---",
+    "...guide",
+    "as-memory-kvstore",
+    "as-http-router",
+    "howto",
+
+    "---References---",
+    "...reference",
+    "packages",
+
+    "---Others---",
+    "...tests",
+    "..."
+  ]
+}
