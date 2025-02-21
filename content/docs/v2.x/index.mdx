@@ -1,0 +1,108 @@
+---
+title: 介绍 cmdr
+description: cmdr 是一个命令行参数处理框架，同时还提供应用程序设置集的集成能力
+---
+
+## 了解 cmdr
+
+所以这里是 cmdr(-go) 的相关文档。
+
+<Cards>
+  <Card title="Cmdr(-go) v2 Documentation" href="./v2.x/" />
+  <Card title="Cmdr(-go) v1 Documentation" href="./v1.x/" />
+</Cards>
+
+用 Golang 编写一个使用 cmdr 软件包的微型 app，可以是这样，
+
+```go title="./examples/tiny0/main.go"
+package main
+
+import (
+	"context"
+
+	"github.com/hedzr/cmdr/v2"
+	"github.com/hedzr/cmdr/v2/cli"
+)
+
+func main() {
+	app := cmdr.New().
+		Info("tiny0-app", "0.3.1").
+		Author("The Example Authors") // .Description(``).Header(``).Footer(``)
+	app.Cmd("jump").
+		Description("jump command").
+		Examples(`jump example`). // {{.AppName}}, {{.AppVersion}}, {{.DadCommands}}, {{.Commands}}, ...
+		OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+			println("jump command:", cmd)
+			if cmd.FlagBy("full").GetTriggeredTimes() > 0 {
+				// for dummy store, `if cmd.Store().MustBool("full") {}` cannot work
+				println("Dump", cmd.Set().Dump()) // nothing to display since a dummy store created
+			}
+			return
+		}).
+		With(func(b cli.CommandBuilder) {
+			b.Flg("full", "f").
+				Default(false).
+				Description("full option here").
+				Build()
+		})
+
+	ctx := context.Background() // with cancel can be passed thru in your actions
+	if err := app.Run(ctx); err != nil {
+		println("Application Error:", err)
+	}
+}
+```
+
+运行的效果为，
+
+```bash
+$ go run ./examples/tiny0/
+
+...[help screen ignored here]
+
+$ go run ./examples/tiny0/ jump
+jump command: (0x1024be4c0,0x140000766c8)
+
+$ go run ./examples/tiny0/ jump --full
+jump command: (0x1024be4c0,0x140000766c8)
+Dump
+```
+
+The help screen looks like,
+
+![tiny0-help-screen](/cmdr/v2/guide/2025-02-16T09.14.24.png)
+
+### 额外的话题
+
+在这个微型示例程序中，我们没有使用标准的 `Store`，因此 cmdr
+自行创建了一个隐含的 DummyStore，它废弃一切进入的操作。
+也因此 `cmd.Store().MustBool("full")` 无法取得 `--full` 的用户输入值。
+为此这里使用了变通的办法：通过检测 full 的 \*Flag 对象被终端用户
+触发的次数来确定它已经被输入了。
+如果用户在命令行输入了 `--full -f`，则触发次数将会是 2。
+
+`cmd.FlagBy("full")` 可以按照选项参数的长标题来找到对应的 \*Flag 对象。
+类似地，`cmd.SubCmdBy("xxx")` 可以用来找到子命令。
+这两者都是非递归的。
+
+如果你想递归向下查找，`cmd.(*cli.CmdS).FindSubCommandRecursive(ctx, longTitle, wide)` 可以做到。
+这组函数有
+
+- `FindSubCommand`
+- `FindSubCommandRecursive`
+- `FindFlag`
+- `FindFlagRecursive`
+
+它们在 `*cli.CmdS` 上提供，但目前没有在 `interface Cmd` 上提
+供，所以可能你需要一个 Type Assertion 进行转换。
+
+## Learn More
+
+<Cards>
+  <Card
+    title="Learn more about `hedzr/store`"
+    href="https://github.com/hedzr/store"
+  />
+  {/* <Card title="Learn more about Fumadocs" href="https://fumadocs.vercel.app" /> */}
+</Cards>
+````

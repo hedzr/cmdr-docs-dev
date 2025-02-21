@@ -1,0 +1,30 @@
+{
+  "title": "Cmdr(-go) v2.x",
+  "description": "Commandline args parsing framework",
+  "icon": "MonitorCog",
+  "root": true,
+  "defaultOpen": true,
+  "pages": [
+    "index",
+    "concepts",
+
+    "---Guide---",
+    "...guide",
+    "auto-close-closers",
+    "redirect-to",
+    "toggle-group",
+    "head-like",
+    "external-tool",
+    "valid-args",
+    "required",
+    "howto",
+
+    "---References---",
+    "...reference",
+    "packages",
+
+    "---Others---",
+    "...tests",
+    "..."
+  ]
+}
