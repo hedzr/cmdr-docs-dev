@@ -1,4 +1,5 @@
 'use client';
+
 import { cn } from '../lib/cn';
 import { type ButtonHTMLAttributes, type HTMLAttributes } from 'react';
 import { useSidebar } from 'fumadocs-ui/provider';

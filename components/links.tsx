@@ -1,4 +1,5 @@
 'use client';
+
 import Link from 'fumadocs-core/link';
 import { usePathname } from 'next/navigation';
 import {
