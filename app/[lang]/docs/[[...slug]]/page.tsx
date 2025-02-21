@@ -23,6 +23,12 @@ import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
 import { TypeTable } from "fumadocs-ui/components/type-table";
 // import { CodeWithTabs } from "@/components/markdown/code-with-tabs";
 // import { Popup, PopupContent, PopupTrigger } from "fumadocs-twoslash/ui";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverClose,
+} from "@/components/ui/popover";
 import { InlineTOC } from "fumadocs-ui/components/inline-toc";
 import { Wrapper } from "@/components/preview/wrapper";
 import { ImageZoom } from "fumadocs-ui/components/image-zoom";
