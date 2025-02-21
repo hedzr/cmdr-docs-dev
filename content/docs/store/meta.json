@@ -1,6 +1,6 @@
 {
   "title": "Store(-go)",
-  "description": "高性能、高可定制的配置管理包，内存键值对管理器",
+  "description": "高性能、高可定制的配置管理包",
   "icon": "MonitorCog",
   "root": true,
   "defaultOpen": true,
