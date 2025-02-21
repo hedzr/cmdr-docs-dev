@@ -8,6 +8,7 @@ import { PostHogProvider } from "../provider";
 import { lang2iso } from "@/lib/i18n";
 import { baseUrl } from "@/lib/metadata";
 import { GoogleAnalytics } from '@next/third-parties/google'
+import { Analytics } from "@vercel/analytics/react"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -56,6 +57,7 @@ export default async function Layout({
         </I18nProvider>
         <SpeedInsights />
         <GoogleAnalytics gaId="G-301DLP27SS" />
+        <Analytics/>
       </body>
     </html>
   );
