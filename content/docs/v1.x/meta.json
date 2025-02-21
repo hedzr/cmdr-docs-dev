@@ -1,0 +1,34 @@
+{
+  "title": "Cmdr(-go) v1.x",
+  "description": "Commandline args parsing framework",
+  "icon": "Airplay",
+  "pages": [
+    "index",
+    "...",
+
+    "---Guide---",
+    "guide",
+    "g01-getting-started",
+    "g31-faq",
+    "g33-refs",
+
+    "---References---",
+    "ref",
+    "r01-cli-main",
+    "r05-subcommand",
+    "r06-actions",
+    "r07-flags",
+    "r15-adv",
+    "r30-option-store",
+    "r81-helpers",
+    "r91-others",
+    "references",
+
+    "---Misc---",
+    "z91-markdown-demo-blank",
+    "z92-markdown-demo",
+    "z93-markdown-page",
+    "z94-markdown-page-2"
+  ],
+  "root": true
+}
