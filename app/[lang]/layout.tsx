@@ -7,6 +7,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { PostHogProvider } from "../provider";
 import { lang2iso } from "@/lib/i18n";
 import { baseUrl } from "@/lib/metadata";
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 const inter = Inter({
   subsets: ["latin"],
@@ -54,6 +55,7 @@ export default async function Layout({
           </PostHogProvider>
         </I18nProvider>
         <SpeedInsights />
+        <GoogleAnalytics gaId="G-301DLP27SS" />
       </body>
     </html>
   );
