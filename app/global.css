@@ -6,6 +6,21 @@
 
 @source '../node_modules/fumadocs-openapi/dist/**/*.js';
 
+code {
+  counter-reset: step;
+  counter-increment: step 0;
+}
+
+code .line::before {
+  content: counter(step);
+  counter-increment: step;
+  width: 1rem;
+  margin-right: 1.5rem;
+  display: inline-block;
+  text-align: right;
+  color: rgba(115, 138, 148, 0.4);
+}
+
 body {
   /*line-height: 1.65;*/
   counter-reset: h2;
@@ -30,17 +45,24 @@ h6 {
   line-height: 1.2;
 }
 
+article h1 {
+  counter-reset: h2 0;
+}
 article h2 {
-  counter-reset: h3;
+  counter-reset: h3 0;
 }
 article h3 {
-  counter-reset: h4;
+  counter-reset: h4 0;
 }
 article h4 {
-  counter-reset: h5;
+  counter-reset: h5 0;
 }
 article h5 {
-  counter-reset: h6;
+  counter-reset: h6 0;
+}
+
+article h1:before {
+  counter-increment: h2;
 }
 
 article h2:before {
