@@ -27,6 +27,7 @@ export const openapi = createOpenAPI();
 export const blog = loader({
   baseUrl: '/blog',
   source: createMDXSource(blogPosts),
+  // source: blogPosts.toFumadocsSource(),
 });
 
 export type Page = InferPageType<typeof source>;

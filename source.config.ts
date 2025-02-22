@@ -47,6 +47,10 @@ export const docs = defineDocs({
   // },
 });
 
+// export const blog = defineDocs({
+//   dir: 'content/blog',
+// });
+
 export const blog = defineCollections({
   type: 'doc',
   dir: 'content/blog',
