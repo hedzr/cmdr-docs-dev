@@ -291,6 +291,10 @@ import "github.com/hedzr/cmdr-loaders/local"
 于终端用户来说稍微不那么友好，因为他可能并不会意识到 `jump` 也可
 以被 _执行_。
 
+另一个副作用是，在 Shell 执行 `app jump` 时，原本会自动显示帮助屏，
+但现在将会执行你所关联的 `OnAction` 代码了，所以你必须使用
+`app jump -h` 来查阅帮助屏。
+
 ### `Build()` 和 `With(cb)`
 
 `app/b.Cmd("long","short",...)...Build()` 是一种 Builder
@@ -369,11 +373,11 @@ $
 
 `cmd.Set()` 相当于调用 `app.Set()`，它获取整个 Store 对象。此时，你需要用 `cmd.Set().MustBool("app.cmd.jump.to.full")` 来取得 `--full` 的状态。
 
-`app.Store()` 获得的是 "app.cmd" 子树，所以你也可以用 `app.Store().MustBool("jump.to.full") 来问询。
+`app.Store()` 获得的是 "app.cmd" 子树，所以你也可以用 `app.Store().MustBool("jump.to.full")` 来问询。
 
 :::tip
 
-MustXXX 函数族包含对很多数据类型的抽取。
+`MustXXX` 函数族包含对很多数据类型的抽取。
 
 例如，`cmd.MustInt("option-long-name")` 得到一个整数值，
 而 `cmd.MustDuration("option-long-name")` 得到一个时间段值，
@@ -383,7 +387,7 @@ MustXXX 函数族包含对很多数据类型的抽取。
 
 你也可以从外部配置文件中载入配置数据集，这将在下一节中示例。
 
-### OS 返回值
+### OS 返回值 [#os-ret-code]
 
 `to` 命令也展示了如何设置应用程序返回值。通过 `app.SetSuggestRetCode(retCode)` 可以
 设置一个错误码，并在 main() 中利用 `os.Exit(app.SuggestRetCode())` 将其返回给操作系统。

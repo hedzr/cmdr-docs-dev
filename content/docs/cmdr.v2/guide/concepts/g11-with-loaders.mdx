@@ -258,3 +258,31 @@ UNIX Filesystem Conventions ([wiki](https://en.wikipedia.org/wiki/Unix_filesyste
 默认地，仅有当前工作目录中的 `<app-name>.{toml,yaml,...}` 才属于 `Alternative` 配置集，它才支持自动回写功能。
 
 > 注意：`<exeutable-dir>` 的 Alternative 配置文件不支持回写功能。
+
+### 自动环境变量绑定
+
+当使用 `local.NewEnvVarLoader()` 这个 loader 时，它将会处理自动环境变量到命令行选项参数的绑定。
+
+所谓自动环境变量，是指 `APP_xxx` 这样的环境变量名字。
+
+如果自动绑定功能启用，那么像 `APP_JUMP_FULL=1` 这样的环境变量值会被
+赋予 `jump` 命令的 `full` 参数选项，从而起到 `app jump --full to`
+这个命令行的等价效果，对应的命令行可以是 `APP_JUMP_FULL=1 app jump to`。
+
+那么孰优孰劣呢？这就很难讲了，负责 DevOps 的人或许会有自己的看法。
+
+#### 没有启用时怎么办
+
+通常情况下，你可以为一个参数选项显式地做环境变量绑定，如同这样：
+
+```go
+b.Flg("full", "f").
+	Default(false).
+	Description("full command").
+	EnvVars("FULL", "F"). // [!code highlight]
+	Build()
+```
+
+所以你也可以不必启用自动环境变量的绑定能力。
+
+:end:
