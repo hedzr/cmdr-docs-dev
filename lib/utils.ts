@@ -50,9 +50,16 @@ export function capitalize(str: string) {
 // }
 
 // Thursday, May 23, 2024
-export function formatDate(dateStr: string): string {
-  const [day, month, year] = dateStr.split("-").map(Number);
+export function formatDate(dateStr: string, lang: string): string {
+  const dta = dateStr.split(" ");
+  const [day, month, year] = dta[0].split("-").map(Number);
   const date = new Date(year, month - 1, day);
+
+  if (day > 1970) {
+    const y = day, m = month, d = year];
+    const date = new Date(y, m - 1, d);
+    return dateToString(date, lang ?? 'en-US');
+  }
 
   const options: Intl.DateTimeFormatOptions = {
     weekday: "long",
@@ -61,7 +68,7 @@ export function formatDate(dateStr: string): string {
     day: "numeric",
   };
 
-  return date.toLocaleDateString("en-US", options);
+  return date.toLocaleDateString(lang ?? "en-US", options);
 }
 
 //  May 23, 2024
