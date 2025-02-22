@@ -71,21 +71,37 @@ export function formatDate(dateStr: string, lang: string): string {
   return date.toLocaleDateString(lang ?? "en-US", options);
 }
 
-//  May 23, 2024
-export function formatDate2(dateStr: string): string {
-  const [day, month, year] = dateStr.split("-").map(Number);
-  const date = new Date(year, month - 1, day);
-
+function dateToString(date: Date, lang: string): string {
   const options: Intl.DateTimeFormatOptions = {
     month: "short",
     day: "numeric",
     year: "numeric",
   };
-  return date.toLocaleDateString("en-US", options);
+  return date.toLocaleDateString(lang, options);
+}
+
+//  May 23, 2024
+export function formatDate2(dateStr: string, lang?: string): string {
+  if (!dateStr) return 'Jan 29, 1979';
+  const dta = dateStr.split(" ");
+  const [day, month, year] = dta[0].split("-").map(Number);
+  if (day > 1970) {
+    const y = day, m = month, d = year;
+    const date = new Date(y, m - 1, d);
+    return dateToString(date, lang ?? 'en-US');
+  }
+  const date = new Date(year, month - 1, day);
+  return dateToString(date, lang ?? 'en-US');
 }
 
 //
 export function stringToDate(date: string) {
-  const [day, month, year] = date.split("-").map(Number);
+  if (!date) return new Date(1973, 3, 13);
+  const dta = date.split(" ");
+  const [day, month, year] = dta[0].split("-").map(Number);
+  if (day > 1970) {
+    const y = day, m = month, d = year;
+    return new Date(y, m - 1, d);
+  }
   return new Date(year, month - 1, day);
 }

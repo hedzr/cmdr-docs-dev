@@ -132,14 +132,18 @@ const postProcess = () => (tree: any) => {
 
 export type Author = {
   avatar?: string;
-  handle: string;
+  handle?: string;
   username: string;
-  handleUrl: string;
+  handleUrl?: string;
 };
 
 export type BlogMdxFrontmatter = BaseMdxFrontmatter & {
   date: string;
-  authors: Author[];
+  authors?: Author[];
+  author?: Author;
+  draft?: boolean;
+  tags: string[];
+  categories: string[];
 };
 
 export async function getAllBlogStaticPaths() {
