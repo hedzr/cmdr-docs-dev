@@ -7,8 +7,8 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { PostHogProvider } from "../provider";
 import { lang2iso } from "@/lib/i18n";
 import { baseUrl } from "@/lib/metadata";
-import { GoogleAnalytics } from '@next/third-parties/google'
-import { Analytics } from "@vercel/analytics/react"
+import { GoogleAnalytics } from "@next/third-parties/google";
+import { Analytics } from "@vercel/analytics/react";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -32,12 +32,12 @@ export default async function Layout({
   return (
     <html
       lang={lang2iso[lang]}
-      base-url={baseUrl.toString()}
-      base-env={process.env.NODE_ENV}
-      base-vercel-env={process.env.NEXT_PUBLIC_VERCEL_ENV || "not-spec"}
-      base-next-site-url={process.env.NEXT_PUBLIC_SITE_URL || "not-spec"}
-      base-next-vercel-url={process.env.NEXT_PUBLIC_VERCEL_URL || "not-spec"}
-      base-vercel-url={process.env.VERCEL_URL || "not-spec"}
+      // base-url={baseUrl.toString()}
+      // base-env={process.env.NODE_ENV}
+      // base-vercel-env={process.env.NEXT_PUBLIC_VERCEL_ENV || "not-spec"}
+      // base-next-site-url={process.env.NEXT_PUBLIC_SITE_URL || "not-spec"}
+      // base-next-vercel-url={process.env.NEXT_PUBLIC_VERCEL_URL || "not-spec"}
+      // base-vercel-url={process.env.VERCEL_URL || "not-spec"}
       className={inter.className}
       suppressHydrationWarning
     >
@@ -57,7 +57,7 @@ export default async function Layout({
         </I18nProvider>
         <SpeedInsights />
         <GoogleAnalytics gaId="G-301DLP27SS" />
-        <Analytics/>
+        <Analytics />
       </body>
     </html>
   );
