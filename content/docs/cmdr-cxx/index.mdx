@@ -1,0 +1,132 @@
+---
+title: 介绍 cmdr-cxx
+description: cmdr-cxx 是一个命令行参数处理框架，同时还提供应用程序设置集的集成能力
+---
+
+## 了解 cmdr-cxx
+
+所以这里是 cmdr-cxx 的相关文档。
+它是一个基于 C++17，也适应 C++20 and Higher 的 header-only 软件包。
+
+:::tip
+
+本文档进一步编写的计划表还没有被规划。
+
+The roadmap of `cmdr-cxx` docs is staying on paper.
+
+:::
+
+<Cards>
+  <Card title="Cmdr(-go) v2 Documentation" href="./v2.x/" />
+  <Card title="Cmdr(-go) v1 Documentation" href="./v1.x/" />
+</Cards>
+
+用 `cmdr-cxx` 编写一个微型 CLI app，可以是这样，
+
+```cpp title="./examples/simple-app.cc"
+#include <cmdr-cxx.hh>
+
+#include <cmath>
+#include <complex>
+#include <fstream>
+
+#include <exception>
+#include <iostream>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+
+#include "second_src.hh"
+
+int main(int argc, char *argv[]) {
+  auto &cli = cmdr::cli("app2", CMDR_VERSION_STRING, "Sample Authors",
+                        "Copyright © 2021 by Sample Authors, All Rights Reserved.",
+                        "A demo app for cmdr-c11 library.",
+                        "$ ~ --help");
+
+  try {
+    // using namespace cmdr::opt;
+    add_test_menu(cli);
+  } catch (std::exception &e) {
+    std::cerr << "Exception caught for testing (NOT BUG) : " << e.what() << '\n';
+    CMDR_DUMP_STACK_TRACE(e);
+  }
+
+  return cli.run(argc, argv);
+}
+
+void add_test_menu(cmdr::app &cli) {
+  using namespace cmdr::opt;
+
+  cli += sub_cmd{}("test", "t", "test-command")
+         .description("main tests commands for testing")
+         .group("Test"); {
+    auto &t1 = *(cli.last_added_command());
+    t1 += sub_cmd{}("hello", "hi")
+          .description("hello world in cmdr-cxx subcmd way")
+          .group("Test")
+          .on_invoke([&cli](cmd const &cc, string_array const &) -> int {
+            std::cout << "Hello, World!\n";
+
+            auto &s = cli.store();
+            const auto &k = s.get_raw_p("app.cli", "test.int");
+            if (k.has_value())
+              std::cout << "int.val:  " << k.as_string() << '\n';
+
+            std::cout << "string:   " << s.get_raw("app.cli.test.string").as_string() << '\n';
+            std::cout << "float:    " << s.get_raw("app.cli.test.float").as_string() << '\n';
+            std::cout << "double:   " << s.get_raw("app.cli.test.double").as_string() << '\n';
+            std::cout << '\n' << "int:      " << cc["int"].default_value() << '\n';
+            return 0;
+          });
+    t1 += opt{10}("int", "i")
+        .description("set the int-value");
+    t1 += opt{""}("string", "str")
+        .description("set the string-value");
+    t1 += opt{3.13f}("float", "f")
+        .description("flag float");
+    t1 += opt{3.12}("double", "d")
+        .description("flag double");
+  }
+}
+```
+
+运行的效果为，
+
+```bash
+$ cd cmdr-cxx/
+$ cmake -S . -B build
+$ cmake --build build
+$ ./bin/examples-simple-app test hi -i 13 -str hi,u-there
+Hello, World!
+int.val:  13
+string:   "hi,u-there"
+float:    3.13
+double:   3.12
+
+int:      0x0
+```
+
+`test` 子命令的帮助屏为：
+
+```bash
+$ ./bin/examples-simple-app test
+$ # Or
+$ ./bin/examples-simple-app test --help
+```
+
+截屏如下：
+
+![simple-app-test-help-screen](/cmdr/cxx/simple-app-test-help-screen.png)
+
+### 额外的话题
+
+...
+
+## Learn More
+
+<Cards>
+  <Card title="`hedzr/cmdr`: cmdr in golang" href="../cmdr.v2" />
+  <Card title="`hedzr/Cmdr.Core`: cmdr in c# (old)" href="../Cmdr.Core/" />
+</Cards>
+````

@@ -1,0 +1,31 @@
+{
+  "title": "cmdr-cxx",
+  "description": "Commandline args parsing framework",
+  "icon": "MonitorCog",
+  "root": true,
+  "defaultOpen": true,
+  "hide": true,
+  "pages": [
+    "index",
+    "concepts",
+
+    "---Guide---",
+    "...guide",
+    "auto-close-closers",
+    "redirect-to",
+    "toggle-group",
+    "head-like",
+    "external-tool",
+    "valid-args",
+    "required",
+    "howto",
+
+    "---References---",
+    "...reference",
+    "packages",
+
+    "---Others---",
+    "...tests",
+    "..."
+  ]
+}
