@@ -1,0 +1,84 @@
+---
+title: 你的首个 CLI app
+description: 从这里开始
+---
+
+## tiny1 Example
+
+在 tiny0 示例中已经展示了极简的 cmdr-based app 的编写。但那只是玩具，接下来的几个小节我们依次介绍较为真实的用法。
+
+同样地，本例中不做标准的集成，简单地、但是代码结构组织得更合理一些，如下所示，
+
+```go title="./examples/tiny1/main.go"
+package main
+
+import (
+	"context"
+	"os"
+
+	"github.com/hedzr/cmdr/v2"
+	"github.com/hedzr/cmdr/v2/cli"
+)
+
+func main() {
+	ctx := context.Background() // with cancel can be passed thru in your actions
+	app := prepareApp()
+	if err := app.Run(ctx); err != nil {
+		println("Application Error:", err)
+		os.Exit(app.SuggestRetCode())
+	}
+}
+
+func prepareApp(opts ...cli.Opt) (app cli.App) {
+	app = cmdr.New(opts...).
+		Info("tiny1-app", "0.3.1").
+		Author("The Example Authors") // .Description(``).Header(``).Footer(``)
+
+	app.Cmd("jump").
+		Description("jump command").
+		Examples(`jump example`). // {{.AppName}}, {{.AppVersion}}, {{.DadCommands}}, {{.Commands}}, ...
+		OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+			println("jump command:", cmd)
+			if cmd.FlagBy("full").GetTriggeredTimes() > 0 {
+				// for dummy store, `if cmd.Store().MustBool("full") {}` cannot work
+				println("Dump", cmd.Set().Dump()) // nothing to display since a dummy store created
+			}
+			return
+		}).
+		With(func(b cli.CommandBuilder) {
+			b.Flg("full", "f").
+				Default(false).
+				Description("full option here").
+				Build()
+		})
+	return
+}
+```
+
+这个微型 app 很简单，没有集成 `Store` 存储应用程序设置, 也没有集成外部设置装载器。
+
+它包含一个子命令 `jump`，相应的业务逻辑处理程序由 `OnAction` 指定。因此，运行它会得到（类似于）：
+
+```bash
+$ go run ./examples/tiny3 jump
+jump command: (0x10140a4a0,0x140001ae6c8)
+```
+
+其他部分和 tiny0 是没有区别的，故而不再解说。
+
+### 额外的话题
+
+为你的应用程序创建一条子命令使用的是两种序列：`app/b.Cmd("long","short",...)...Build()` 和 `app/b.Cmd("long","short",...)...With(cb)`。
+
+前者使用 `Build()` 结束创建模式。
+
+后者带有一个回调函数闭包。这样你就能在闭包中继续创建下一级子命令了。
+
+创建一个选项参数的方式也是类似的，`app/b.Flag("long","short",...)...Build()` 和 `app/b.Flag("long","short",...)...With(cb)`。
+其中，后者可以用于在闭包中设置 flag 的其他属性。但你依然可以使用流式调用风格，然后以 `Build()` 作为终结符完成构建模式。
+
+## 下一步
+
+<Cards>
+  <Card title="更简单的写法" href="./g02-concise-version" />
+</Cards>

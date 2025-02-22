@@ -1,0 +1,7 @@
+{
+  "title": "Packages",
+  "description": "The docs framework for cmdr v2",
+  "icon": "Package",
+  "root": false,
+  "defaultOpen": true
+}

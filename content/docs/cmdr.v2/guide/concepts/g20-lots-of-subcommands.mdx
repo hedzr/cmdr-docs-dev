@@ -1,0 +1,112 @@
+---
+title: 很多很多的子命令
+description: Commands, Lots of Commands
+---
+
+## 创建子命令层级
+
+我们已经提到过子命令应该在上级命令的 `With(cb)` 代码块中编写。通过
+如此的模式，你可以创建大量的子命令，它们将构成子命令的树状层级体系。
+
+```go title="./examples/lots-subcmds/main.go"
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+
+	"github.com/hedzr/cmdr-loaders/local"
+	"github.com/hedzr/cmdr-tests/examples/common"
+	"github.com/hedzr/cmdr-tests/examples/common/cmd"
+	"github.com/hedzr/cmdr/v2"
+	"github.com/hedzr/cmdr/v2/cli"
+	logz "github.com/hedzr/logg/slog"
+	"github.com/hedzr/store"
+)
+
+const (
+	appName = "lots-subcmds"
+)
+
+func main() {
+	app := chain(common.PrepareApp(
+		appName,
+
+		// use an option store explicitly, or a dummy store by default
+		cmdr.WithStore(store.New()),
+
+		// import "github.com/hedzr/cmdr-loaders/local" to get in advanced external loading features
+		cmdr.WithExternalLoaders(
+			local.NewConfigFileLoader(
+				local.WithAlternateWriteBack(false), // disable write-back the modified state into alternative config file
+				local.WithAlternateDotPrefix(false), // use '<app-name>.toml' instead of '.<app-name>.toml'
+			),
+			local.NewEnvVarLoader(),
+		),
+	)(cmd.Commands...))
+
+	ctx := context.Background() // with cancel can be passed thru in your actions
+	if err := app.Run(ctx); err != nil {
+		logz.ErrorContext(ctx, "Application Error:", "err", err) // stacktrace if in debug mode/build
+		os.Exit(app.SuggestRetCode())
+	} else if rc := app.SuggestRetCode(); rc != 0 {
+		os.Exit(rc)
+	}
+}
+
+// [!code highlight:18]
+func chain(app cli.App) cli.App {
+	app.Cmd("subcmd").
+		Description("subcommands here").
+		With(func(b cli.CommandBuilder) {
+			for i := 0; i < 5; i++ {
+				b.Cmd(fmt.Sprintf("sub-%d", i)).
+					Description(fmt.Sprintf("subcommand-%d here", i)).
+					With(func(b cli.CommandBuilder) {
+						for j := 0; j < 3; j++ {
+							b.Cmd(fmt.Sprintf("sub-%d-sub-%d", i, j)).
+								Description(fmt.Sprintf("sub-%d-subcommand=%d here", i, j)).
+								With(func(b cli.CommandBuilder) {})
+						}
+					})
+			}
+		})
+	return app
+}
+```
+
+用 cmdr 内建选项 `~~tree` 来运行它，显示全部的命令层级如下：
+
+```bash
+$ FORCE_DEFAULT_ACTION=1 go run ./examples/lots-subcmds/ ~~tree
+...
+```
+
+其结果像这样，
+
+![image-20250217213824849](/cmdr/v2/guide/_assets/g10-lots-of-subcommands/image-20250217213824849.png)
+
+### 说明
+
+环境变量 `FORCE_DEFAULT_ACTION=1` 促使 cmdr 略过你的 `OnAction` 转而执行一个内建的响应函数，该函数显示命中的命令（ACTIONS）以及选项参数清单。
+这对于调试命令行参数会很有用。
+
+像 `jump` 命令这样的被标记了废弃版本（例如 `.Deprecated("v1.2.3")`）的命令，在帮助屏显示时会有删除线穿过文字，同时文字也被暗淡显示。
+
+如果一条命令被标记为隐藏（例如 `.Hidden(true)`），将会暗淡显示（如果在命令行给出了多于一个 `--verbose` 的话），或者不显示（正常情况下）。
+
+如果命令是被标记为厂商内置的（通过 `.Hidden(true,true）`），则必须指定至少 3 次 verbose（通过 `-vvv`），才会被显示出来。
+
+cmdr 也提供一些内置的命令和选项，其中一部分处于隐藏状态或者被标记为厂商内置的，可以通过 `-vvv` 来查阅它们。
+
+同时，像 `~~tree` 和 `~~debug` 这样的特殊选项（被称为 TILDE 选项）也被赋予特殊意义。
+其中 `~~tree` 会显示命令树结构，而 `~~debug` 则会打印出内置的 Store 状态。
+
+:::tip
+
+注意 `~~debug` 和正常的选项 `--debug`/`-D` 是不同的。
+
+:::
+
+### 额外的话题

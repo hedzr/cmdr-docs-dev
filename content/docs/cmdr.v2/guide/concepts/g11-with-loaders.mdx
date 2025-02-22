@@ -1,0 +1,260 @@
+---
+title: 载入外部配置数据
+---
+
+## tiny3 Example
+
+在本节中，通过引入 [hedzr/cmdr-loaders](https://github.com/hedzr/cmdr-loaders) 可以提供外部数据集的自动装载。
+
+示例程序如下，
+
+```go title="./examples/tiny3/main.go"
+package main
+
+import (
+	"context"
+	"io"
+	"os"
+
+	"gopkg.in/hedzr/errors.v3"
+
+	"github.com/hedzr/cmdr-loaders/local"
+	"github.com/hedzr/cmdr/v2"
+	"github.com/hedzr/cmdr/v2/cli"
+	"github.com/hedzr/cmdr/v2/pkg/dir"
+	logz "github.com/hedzr/logg/slog"
+	"github.com/hedzr/store"
+)
+
+func main() {
+	ctx := context.Background() // with cancel can be passed thru in your actions
+	app := prepareApp(
+		// use an option store explicitly, or a dummy store by default
+		cmdr.WithStore(store.New()),
+
+		// [!code highlight:8]
+		// import "github.com/hedzr/cmdr-loaders/local" to get in advanced external loading features
+		cmdr.WithExternalLoaders(
+			local.NewConfigFileLoader(
+				local.WithAlternateWriteBack(false), // disable write-back the modified state into alternative config file
+				local.WithAlternateDotPrefix(false), // use '<app-name>.toml' instead of '.<app-name>.toml'
+			),
+			local.NewEnvVarLoader(),
+		),
+
+		cmdr.WithTasksBeforeRun(func(ctx context.Context, cmd cli.Cmd, runner cli.Runner, extras ...any) (err error) {
+			logz.DebugContext(ctx, "command running...", "cmd", cmd, "runner", runner, "extras", extras)
+			return
+		}),
+
+		// true for debug in developing time, it'll disable onAction on each Cmd.
+		// for productive mode, comment this line.
+		// The envvars FORCE_DEFAULT_ACTION & FORCE_RUN can override this.
+		// cmdr.WithForceDefaultAction(true),
+
+		// cmdr.WithAutoEnvBindings(true),
+	)
+	if err := app.Run(ctx); err != nil {
+		logz.ErrorContext(ctx, "Application Error:", "err", err) // stacktrace if in debug mode/build
+		os.Exit(app.SuggestRetCode())
+	} else if rc := app.SuggestRetCode(); rc != 0 {
+		os.Exit(rc)
+	}
+}
+
+func prepareApp(opts ...cli.Opt) (app cli.App) {
+	app = cmdr.New(opts...).
+		Info("tiny3-app", "0.3.1").
+		Author("The Example Authors") // .Description(``).Header(``).Footer(``)
+
+	// another way to disable `cmdr.WithForceDefaultAction(true)` is using
+	// env-var FORCE_RUN=1 (builtin already).
+	app.Flg("no-default").
+		Description("disable force default action").
+		// Group(cli.UnsortedGroup).
+		OnMatched(func(f *cli.Flag, position int, hitState *cli.MatchState) (err error) {
+			if b, ok := hitState.Value.(bool); ok {
+				// disable/enable the final state about 'force default action'
+				f.Set().Set("app.force-default-action", b)
+			}
+			return
+		}).
+		Build()
+
+	app.Cmd("jump").
+		Description("jump command").
+		Examples(`jump example`). // {{.AppName}}, {{.AppVersion}}, {{.DadCommands}}, {{.Commands}}, ...
+		Deprecated(`v1.1.0`).
+		// Group(cli.UnsortedGroup).
+		Hidden(false).
+		// Both With(cb) and Build() to end a building sequence
+		With(func(b cli.CommandBuilder) {
+			b.Cmd("to").
+				Description("to command").
+				Examples(``).
+				Deprecated(`v0.1.1`).
+				OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+					// cmd.Set() == cmdr.Store(), cmd.Store() == cmdr.Store()
+					cmd.Set().Set("app.tiny3.working", dir.GetCurrentDir())
+					println()
+					println(cmd.Set().WithPrefix("app.tiny3").MustString("working"))
+
+					cs := cmdr.Store().WithPrefix("jump.to")
+					if cs.MustBool("full") {
+						println()
+						println(cmd.Set().Dump())
+					}
+					cs2 := cmd.Store()
+					if cs2.MustBool("full") != cs.MustBool("full") {
+						logz.Panic("a bug found")
+					}
+					app.SetSuggestRetCode(1) // ret code must be in 0-255
+					return                   // handling command action here
+				}).
+				With(func(b cli.CommandBuilder) {
+					b.Flg("full", "f").
+						Default(false).
+						Description("full command").
+						Build()
+				})
+		})
+
+	app.Flg("dry-run", "n").
+		Default(false).
+		Description("run all but without committing").
+		Build()
+
+	app.Flg("wet-run", "w").
+		Default(false).
+		Description("run all but with committing").
+		Build() // no matter even if you're adding the duplicated one.
+
+	app.Cmd("wrong").
+		Description("a wrong command to return error for testing").
+		// cmdline `FORCE_RUN=1 go run ./tiny wrong -d 8s` to verify this command to see the returned application error.
+		OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+			dur := cmd.Store().MustDuration("duration")
+			println("the duration is:", dur.String())
+
+			ec := errors.New()
+			defer ec.Defer(&err) // store the collected errors in native err and return it
+			ec.Attach(io.ErrClosedPipe, errors.New("something's wrong"), os.ErrPermission)
+			// see the application error by running `go run ./tiny/tiny/main.go wrong`.
+			return
+		}).
+		With(func(b cli.CommandBuilder) {
+			b.Flg("duration", "d").
+				Default("5s").
+				Description("a duration var").
+				Build()
+		})
+	return
+}
+```
+
+在 `hedzr/cmdr-tests` 的根目录中包含一个名为 `tiny3-app.toml` 的配置数据文件：
+
+```toml
+[app.tiny3]
+foo = "bar"
+```
+
+它将被 tiny3 在执行时装入。我们可以借助于 `--full` 打印的配置数据树观察到这个功能是正常工作的：
+
+```bash
+$ go run ./examples/tiny3 jump to --full                                                                                                                                                                                                                                                  21:02:38 ✗ TTY:s014
+
+~work/godev/cmdr.v2/cmdr.tests
+
+  app.                          <B>
+    cmd.                        <B>
+      jump.to.full              <L> app.cmd.jump.to.full => true
+      w                         <B>
+        rong.duration           <L> app.cmd.wrong.duration => 5s
+        et-run                  <L> app.cmd.wet-run => false
+      generate.                 <B>
+        manual.                 <B>
+          dir                   <L> app.cmd.generate.manual.dir =>
+          type                  <L> app.cmd.generate.manual.type => 1
+        doc.dir                 <L> app.cmd.generate.doc.dir =>
+        shell.                  <B>
+          dir                   <L> app.cmd.generate.shell.dir =>
+          output                <L> app.cmd.generate.shell.output =>
+          auto                  <L> app.cmd.generate.shell.auto => true
+          zsh                   <L> app.cmd.generate.shell.zsh => false
+          bash                  <L> app.cmd.generate.shell.bash => false
+          fi                    <B>
+            sh                  <L> app.cmd.generate.shell.fish => false
+            g                   <L> app.cmd.generate.shell.fig => false
+          powershell            <L> app.cmd.generate.shell.powershell => false
+          elvish                <L> app.cmd.generate.shell.elvish => false
+      no-                       <B>
+        default                 <L> app.cmd.no-default => <nil>
+        env-overrides           <L> app.cmd.no-env-overrides => false
+        color                   <L> app.cmd.no-color => false
+      d                         <B>
+        ry-run                  <L> app.cmd.dry-run => false
+        ebug                    <L> app.cmd.debug => false
+          -output               <L> app.cmd.debug-output =>
+      strict-mode               <L> app.cmd.strict-mode => false
+      v                         <B>
+        er                      <B>
+          bose                  <L> app.cmd.verbose => false
+          sion                  <L> app.cmd.version => false
+            -sim                <L> app.cmd.version-sim =>
+        alue-type               <L> app.cmd.value-type => false
+      quiet                     <L> app.cmd.quiet => false
+      env                       <L> app.cmd.env => false
+      m                         <B>
+        ore                     <L> app.cmd.more => false
+        anual                   <L> app.cmd.manual => false
+      raw                       <L> app.cmd.raw => false
+      built-info                <L> app.cmd.built-info => false
+      help                      <L> app.cmd.help => false
+      tree                      <L> app.cmd.tree => false
+      config                    <L> app.cmd.config =>
+    tiny3.                      <B>
+      foo                       <L> app.tiny3.foo => bar    # [!code highlight]
+      working                   <L> app.tiny3.working => ~work/godev/cmdr.v2/cmdr.tests
+
+exit status 1
+```
+
+注意到高亮行显示了 `app.tiny3.foo` 的键值被正确加载了。
+
+### 自动搜索配置文件夹
+
+[hedzr/cmdr-loaders](https://github.com/hedzr/cmdr-loaders) 提供符合 GNU Folder Spec,
+UNIX Filesystem Conventions ([wiki](https://en.wikipedia.org/wiki/Unix_filesystem#Conventional_directory_layout))
+以及 Filesystem Hierarchy Standard ([wiki](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard))。
+
+因此，cmdr &amp; cmdr-loaders 将会自动搜索诸如
+
+1. `Primary`: `/etc/<app-name>`
+2. `Secondary`: `$HOME/.config/<app-name>`
+3. `Alternative(s)`: `.` and `<exeutable-dir>`
+
+这些文件夹来查找 `<app-name>.toml` 是否存在。
+
+如果找到了（例如本例中的 `tiny3-app.toml`），那就载入其中的数据集。
+然后，如果这是 `Primary` 和 `Secondary` 配置集，那就检查该文件夹中是否有 `conf.d` 子文件夹，
+如果有，自动装载这个子文件夹中的全部配置文件。
+
+`hedzr/cmdr-loaders` 识别多种文件名后缀并正确装载它们，包括：
+
+- .toml
+- .yaml, .yml
+- .json
+- .hjson
+- .hcl
+- .nestedtext, .txt, .conf
+
+你甚至可以同时混用它们。
+
+### 自动回写变更集合
+
+对于 `Alternative` 配置集，我们还支持自动回写的功能：当应用程序结束时，自动将内存中的配置数据集的变更条目写入到 Alternative 配置文件中。
+
+默认地，仅有当前工作目录中的 `<app-name>.{toml,yaml,...}` 才属于 `Alternative` 配置集，它才支持自动回写功能。
+
+> 注意：`<exeutable-dir>` 的 Alternative 配置文件不支持回写功能。

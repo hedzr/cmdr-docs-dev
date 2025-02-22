@@ -1,3 +1,23 @@
 {
-  "pages": ["index", "z...a", "[On Github](https://github.com/hedzr/cmdr)", "!headless"]
+  "pages": [
+    "index",
+
+    "cmdr.v2",
+    "cmdr.v1",
+    "cmdr-cxx",
+    "Cmdr.Core",
+    "cmdr-zig",
+    "cmdr-rs",
+
+    "store",
+    "evendeep",
+    "logg.slog",
+    "is",
+    "errors.v3",
+
+    "z...a",
+
+    "[On Github](https://github.com/hedzr/cmdr)",
+    "!headless"
+  ]
 }

@@ -1,0 +1,53 @@
+---
+title: Your First CLI App
+description: Getting Started
+---
+
+## tiny1 Example
+
+With `cmdr`, a tiny CLI app can be written like this,
+
+```go title="./examples/tiny1/main.go"
+package main
+
+import (
+	"context"
+	"os"
+
+	"github.com/hedzr/cmdr/v2"
+	"github.com/hedzr/cmdr/v2/cli"
+)
+
+func main() {
+	ctx := context.Background() // with cancel can be passed thru in your actions
+	app := prepareApp()
+	if err := app.Run(ctx); err != nil {
+		println("Application Error:", err)
+		os.Exit(app.SuggestRetCode())
+	}
+}
+
+func prepareApp(opts ...cli.Opt) (app cli.App) {
+	app = cmdr.New(opts...).
+		Info("tiny1-app", "0.3.1").
+		Author("The Example Authors") // .Description(``).Header(``).Footer(``)
+
+	app.Cmd("jump").
+		Description("jump command").
+		Examples(`jump example`). // {{.AppName}}, {{.AppVersion}}, {{.DadCommands}}, {{.Commands}}, ...
+		OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+			println("jump command:", cmd)
+			return
+		}).
+		Build()
+	return
+}
+```
+
+It's simple, neither `Store`, nor external loaders integrated with it.
+
+## Next Step
+
+<Cards>
+  <Card title="Want More Conciser?" href="./g02-concise-version" />
+</Cards>

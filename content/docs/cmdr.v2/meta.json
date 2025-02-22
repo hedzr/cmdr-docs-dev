@@ -1,5 +1,5 @@
 {
-  "title": "Cmdr(-go) v2.x",
+  "title": "cmdr(-go) v2.x",
   "description": "Commandline args parsing framework",
   "icon": "MonitorCog",
   "root": true,

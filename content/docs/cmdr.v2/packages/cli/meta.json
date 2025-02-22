@@ -1,0 +1,8 @@
+{
+  "title": "cli",
+  "description": "The docs framework for cmdr v2",
+  "icon": "Package",
+  "root": false,
+  "defaultOpen": false,
+  "pages": ["app", "config", "command", "flag", "runner", "..."]
+}

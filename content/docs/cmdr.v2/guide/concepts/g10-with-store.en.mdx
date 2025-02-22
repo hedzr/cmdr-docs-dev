@@ -1,0 +1,183 @@
+---
+title: With Store
+---
+
+## tiny2 Example
+
+By integrated with [hedzr/store](https://github.com/hedzr/store)[^1],
+your app can manage its configuration dataset seamlessly and fluently.
+
+> In [tiny1](./g01-first-cli-app) example app, A DummyStore will be created by cmdr internally, which receives any accessing requests to app configuration dataset, and discard them.
+
+```go title="./examples/tiny2/main.go"
+package main
+
+import (
+	"context"
+	"os"
+
+	"github.com/hedzr/cmdr-tests/examples/common"
+	"github.com/hedzr/cmdr/v2/cli"
+	"github.com/hedzr/cmdr/v2/examples/cmd" // import jumpCmd
+	logz "github.com/hedzr/logg/slog"
+)
+
+const (
+	appName = "tiny2-app"
+	desc    = ``
+)
+
+func main() {
+	// [!code highlight:3]
+	app := chain(common.PrepareApp(
+		appName, desc,
+	)(cmd.Commands...)) // import jumpCmd
+
+	ctx := context.Background() // with cancel can be passed thru in your actions
+	if err := app.Run(ctx); err != nil {
+		logz.ErrorContext(ctx, "Application Error:", "err", err) // stacktrace if in debug mode/build
+		os.Exit(app.SuggestRetCode())
+	} else if rc := app.SuggestRetCode(); rc != 0 {
+		os.Exit(rc)
+	}
+}
+
+func chain(app cli.App) cli.App {
+	return app
+}
+```
+
+As above, we adds the integration to `Store` (hedzr/store), which provides a powerful in-memory hierarchical configuration store.
+
+The multilevel subcommands `jump` > `to` was been also added.
+
+### `Build()` and `With(cb)
+
+As a Builder Pattern, `Build()` will end a building sequence in `app/b.Cmd("long","short",...)...Build()`.
+
+But you can end the building sequence by `With(cb)` call, the form is `app/b.Cmd("long","short",...)...With(cb)`.
+
+In `With(cb)` code block of `jump`, `to` subcommand was been created and attached to.
+
+Similar with it, inside `With(cb)` block of `to`, `full` option was been attached to.
+
+So a end-user can type `tiny2 jump to --full` in shell to enable it.
+
+In `OnAction(cb)` code block, `--full` enables dumping the internal `Store` data structure to console. Just like this following,
+
+```bash
+$ go run ./examples/tiny2 jump to --full                                                                                                                                                                                                                                                  20:44:31 ✓ TTY:s014
+
+  app.cmd.                      <B>
+    jump.to.full                <L> app.cmd.jump.to.full => true
+    generate.                   <B>
+      manual.                   <B>
+        dir                     <L> app.cmd.generate.manual.dir =>
+        type                    <L> app.cmd.generate.manual.type => 1
+      doc.dir                   <L> app.cmd.generate.doc.dir =>
+      shell.                    <B>
+        dir                     <L> app.cmd.generate.shell.dir =>
+        output                  <L> app.cmd.generate.shell.output =>
+        auto                    <L> app.cmd.generate.shell.auto => true
+        zsh                     <L> app.cmd.generate.shell.zsh => false
+        bash                    <L> app.cmd.generate.shell.bash => false
+        fi                      <B>
+          sh                    <L> app.cmd.generate.shell.fish => false
+          g                     <L> app.cmd.generate.shell.fig => false
+        powershell              <L> app.cmd.generate.shell.powershell => false
+        elvish                  <L> app.cmd.generate.shell.elvish => false
+    strict-mode                 <L> app.cmd.strict-mode => false
+    no-                         <B>
+      env-overrides             <L> app.cmd.no-env-overrides => false
+      color                     <L> app.cmd.no-color => false
+    v                           <B>
+      er                        <B>
+        bose                    <L> app.cmd.verbose => false
+        sion                    <L> app.cmd.version => false
+          -sim                  <L> app.cmd.version-sim =>
+      alue-type                 <L> app.cmd.value-type => false
+    quiet                       <L> app.cmd.quiet => false
+    debug                       <L> app.cmd.debug => false
+      -output                   <L> app.cmd.debug-output =>
+    env                         <L> app.cmd.env => false
+    m                           <B>
+      ore                       <L> app.cmd.more => false
+      anual                     <L> app.cmd.manual => false
+    raw                         <L> app.cmd.raw => false
+    built-info                  <L> app.cmd.built-info => false
+    help                        <L> app.cmd.help => false
+    tree                        <L> app.cmd.tree => false
+
+`jump to` has been invoked, and will return with code '1'.
+exit status 1
+
+$
+```
+
+### Operate to `Store`
+
+In this above tree structure,
+`app.cmd` subtree includes the mapping to the cmdline options
+and its final value of `tiny2` app.
+
+Also, you can read/write the configuration key and value by
+`app.Store()/app.Set()`.
+
+As a shortcut, you can use `cmd.Store()` and `cmd.Set()` in
+the `OnAction` handler func.
+
+`cmd.Store()` will return a reference to its associating subtree
+in the whole Store. So `cmd.Store().MustBool("full")` would
+access the final value of `full` option.
+
+`cmd.Set()` returns the whole Store, just like app.Set().
+Use it you can pass key path as `cmd.Set().MustBool("app.cmd.jump.to.full")`
+to get the value of `full` option.
+
+`app.Set()` is like above, a uncut complete store will be given to you.
+
+`app.Store()` returns the subtree to `app.cmd`, so you can
+inspect the values of cmdline options in a better way.
+For example, `app.Store().MustBool("jump.to.full")` is
+whether a end-user input `--full` at least once at command
+line or not.
+
+:::tip
+
+Accessing an integer value by `cmd.MustInt("option-long-name")`, or
+a time duration value by `cmd.MustDuration("option-long-name"),
+and so on.
+
+:::
+
+### Load external sources
+
+you may load configuration dataset from external sources, such
+as a .toml file, a .yaml file, or a remote config center like
+consul or etcd.
+
+We will discuss it at next section.
+
+### App ret-code
+
+The subcommand `to` shows you how to terminate the app and
+exit to OS with a ret code.
+To mark a ret code, invoking `app.SetSuggestRetCode(retCode)`.
+It will be retrieved at `main()` function later.
+`main()` will use the code to exit to OS, by invoking `os.Exit(app.SuggestRetCode())`.
+
+> Why so complex?
+>
+> A incorrect way is `exiting at anywhere`.
+>
+> For a service app or anyelse, you should end a program normally with graceful cleanup,
+> which means, the executing step will end at end of `main()`. Thus the running go routines,
+> opened resources, connections will be shut down gracefully.
+>
+> As a best practise, marking ret code with `app.SetSuggestRetCode(retCode)`,
+> and returning to `main()` by `return err` deeply,
+> so any cleanup codes has chances to be called,
+> now you can end the program with `os.Exit(app.SuggestRetCode())` finally,
+> which will notify the ret code to OS.
+
+[^1]: `hedzr/store` is a high-performance configure management library.

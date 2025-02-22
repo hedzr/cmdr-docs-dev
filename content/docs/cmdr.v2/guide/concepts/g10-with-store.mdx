@@ -1,0 +1,401 @@
+---
+title: 管理 app 配置
+description: 集成 `Store` 能够提供应用程序配置数据的管理能力
+---
+
+## tiny2 Example
+
+通过集成 [`hedzr/store`](https://github.com/hedzr/store)[^1]，可以无缝地添加应用程序配置数据的管理功能。
+
+> 在 [tiny1](./g01-first-cli-app) 示例程序中，实际上 cmdr 也隐含地使用了一个 DymmyStore，这个空包将会忽略对配置数据的访问请求。
+
+通过集成 [`hedzr/cmdr-loaders`](https://github.com/hedzr/cmdr-loaders) 提供的插件，可以添加符合 GNU 文件夹规范的外部配置文件自动加载。
+
+下面的示例完成了这些任务：
+
+<Tabs items={['main.go', 'cmdr-tests/examples/common/prepare_app.go', 'cmdr-loaders/prepare_app.go', 'cmd/all.go', 'cmd/jump.go', 'project layout']} default>
+
+<Tab value="main.go">
+
+```go title="./examples/tiny2/main.go"
+package main
+
+import (
+	"context"
+	"os"
+
+	"github.com/hedzr/cmdr-tests/examples/common"
+	"github.com/hedzr/cmdr/v2/cli"
+	"github.com/hedzr/cmdr/v2/examples/cmd" // import jumpCmd
+	logz "github.com/hedzr/logg/slog"
+)
+
+const (
+	appName = "tiny2-app"
+	desc    = ``
+)
+
+func main() {
+	// [!code highlight:3]
+	app := chain(common.PrepareApp(
+		appName, desc,
+	)(cmd.Commands...)) // import jumpCmd
+
+	ctx := context.Background() // with cancel can be passed thru in your actions
+	if err := app.Run(ctx); err != nil {
+		logz.ErrorContext(ctx, "Application Error:", "err", err) // stacktrace if in debug mode/build
+		os.Exit(app.SuggestRetCode())
+	} else if rc := app.SuggestRetCode(); rc != 0 {
+		os.Exit(rc)
+	}
+}
+
+func chain(app cli.App) cli.App {
+	return app
+}
+```
+
+</Tab>
+
+<Tab value="cmdr-tests/examples/common/prepare_app.go">
+
+```go
+package common
+
+import (
+	loaders "github.com/hedzr/cmdr-loaders"
+	"github.com/hedzr/cmdr/v2/cli"
+)
+
+func PrepareApp(appName, desc string, opts ...cli.Opt) func(adders ...cli.CmdAdder) (app cli.App) {
+	return loaders.PrepareApp(appName, desc, opts...)
+}
+```
+
+</Tab>
+
+<Tab value="cmdr-loaders/prepare_app.go">
+
+```go
+package loaders
+
+import (
+	"github.com/hedzr/cmdr-loaders/local"
+	"github.com/hedzr/cmdr/v2"
+	"github.com/hedzr/cmdr/v2/cli"
+)
+
+func PrepareApp(appName, desc string, opts ...cli.Opt) func(adders ...cli.CmdAdder) (app cli.App) {
+	return func(adders ...cli.CmdAdder) (app cli.App) {
+		cs := cmdr.Create(appName, version, author, desc, append([]cli.Opt{
+			// import "github.com/hedzr/cmdr-loaders/local" to get in advanced external loading features
+			cmdr.WithExternalLoaders(
+				local.NewConfigFileLoader(
+					local.WithAlternateWriteBack(false), // disable write-back the modified state into alternative config file
+					local.WithAlternateDotPrefix(false), // use '<app-name>.toml' instead of '.<app-name>.toml'
+				),
+				local.NewEnvVarLoader(),
+			),
+		}, opts...)...)
+
+		cs.With(func(app cli.App) {
+			// another way to disable `cmdr.WithForceDefaultAction(true)` is using
+			// env-var FORCE_RUN=1 (builtin already).
+			app.Flg("no-default").
+				Description("disable force default action").
+				// Group(cli.UnsortedGroup).
+				OnMatched(func(f *cli.Flag, position int, hitState *cli.MatchState) (err error) {
+					if b, ok := hitState.Value.(bool); ok {
+						// disable/enable the final state about 'force default action'
+						f.Set().Set("app.force-default-action", b)
+					}
+					return
+				}).
+				Build()
+
+			app.Flg("dry-run", "n").
+				Default(false).
+				Description("run all but without committing").
+				Build()
+
+			app.Flg("wet-run", "w").
+				Default(false).
+				Description("run all but with committing").
+				Build() // no matter even if you're adding the duplicated one.
+
+			for _, adder := range adders {
+				adder.Add(app)
+			}
+		})
+
+		cs.WithAdders(adders...)
+
+		app = cs.Build()
+
+		return
+	}
+}
+```
+
+</Tab>
+
+<Tab value="cmd/all.go">
+
+```go title="./examples/cmd/all.go"
+package cmd
+
+import (
+	"github.com/hedzr/cmdr/v2/cli"
+)
+
+var Commands = []cli.CmdAdder{
+	jumpCmd{},
+	// wrongCmd{},
+}
+```
+
+</Tab>
+
+<Tab value="cmd/jump.go">
+
+```go title="./examples/cmd/all.go"
+package cmd
+
+import (
+	"context"
+
+	"github.com/hedzr/cmdr/v2"
+	"github.com/hedzr/cmdr/v2/cli"
+	"github.com/hedzr/cmdr/v2/examples/dyncmd"
+	"github.com/hedzr/cmdr/v2/pkg/dir"
+	logz "github.com/hedzr/logg/slog"
+)
+
+type jumpCmd struct{}
+
+func (jumpCmd) Add(app cli.App) {
+	app.Cmd("jump").
+		Description("jump command").
+		Examples(`jump example`). // {{.AppName}}, {{.AppVersion}}, {{.DadCommands}}, {{.Commands}}, ...
+		Deprecated(`v1.1.0`).
+		Group("Test").
+		// Group(cli.UnsortedGroup).
+		// Hidden(false).
+		// OnEvaluateSubCommands(dyncmd.OnEvalJumpSubCommands).
+		// Both With(cb) and Build() to end a building sequence
+		With(func(b cli.CommandBuilder) {
+			b.Cmd("to").
+				Description("to command").
+				Examples(``).
+				Deprecated(`v0.1.1`).
+				OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+					// cmd.Set() == cmdr.Store(), cmd.Store() == cmdr.Store()
+					cmd.Set().Set("app.tiny3.working", dir.GetCurrentDir())
+					println()
+					println(cmd.Set().WithPrefix("app.tiny3").MustString("working"))
+
+					cs := cmdr.Store().WithPrefix("jump.to")
+					if cs.MustBool("full") {
+						println()
+						println(cmd.Set().Dump())
+					}
+					cs2 := cmd.Store()
+					if cs2.MustBool("full") != cs.MustBool("full") {
+						logz.Panic("a bug found")
+					}
+					app.SetSuggestRetCode(1) // ret code must be in 0-255
+					return                   // handling command action here
+				}).
+				With(func(b cli.CommandBuilder) {
+					b.Flg("full", "f").
+						Default(false).
+						Description("full command").
+						Build()
+				})
+		})
+}
+```
+
+</Tab>
+
+<Tab value="project layout">
+
+<Files>
+  <Folder name="cmdr-loaders/" defaultOpen>
+    <File name="prepare_app.go" />
+  </Folder>
+  <File name="..." />
+  <Folder name="cmdr-tests/examples/common" defaultOpen>
+    <File name="prepare_app.go" />
+  </Folder>
+  <File name="..." />
+  <Folder name="cmd" defaultOpen>
+    <File name="all.go" />
+    <File name="jump.go" />
+  </Folder>
+  <File name="main.go" />
+</Files>
+
+</Tab>
+
+</Tabs>
+
+在 tiny2 示例程序中，我们加上了到 Store 的集成，并且创建了 `jump to` 这样的两级子命令。
+
+:::tip
+
+[`hedzr/cmdr-loaders`](https://github.com/hedzr/cmdr-loaders) 提供了一个对 `cmdr.Create()` 更进一步的包装接口 `loaders.PrepareApp()`。
+
+[`hedzr/cmdr-tests`](https://github.com/hedzr/cmdr-tests) 再一次对其包装提供一个 `common.PrepareApp()`，这是为了简化其中的 examples 示例程序们的编写。
+
+它们的用途在于三点：
+
+1. 自动集成 store.Store，
+2. 集成 loaders 以便加载环境变量和外部配置文件，
+3. 扁平化 app name，author 等基础信息。
+
+:::
+
+### 手动集成 `Store` 以及 `loaders`
+
+如果你想自行集成，下面的片段是一个做法：
+
+```go
+import "github.com/hedzr/cmdr-loaders/local"
+
+	app = cmdr.New(
+ 		// [!code highlight:2]
+ 		// use an option store explicitly, or a dummy store by default
+ 		cmdr.WithStore(store.New()),
+
+		// [!code highlight:8]
+		// import "github.com/hedzr/cmdr-loaders/local" to get in advanced external loading features
+		cmdr.WithExternalLoaders(
+			local.NewConfigFileLoader(
+				local.WithAlternateWriteBack(false), // disable write-back the modified state into alternative config file
+				local.WithAlternateDotPrefix(false), // use '<app-name>.toml' instead of '.<app-name>.toml'
+			),
+			local.NewEnvVarLoader(),
+		),
+	).
+		Info("tiny-app", "0.3.1").
+		Author("The Example Authors") // .Description(``).Header(``).Footer(``)
+```
+
+### 用 `OnAction` 为命令关联处理逻辑
+
+通常来说，多级子命令的结构中，只有末级命令应该带有 `OnAction` —— 尽
+管我们允许你在中间层级也同样提供它。
+
+如果你真的这么做了，它也并不会产生什么逻辑错误或者运行错误，只是对
+于终端用户来说稍微不那么友好，因为他可能并不会意识到 `jump` 也可
+以被 _执行_。
+
+### `Build()` 和 `With(cb)`
+
+`app/b.Cmd("long","short",...)...Build()` 是一种 Builder
+Pattern，末尾的 `Build()` 调用用于提交前面的一系列构建动作，
+就像 tiny1 示例程序所做的那样。
+但同时，我们也提供 `app/b.Flag("long","short",...)...With(cb)`
+风格，`With(cb)` 同样起到提交作用，所以这时候就不必在结尾加上
+`.Build()` 调用了。
+
+在 tiny2 中，借助于 With 回调代码块，我们为 `to` 子命令附着了 `full` 选项。
+所以终端用户可以在命令行加上 `--full` 或者 `-f` 来使能这个选项。
+
+类似地，在 `jump` 的 With 代码块中，可以添加它的下级子命令，当然
+也包括为其添加关联的选项。
+
+### 对 `Store` 的操作
+
+在相应的 `OnAction` 处理程序中，full 选项将导致在控制台打印 Store 的内部结构。
+
+```bash
+$ go run ./examples/tiny2 jump to --full                                                                                                                                                                                                                                                  20:44:31 ✓ TTY:s014
+
+  app.cmd.                      <B>
+    jump.to.full                <L> app.cmd.jump.to.full => true
+    generate.                   <B>
+      manual.                   <B>
+        dir                     <L> app.cmd.generate.manual.dir =>
+        type                    <L> app.cmd.generate.manual.type => 1
+      doc.dir                   <L> app.cmd.generate.doc.dir =>
+      shell.                    <B>
+        dir                     <L> app.cmd.generate.shell.dir =>
+        output                  <L> app.cmd.generate.shell.output =>
+        auto                    <L> app.cmd.generate.shell.auto => true
+        zsh                     <L> app.cmd.generate.shell.zsh => false
+        bash                    <L> app.cmd.generate.shell.bash => false
+        fi                      <B>
+          sh                    <L> app.cmd.generate.shell.fish => false
+          g                     <L> app.cmd.generate.shell.fig => false
+        powershell              <L> app.cmd.generate.shell.powershell => false
+        elvish                  <L> app.cmd.generate.shell.elvish => false
+    strict-mode                 <L> app.cmd.strict-mode => false
+    no-                         <B>
+      env-overrides             <L> app.cmd.no-env-overrides => false
+      color                     <L> app.cmd.no-color => false
+    v                           <B>
+      er                        <B>
+        bose                    <L> app.cmd.verbose => false
+        sion                    <L> app.cmd.version => false
+          -sim                  <L> app.cmd.version-sim =>
+      alue-type                 <L> app.cmd.value-type => false
+    quiet                       <L> app.cmd.quiet => false
+    debug                       <L> app.cmd.debug => false
+      -output                   <L> app.cmd.debug-output =>
+    env                         <L> app.cmd.env => false
+    m                           <B>
+      ore                       <L> app.cmd.more => false
+      anual                     <L> app.cmd.manual => false
+    raw                         <L> app.cmd.raw => false
+    built-info                  <L> app.cmd.built-info => false
+    help                        <L> app.cmd.help => false
+    tree                        <L> app.cmd.tree => false
+
+`jump to` is been invoked, and will return with code '1'.
+exit status 1
+
+$
+```
+
+在上面打印的 app 配置数据集树结构中，`app.cmd` 包含了 tiny2 的命令行选项集合的映射，以及这些选项的最终值。
+
+除此而外，你也可以通过 `app.Store()/app.Set()` 读写你的数据。
+
+检测一个选项参数在命令行中被指定过，可以使用 cmd.Store().MustXXX() 函数族。
+
+`cmd.Store()` 返回一个完整 Store 的子集，也就是键值 `app.cmd.jump.to` 所下辖的子树。所以 `cmd.Store().MustBool("full")` 就可以直接取得 `--full` 的状态。
+
+`cmd.Set()` 相当于调用 `app.Set()`，它获取整个 Store 对象。此时，你需要用 `cmd.Set().MustBool("app.cmd.jump.to.full")` 来取得 `--full` 的状态。
+
+`app.Store()` 获得的是 "app.cmd" 子树，所以你也可以用 `app.Store().MustBool("jump.to.full") 来问询。
+
+:::tip
+
+MustXXX 函数族包含对很多数据类型的抽取。
+
+例如，`cmd.MustInt("option-long-name")` 得到一个整数值，
+而 `cmd.MustDuration("option-long-name")` 得到一个时间段值，
+等等。
+
+:::
+
+你也可以从外部配置文件中载入配置数据集，这将在下一节中示例。
+
+### OS 返回值
+
+`to` 命令也展示了如何设置应用程序返回值。通过 `app.SetSuggestRetCode(retCode)` 可以
+设置一个错误码，并在 main() 中利用 `os.Exit(app.SuggestRetCode())` 将其返回给操作系统。
+
+> Why so complex?
+>
+> 对于服务型应用程序来说，在退出程序之前往往需要进行占用资源清理（包括打开的文件、网络连接，
+> 以及运行中的 go routines 等等）。
+>
+> 所以在程序的中途执行 `panic()` 或者 `os.Exit(##)` 是不恰当的，这会导致资源的异常占用或者泄漏。
+>
+> 如此被推荐的最佳实践是，在需要的运行中途通过 `app.SetSuggestRetCode(retCode)` 标记一个退出码，
+> 然后逐级通过 `return err` 返回到 main() 函数，此时必要的清理代码都将正常执行，最后再调用 `os.Exit(app.SuggestRetCode())` 向操作系统返回错误码。
+
+[^1]: `hedzr/store` 提供应用程序配置数据集的操作能力，以层次化的键值对方式管理数据。
