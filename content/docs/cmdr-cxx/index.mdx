@@ -36,8 +36,6 @@ The roadmap of `cmdr-cxx` docs is staying on paper.
 #include <stdexcept>
 #include <string>
 
-#include "second_src.hh"
-
 int main(int argc, char *argv[]) {
   auto &cli = cmdr::cli("app2", CMDR_VERSION_STRING, "Sample Authors",
                         "Copyright © 2021 by Sample Authors, All Rights Reserved.",
@@ -46,6 +44,7 @@ int main(int argc, char *argv[]) {
 
   try {
     // using namespace cmdr::opt;
+    void add_test_menu(cmdr::app &cli);
     add_test_menu(cli);
   } catch (std::exception &e) {
     std::cerr << "Exception caught for testing (NOT BUG) : " << e.what() << '\n';
