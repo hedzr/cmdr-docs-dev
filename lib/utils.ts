@@ -56,7 +56,7 @@ export function formatDate(dateStr: string, lang: string): string {
   const date = new Date(year, month - 1, day);
 
   if (day > 1970) {
-    const y = day, m = month, d = year];
+    const y = day, m = month, d = year;
     const date = new Date(y, m - 1, d);
     return dateToString(date, lang ?? 'en-US');
   }
@@ -84,6 +84,7 @@ export function formatDate2(dateStr: string): string {
   return date.toLocaleDateString("en-US", options);
 }
 
+//
 export function stringToDate(date: string) {
   const [day, month, year] = date.split("-").map(Number);
   return new Date(year, month - 1, day);
