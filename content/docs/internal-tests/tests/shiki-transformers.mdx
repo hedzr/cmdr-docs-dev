@@ -1,0 +1,90 @@
+---
+title: More markdown effects with shiki transformers
+---
+
+## Sample
+
+See also:  [@shikijs/transformers | Shiki](https://shiki.style/packages/transformers)
+
+### Highlight
+
+````markdown
+```ts
+console.log('Not highlighted')
+console.log('Highlighted') // [!code highlight]
+console.log('Not highlighted')
+```
+````
+
+```ts
+console.log('Not highlighted')
+console.log('Highlighted') // [!code highlight]
+console.log('Not highlighted')
+```
+
+### Word Highlight
+
+````markdown
+```ts
+// [!code word:Hello]
+const message = 'Hello World'
+console.log(message) // prints Hello World
+```
+````
+
+```ts
+// [!code word:Hello]
+const message = 'Hello World'
+console.log(message) // prints Hello World
+```
+
+### Focus
+
+````markdown
+```ts
+console.log('Not focused');
+console.log('Focused') // [!code focus]
+console.log('Not focused');
+```
+````
+
+```ts
+console.log('Not focused');
+console.log('Focused') // [!code focus]
+console.log('Not focused');
+```
+
+### Error Level
+
+````markdown
+```ts
+console.log('No errors or warnings')
+console.error('Error') // [!code error]
+console.warn('Warning') // [!code warning]
+```
+````
+
+```ts
+console.log('No errors or warnings')
+console.error('Error') // [!code error]
+console.warn('Warning') // [!code warning]
+```
+
+### Whitespace (TODO)
+
+
+### Diff
+
+````markdown
+```ts
+console.log('hewwo') // [!code --]
+console.log('hello') // [!code ++]
+console.log('goodbye')
+```
+```
+
+```ts
+console.log('hewwo') // [!code --]
+console.log('hello') // [!code ++]
+console.log('goodbye')
+```
