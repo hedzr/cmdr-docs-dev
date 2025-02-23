@@ -14,9 +14,9 @@
   },
   "packageManager": "pnpm@9.1.1",
   "scripts": {
-    "build": "next build --experimental-debug-memory-usage",
-    "dev": "next dev --turbopack # https://nextjscn.org/docs/architecture/turbopack",
-    "build-old": "next build",
+    "build-mem-dbg": "next build --experimental-debug-memory-usage",
+    "dev": "next dev # --turbopack # https://nextjscn.org/docs/architecture/turbopack",
+    "build": "next build",
     "start": "next start",
     "start-3001": "next start --port 3001",
     "postinstall": "fumadocs-mdx",
