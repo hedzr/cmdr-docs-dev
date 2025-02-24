@@ -64,6 +64,14 @@ const config = {
     "oxc-transform",
     "@shikijs/twoslash",
   ],
+  images: {
+    unoptimized: true ,
+    domains: [
+        'images.unsplash.com',
+        'avatars.githubusercontent.com',
+        'cdn.jsdelivr.net',
+    ],
+  },
   // images: {
   //   unoptimized: true,
   //   remotePatterns: [
