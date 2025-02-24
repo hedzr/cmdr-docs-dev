@@ -123,7 +123,7 @@ export default async function BlogPage(props: {
           </div>
         </div>
       </div>
-      <div className="blog-content !w-full mb-16">
+      <div className="blog-content !w-full">
         <Typography>{res.content}</Typography>
         <div id="blog-tail-row">
           <div id="blog-categories" className="inline mr-4">
@@ -146,7 +146,7 @@ function AuthorCards({ authors }: { authors: AuthorT[] }) {
   return (
     <div className="flex items-center gap-8 flex-wrap">
       {authors.map((author) => {
-        return <AuthorCardCore author={author} key={author.username} />;
+        return <AuthorCardCore author={author} key={author.username||author.name||'(noname)'} />;
       })}
     </div>
   );
@@ -168,6 +168,7 @@ export function AuthorCardCore({
   author: AuthorT;
   key?: string;
 }) {
+  let name = author.username||author.name||'(noname)';
   return (
     <Link
       href={author.handleUrl ?? ""}
@@ -175,13 +176,13 @@ export function AuthorCardCore({
       key={key}
     >
       <Avatar className="w-10 h-10">
-        <AvatarImage src={author.avatar} />
+        <AvatarImage src={author.avatar||author.picture} />
         <AvatarFallback>
-          {author.username.slice(0, 2).toUpperCase()}
+          {name.slice(0, 2).toUpperCase()}
         </AvatarFallback>
       </Avatar>
       <div className="">
-        <p className="text-sm font-medium">{author.username}</p>
+        <p className="text-sm font-medium">{name}</p>
         {author.handle ? (
           <p className="font-code text-[13px] text-muted-foreground">
             @{author.handle}
