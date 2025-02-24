@@ -21,12 +21,12 @@ const config = {
 
   serverRuntimeConfig: {
     // PROJECT_ROOT: process.env.pwd(),
-    mySecret: 'secret',
+    mySecret: "secret",
     secondSecret: process.env.SECOND_SECRET,
   },
   publicRuntimeConfig: {
     // Will be available on both server and client
-    staticFolder: '/public',
+    staticFolder: "/public",
   },
 
   // logging: false,
@@ -81,11 +81,14 @@ const config = {
     "@shikijs/twoslash",
   ],
   images: {
-    unoptimized: true ,
+    unoptimized: true,
     domains: [
-        'images.unsplash.com',
-        'avatars.githubusercontent.com',
-        'cdn.jsdelivr.net',
+      "images.unsplash.com",
+      "avatars.githubusercontent.com",
+      "raw.githubusercontent.com",
+      "github.com",
+      "cdn.jsdelivr.net",
+      "upload.wikimedia.org",
     ],
   },
   // images: {
@@ -130,6 +133,15 @@ const config = {
       config.cache = Object.freeze({
         type: "memory",
       });
+    }
+
+    // HookWebpackError: /.../react.work/next/my-fuma/static/css/fb5ee875f83d1deb.css:2:58850: Unclosed block
+    if (!dev) {
+      if (!config.optimization) {
+        config.optimization = {};
+      }
+      config.optimization.minimize = false;
+      config.optimization.minimizer = [];
     }
     // if (isServer) {
     //   config.externals = {
