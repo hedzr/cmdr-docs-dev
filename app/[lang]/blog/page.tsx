@@ -9,6 +9,7 @@ import spot from "@/public/default.png";
 import Image, { type ImageProps } from "next/image";
 import { Suspense } from "react";
 import { Pagination, Search } from "@/components/blog/pager";
+import { TemplateString } from "next/dist/lib/metadata/types/metadata-types";
 // import serverPublicPath from "@/lib/utils";
 // import { lusitana } from '@/app/ui/fonts';
 // import Footer from "@/components/layout/footer";
@@ -53,14 +54,19 @@ export default async function BlogIndexPage({
   console.log(
     `blog index ------ params: ${sp}, lang: ${lang}, total: ${blogs.items.length}`
   );
+  let title: string = "The Latest Posts";
+  if (metadata.title) {
+    if (typeof metadata.title === "string") title = metadata.title.toString();
+    else if (typeof metadata.title === "object") {
+      if ("default" in metadata.title)
+        title = metadata.title["default"].toString();
+    }
+  }
+
   return (
     <div className="w-full flex  flex-col gap-5 sm:min-h-[91vh] min-h-[88vh] md:pt-5 pt-2">
       <div className="md:mb-10 mb-5 flex flex-col gap-2 ">
-        <h1 className="text-3xl font-extrabold">
-          {metadata.title?.default
-            ? metadata.title.default.toString()
-            : "The Latest Posts"}
-        </h1>
+        <h1 className="text-3xl font-extrabold">{title}</h1>
         <p className="text-muted-foreground">
           {metadata.description ?? "There is somthing due to my life"}
         </p>
