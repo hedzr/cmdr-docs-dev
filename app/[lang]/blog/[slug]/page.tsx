@@ -128,12 +128,12 @@ export default async function BlogPage(props: {
         <div id="blog-tail-row">
           <div id="blog-categories" className="inline mr-4">
             {categories.map((it) => {
-              return <span className="px-1">{it}</span>;
+              return <span className="px-1" key={it}>{it}</span>;
             })}
           </div>
           <div id="blog-tags" className="inline mr-4">
             {tags.map((it) => {
-              return <span className="px-1">{it}</span>;
+              return <span className="px-1" key={it}>{it}</span>;
             })}
           </div>
         </div>
@@ -155,14 +155,14 @@ function AuthorCards({ authors }: { authors: AuthorT[] }) {
 function AuthorCard({ author }: { author: AuthorT }) {
   return (
     <div className="flex items-center gap-8 flex-wrap">
-      <AuthorCardCore author={author} />
+      <AuthorCardCore author={author} key={author.username||author.name||'(noname)'} />
     </div>
   );
 }
 
 export function AuthorCardCore({
   author,
-  key = "",
+  key = "(noname)",
   ...props
 }: HTMLAttributes<HTMLDivElement> & {
   author: AuthorT;
