@@ -114,32 +114,25 @@ article h6.nocount:before {
   align-items: center;
   padding: 0;
   margin-top: 0.5em;
+}
 
-  li {
-    a {
-      display: flex;
-      align-items: center;
-      height: 100%;
-      padding: 0 10px;
-      cursor: pointer;
+.pagination li a {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 10px;
+  cursor: pointer;
+}
+.pagination li a:hover {
+  text-decoration: underline;
+}
 
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-
-    &.active {
-      a {
-        font-weight: bold;
-        text-decoration: solid;
-        pointer-events: none;
-        @apply bg-sky-500 text-zinc-500;
-      }
-    }
-    &.disabled {
-      a {
-        @apply text-gray-500;
-      }
-    }
-  }
+.pagination li.active a {
+  font-weight: bold;
+  text-decoration: solid;
+  pointer-events: none;
+  @apply bg-sky-500 text-zinc-500;
+}
+.pagination li .disabled a {
+  @apply text-gray-500;
 }
