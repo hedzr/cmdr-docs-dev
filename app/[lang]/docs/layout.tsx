@@ -6,13 +6,17 @@ import { baseUrl, createMetadata, site } from "@/lib/metadata";
 import "katex/dist/katex.min.css";
 
 export const metadata = createMetadata({
+  metadataBase: baseUrl,
   title: {
-    template: "%s | " + site.title,
+    template: `%s | ${site.title}`,
     default: site.title,
   },
   description: site.desc,
+  robots: {
+    follow: true,
+    index: true,
+  },
   // "a command-line arguments parser and app framework with hierarchical settings supporting",
-  metadataBase: baseUrl,
 
   // metadataBase: new URL('https://acme.com'),
   alternates: {
