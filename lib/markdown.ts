@@ -14,6 +14,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Note from "@/components/ui/note";
 import { Stepper, StepperItem } from "@/components/ui/stepper";
 import { availableVersions } from "./routes-config";
+import { CodeBlock } from "@/components/ui/ui/code-block";
+import { stringToDate } from "./utils";
 // import { CodeWithTabs } from "@/components/markdown/code-with-tabs";
 
 // const latestString = availableVersions[0];
@@ -30,6 +32,7 @@ const components = {
   Stepper,
   StepperItem,
   // CodeWithTabs,
+  CodeBlock,
 };
 
 // can be used for other pages like blogs, Guides etc
@@ -131,47 +134,123 @@ const postProcess = () => (tree: any) => {
 };
 
 export type Author = {
+  username: string;
   avatar?: string;
   handle?: string;
-  username: string;
   handleUrl?: string;
+};
+
+/**
+ * Sample:
+ * @code{yaml}
+ * header:
+ *   teaser: https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20211028185204870.png
+ *   overlay_image: /assets/images/3953273590_704e3899d5_m.jpg
+ *   overlay_filter: rgba(16, 16, 32, 0.73)
+ * @endcode
+ */
+export type FeaturedImage = {
+  teaser: string;
+  overlay_image: string;
+  overlay_filter: string;
 };
 
 export type BlogMdxFrontmatter = BaseMdxFrontmatter & {
   date: string;
   authors?: Author[];
   author?: Author;
-  draft?: boolean;
-  tags: string[];
-  categories: string[];
+  draft?: boolean; // just showing at local dev server
+  preview?: boolean; // preview mode, like draft but it's public and showing always
+
+  toc?: boolean;
+  comment?: boolean;
+  feedback?: boolean;
+  layout?: string; // single, full, ...
+  tags?: string | string[];
+  categories?: string | string[];
+  excerpt?: string;
+  header?: FeaturedImage;
+  cover?: string; // caver image if necessary
+
+  // featuredImage: {
+  //     node: {
+  //       sourceUrl: string;
+  //     };
+  // };
+  // categories: {
+  //     edges: {
+  //         node: {
+  //             name: string;
+  //         };
+  //     }[];
+  // };
 };
 
 export async function getAllBlogStaticPaths() {
   try {
     const blogFolder = path.join(process.cwd(), "/content/blog/");
     const res = await fs.readdir(blogFolder);
-    return res.map((file) => file.split(".")[0]);
+    return res.filter((val, idx, allfiles) => {
+      return val[0] !== '.' && val.endsWith('.mdx');
+    }).map((file) => file.split(".")[0]);
   } catch (err) {
     console.log(err);
   }
 }
 
-export async function getAllBlogs() {
+export async function getAllBlogs(page: number = 1, perpage: number = 7) {
   const blogFolder = path.join(process.cwd(), "/content/blog/");
   const files = await fs.readdir(blogFolder);
-  return await Promise.all(
-    files.map(async (file) => {
-      const filepath = path.join(process.cwd(), `/content/blog/${file}`);
-      const rawMdx = await fs.readFile(filepath, "utf-8");
-      return {
-        ...(await parseMdx<BlogMdxFrontmatter>(rawMdx)),
-        slug: file.split(".")[0],
-      };
+
+  console.log(`getAllBlogs: page=${page}, perpage=${perpage}`);
+
+  const items = await Promise.all(
+    files.filter((val, idx, allfiles) => {
+      return val[0] !== '.' && val.endsWith('.mdx');
+    }).map(async (file) => {
+      try {
+        const filepath = path.join(process.cwd(), `/content/blog/${file}`);
+        const rawMdx = await fs.readFile(filepath, "utf-8");
+        return {
+          ...(await parseMdx<BlogMdxFrontmatter>(rawMdx)),
+          slug: file.split(".")[0],
+          file: filepath,
+        };
+      } catch (err) {
+        console.log(err);
+      }
     })
-  );
+  )
+
+  const start = (page - 1) * perpage, stop = page * perpage;
+  const pagemax = Math.floor((items.length + perpage - 1) / perpage);
+  console.log(`getAllBlogs: total=${items.length}, pages=${pagemax}, page=${page}, start=${start}, stop=${stop}`);
+  return {
+    page: page,
+    perpage: perpage,
+    total: items.length,
+    maxpage: pagemax,
+    items: items.sort((a, b) =>
+      stringToDate(b?.frontmatter.date ?? "").getTime() -
+      stringToDate(a?.frontmatter.date ?? "").getTime()
+    ).filter((val, idx, allfiles) => {
+      // console.log('filtering', val[0], val, idx);
+      return start <= idx && idx < stop;
+    })
+  };
 }
 
 export async function getBlogForSlug(slug: string) {
-  const blogs = await getAllBlogs();
-  return blogs.find((it) => it.slug == slug);
+  const blogFolder = path.join(process.cwd(), "/content/blog/");
+  const filepath = path.join(blogFolder, slug + '.mdx');
+
+  // console.log(`getBlogForSlug: slug=${slug}, filepath=${filepath}`);
+  const rawMdx = await fs.readFile(filepath, "utf-8");
+  return {
+    ...(await parseMdx<BlogMdxFrontmatter>(rawMdx)),
+    slug: slug,
+    file: filepath,
+  };
+  // const blogs = await getAllBlogs();
+  // return blogs.items.find((it) => it ? it.slug == slug : false);
 }

@@ -2,6 +2,9 @@
 // import { twMerge } from "tailwind-merge";
 // import { EachRoute, getRoutesForVersion, Version } from "./routes-config";
 
+import path from 'path'
+import getConfig from 'next/config'
+
 export function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
@@ -105,3 +108,11 @@ export function stringToDate(date: string) {
   }
   return new Date(year, month - 1, day);
 }
+
+const serverPublicPath = (staticFilePath: string): string => {
+  // const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
+
+  return path.join(getConfig().publicRuntimeConfig.staticFolder, staticFilePath)
+}
+
+export default serverPublicPath
