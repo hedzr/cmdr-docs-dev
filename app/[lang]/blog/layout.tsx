@@ -17,11 +17,8 @@ export default function BlogLayout({
   children,
 }: {
   params: Promise<{ lang: string }>;
-  children: PropsWithChildren;
+  children: ReactNode; // PropsWithChildren;
 }) {
-  // var c: ReactNode;
-  // if (!children.children) c = <div>empty</div>;
-  // else c = children.children;
   return (
     <div
       className={`flex flex-col items-start justify-center pt-8 pb-10 md:w-[70%] mx-auto ${geistSans.variable} ${geistMono.variable} antialiased`}
