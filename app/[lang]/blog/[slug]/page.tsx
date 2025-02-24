@@ -63,7 +63,7 @@ export default async function BlogPage(props: {
   );
 
   return (
-    <div className="lg:w-[93%] md:[99%] mx-auto">
+    <article className="lg:w-[93%] md:[99%] mx-auto mb-32">
       <div className="flex flex-col-1 gap-x-3">
         <Link
           className={buttonVariants1({
@@ -138,7 +138,7 @@ export default async function BlogPage(props: {
           </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 }
 
