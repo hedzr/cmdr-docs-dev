@@ -19,6 +19,17 @@ const withMDX = createMDX();
 const config = {
   reactStrictMode: true,
 
+  serverRuntimeConfig: {
+    // PROJECT_ROOT: process.env.pwd(),
+    mySecret: 'secret',
+    secondSecret: process.env.SECOND_SECRET,
+  },
+  publicRuntimeConfig: {
+    // Will be available on both server and client
+    staticFolder: '/public',
+  },
+
+  // logging: false,
   logging: {
     fetches: {
       fullUrl: true,
