@@ -201,10 +201,11 @@ export async function getAllBlogStaticPaths() {
 export async function getAllBlogs(page: number = 1, perpage: number = 7) {
   const blogFolder = path.join(process.cwd(), "/content/blog/");
   const files = await fs.readdir(blogFolder);
+  const prod = process.env.NODE_ENV === 'production';
 
   console.log(`getAllBlogs: page=${page}, perpage=${perpage}`);
 
-  const items = await Promise.all(
+  let items = await Promise.all(
     files.filter((val, idx, allfiles) => {
       return val[0] !== '.' && val.endsWith('.mdx');
     }).map(async (file) => {
@@ -220,23 +221,28 @@ export async function getAllBlogs(page: number = 1, perpage: number = 7) {
         console.log(err);
       }
     })
-  )
+  );
 
   const start = (page - 1) * perpage, stop = page * perpage;
   const pagemax = Math.floor((items.length + perpage - 1) / perpage);
   console.log(`getAllBlogs: total=${items.length}, pages=${pagemax}, page=${page}, start=${start}, stop=${stop}`);
+
+  items = items.filter((v, i, a) => {
+    return v && (!v.frontmatter.draft || !prod);
+  }).sort((a, b) =>
+    stringToDate(b?.frontmatter.date ?? "").getTime() -
+    stringToDate(a?.frontmatter.date ?? "").getTime()
+  ).filter((val, idx, allfiles) => {
+    // console.log('filtering', val[0], val, idx);
+    return start <= idx && idx < stop;
+  });
+
   return {
     page: page,
     perpage: perpage,
     total: items.length,
     maxpage: pagemax,
-    items: items.sort((a, b) =>
-      stringToDate(b?.frontmatter.date ?? "").getTime() -
-      stringToDate(a?.frontmatter.date ?? "").getTime()
-    ).filter((val, idx, allfiles) => {
-      // console.log('filtering', val[0], val, idx);
-      return start <= idx && idx < stop;
-    })
+    items: items
   };
 }
 
