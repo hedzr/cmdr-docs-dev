@@ -134,8 +134,10 @@ const postProcess = () => (tree: any) => {
 };
 
 export type Author = {
-  username: string;
+  username?: string;
+  name?: string;
   avatar?: string;
+  picture?: string;
   handle?: string;
   handleUrl?: string;
 };
@@ -170,7 +172,12 @@ export type BlogMdxFrontmatter = BaseMdxFrontmatter & {
   categories?: string | string[];
   excerpt?: string;
   header?: FeaturedImage;
+
   cover?: string; // caver image if necessary
+  coverImage?: string;
+  ogImage?: {
+    url: string;
+  };
 
   // featuredImage: {
   //     node: {
@@ -203,7 +210,7 @@ export async function getAllBlogs(page: number = 1, perpage: number = 7) {
   const files = await fs.readdir(blogFolder);
   const prod = process.env.NODE_ENV === 'production';
 
-  console.log(`getAllBlogs: page=${page}, perpage=${perpage}`);
+  // console.log(`getAllBlogs: page=${page}, perpage=${perpage}.`);
 
   let items = await Promise.all(
     files.filter((val, idx, allfiles) => {
