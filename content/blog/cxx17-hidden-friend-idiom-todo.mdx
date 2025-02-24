@@ -1,0 +1,151 @@
+---
+layout: single
+title: "C++11/17 怎么写操作符重载 - 二元操作符"
+date: 2023-8-13 05:00:00 +0800
+last_modified_at: 2023-8-17 09:15:00 +0800
+Author: hedzr
+draft: true
+tags: [c++, idiom]
+categories: c++ algorithm
+comments: true
+toc: true
+header:
+  teaser: https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/image-20230811092120144.png
+  overlay_image: /assets/images/3953273590_704e3899d5_m.jpg
+  overlay_filter: rgba(16, 16, 32, 0.73)
+excerpt: >-
+  探讨操作符重载的设计，介绍一些典型的惯用法如 Hidden Friend 等等...
+---
+
+Hidden Friend Idiom 引起的
+
+ADL 特性的故事
+
+操作符重载
+
+如何理解 C++ 中的 定制点对象 这一概念？为什么要这样设计？ - Mick235711的回答 - 知乎 https://www.zhihu.com/question/518132411/answer/2360830245
+
+## NVI 模式
+
+- [PreventSlicing_VirtualClone - ltimaginea - 博客园](https://www.cnblogs.com/ltimaginea/p/16207695.html)
+- c++中如何正确实现克隆（原型）模式？ - ltimaginea的回答 - 知乎 https://www.zhihu.com/question/52610176/answer/2558225547
+- [More C++ Idioms/Non-Virtual Interface - Wikibooks, open books for an open world](https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Non-Virtual_Interface)
+
+Non-Virtual Interface (NVI) idiom allows us to refactor before and after code fragments at one convenient location - the base class. The NVI idiom is based on 4 guidelines outlined by Herb Sutter in his article named "Virtuality"[2]. Quoting Herb:
+
+- Guideline #1: Prefer to make interfaces nonvirtual, using Template Method design pattern.
+- Guideline #2: Prefer to make virtual functions private.
+- Guideline #3: Only if derived classes need to invoke the base implementation of a virtual function, make the virtual function protected.
+- Guideline #4: A base class destructor should be either public and virtual, or protected and nonvirtual. - Quote complete.
+
+Here is some code that implements the NVI idiom following the above 4 guidelines.
+
+```
+class Base {
+private:
+    ReaderWriterLock lock_;
+    SomeComplexDataType data_;
+public:
+    void read_from( std::istream & i)  { // Note non-virtual
+      lock_.acquire();
+      assert(data_.check_invariants()); // must be true
+
+      read_from_impl(i);
+
+      assert(data_.check_invariants()); // must be true
+      lock_.release();
+    }
+    void write_to( std::ostream & o) const { // Note non-virtual
+      lock_.acquire();
+      write_to_impl(o);
+      lock_.release();
+    }
+    virtual ~Base() {}  // Virtual because Base is a polymorphic base class.
+private:
+    virtual void read_from_impl( std::istream & ) = 0;
+    virtual void write_to_impl( std::ostream & ) const = 0;
+};
+class XMLReaderWriter : public Base {
+private:
+    virtual void read_from_impl (std::istream &) {
+      // Read XML.
+    }
+    virtual void write_to_impl (std::ostream &) const {
+      // Write XML.
+    }
+};
+class TextReaderWriter : public Base {
+private:
+    virtual void read_from_impl (std::istream &) {}
+    virtual void write_to_impl (std::ostream &) const {}
+};
+```
+
+The above implementation of the base class captures several design intents that are central to achieving the benefits of the NVI idiom. This class intends to be used as a base class and therefore, it has a virtual destructor and some pure virtual functions (read_from_impl, write_to_impl), which must be implemented by all the concrete derived classes. The interface for clients (i.e., read_from and write_to) is separate from the interface for the subclasses (i.e. read_from_impl and write_to_impl). Although the read_from_impl and write_to_impl are two private functions, the base class can invoke the corresponding derived class functions using dynamic dispatch. These two functions give the necessary extension points to a family of derived classes. However, they are prevented from extending the client interface (read_from and write_to). Note that, it is possible to call interface for clients from the derived classes, however, it will lead to recursion. Finally, the NVI idiom suggests use of exactly one private virtual extension point per public non-virtual function.
+
+Clients invoke only the public interface, which in turn invokes virtual _\_impl functions as in the Template Method design pattern. Before and after invoking the _\_impl functions, lock operations and invariant checking operations are performed by the base class. In this way, hierarchy wide before and after code fragments can be put together at one place, simplifying maintenance. Clients of the Base hierarchy still get polymorphic behavior even though they don't invoke virtual functions directly. Derived classes should ensure that direct access to the implementation functions (\*\_impl) is disallowed to the clients by making them private in the derived class as well.
+
+## Guide
+
+C++ 最令人迷醉的特性之一，当然是操作符重载了。
+
+操作符重载这种能力，也不知道那些家伙是怎么想象到并设计出来的。总之，最早提出并实现 操作符重载的 PL 是 [ALGOL 68](https://en.wikipedia.org/wiki/ALGOL_68)。
+
+> ALGOL 是一种神奇的语言，它几乎算是最早的高级语言了，现今的多数语言都直接或间接地受到了其影响。不过，ALGOL 的语法和今天的主流语言的相似度不太高，反而更像那个时代的 PL，例如 Fortran，Cobol，Ada，Pascal 等等。
+
+但是，将操作符重载这门技术发扬广大且琢磨得精致而全面，还得是我大 C++ 才行。这里面，最重要的家伙要算是 80年代的 Turbo C++ 及其继任者 Borland C++，挺唏嘘的。
+
+> 精确地讲，Turbo C++ 1.0 发布于 1990 年。不过，你知道的，[Turbo C](https://en.wikipedia.org/wiki/Turbo_C) 2.0（1988）到 [Turbo C++](https://en.wikipedia.org/wiki/Borland_Turbo_C) 3.0（1991）只在区区三年前就发展出来了，从这个角度来看，算作80年代末班车并不太离谱。
+
+从 3.1 起 TC++ 更名为 Borland C++ 3.1，这是一个里程碑版本，完善、完美。不过要到 BC++ 4.0（1993） 才开始支持 template 模板元编程，而且支持程度较低，那时候的 template 本来就还很初阶，一直要到 2003～2011 这个阶段，Loki 和 Boost 等等推动了一系列的元编程理论完善之后，才有我们今天所使用的完整而严密的模板元编程规范，而在 Borland C++ 时代，以及的 Visual C++ 6 及其升级版本，模板都是在野蛮生长的。
+
+咦，跑题了。
+
+好的继续说操作符重载。
+
+所谓隐藏友元函数惯用法，是指 Hidden Friend Idiom。这种惯用法的手法是在类中定义友元函数而非在全局为这个类定义函数的重载版本。它典型地被用在操作符重载用途上。
+
+单纯谈论操作符的重载函数定义，我们应该会有固有的印象，即在给一个类定义了操作符重载的情况下，在全局的任何地方对该类运用该操作符，都是有效的。请看下面的例子：
+
+```c++
+class X
+{
+public:
+    X& operator+=(const X& rhs) // compound assignment (does not need to be a member,
+    {                           // but often is, to modify the private members)
+        /* addition of rhs to *this takes place here */
+        return *this; // return the result by reference
+    }
+
+    // friends defined inside class body are inline and are hidden from non-ADL lookup
+    friend X operator+(X lhs,        // passing lhs by value helps optimize chained a+b+c
+                       const X& rhs) // otherwise, both parameters may be const references
+    {
+        lhs += rhs; // reuse compound assignment
+        return lhs; // return the result by value (uses move constructor)
+    }
+};
+
+X a, b;
+std::cout << (a + b) << '\n';
+a += b;
+```
+
+此外，操作符重载可以被定义为类的成员函数，如上面的例子；也可以定义为类的友元函数；再有一种情况是，为一个全局操作符定义一份重载函数，形参采用对应的类（例如 `X const &`）。请看上例的等效实现：
+
+```c++
+
+```
+
+### Conclusion
+
+### References
+
+- [Operator overloading - Wikipedia](https://en.wikipedia.org/wiki/Operator_overloading)
+- [/Zc:hiddenFriend (Enforce Standard C++ hidden friend rules) | Microsoft Learn](https://learn.microsoft.com/en-us/cpp/build/reference/zc-hiddenfriend?view=msvc-170)
+- [Barton–Nackman trick - Wikipedia](https://en.wikipedia.org/wiki/Barton%E2%80%93Nackman_trick)
+- [More C++ Idioms/Barton-Nackman trick - Wikibooks, open books for an open world](https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Barton-Nackman_trick)
+- [An example of the Barton–Nackman trick – Arthur O'Dwyer – Stuff mostly about C++](https://quuxplusone.github.io/blog/2020/12/09/barton-nackman-in-practice/)
+- [`operator<=>` doesn't obsolete the hidden friend idiom – Arthur O'Dwyer – Stuff mostly about C++](https://quuxplusone.github.io/blog/2021/10/22/hidden-friend-outlives-spaceship/)
+-
+-
