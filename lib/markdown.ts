@@ -16,6 +16,7 @@ import { Stepper, StepperItem } from "@/components/ui/stepper";
 import { availableVersions } from "./routes-config";
 import { CodeBlock } from "@/components/ui/ui/code-block";
 import { stringToDate } from "./utils";
+import { cache } from "react";
 // import { CodeWithTabs } from "@/components/markdown/code-with-tabs";
 
 // const latestString = availableVersions[0];
@@ -193,7 +194,7 @@ export type BlogMdxFrontmatter = BaseMdxFrontmatter & {
   // };
 };
 
-export async function getAllBlogStaticPaths() {
+export const getAllBlogStaticPaths = cache(async () => {
   try {
     const blogFolder = path.join(process.cwd(), "/content/blog/");
     const res = await fs.readdir(blogFolder);
@@ -203,9 +204,9 @@ export async function getAllBlogStaticPaths() {
   } catch (err) {
     console.log(err);
   }
-}
+});
 
-export async function getAllBlogs(page: number = 1, perpage: number = 7, query: string | string[] = '') {
+export const getAllBlogs = cache(async (page: number = 1, perpage: number = 7, query: string | string[] = '') => {
   const blogFolder = path.join(process.cwd(), "/content/blog/");
   const files = await fs.readdir(blogFolder);
   const prod = process.env.NODE_ENV === 'production';
@@ -238,35 +239,82 @@ export async function getAllBlogs(page: number = 1, perpage: number = 7, query: 
     if (!v) return false;
 
     const fm = v.frontmatter;
-    const test = (qry: string) => {
+    const log = /(winter alies)/i.test(v.slug);
+    const test = (qry: string): boolean => {
       const qq = qry.replace(/[+-\[\]*\/\\{}()?^$]/g, (v) => { return "\\" + v; });
       // const qq = RegExp.escape(qry);
-      console.log(qq);
-      const q = new RegExp(qq);
+      // console.log(qq);
+      const tagsOnly = qq.startsWith('#');
+      const q = tagsOnly ? new RegExp(qq.substring(1)) : new RegExp("\\b" + qq); // `\bgo` will match 'go', 'golang', but `algo`
       // const tt = v.slug == 'time-travle';
       // if (tt) console.log(fm);
-      if (q.test(fm.title) || q.test(fm.description) || q.test(v.slug)) return true;
-      if (fm.excerpt && q.test(fm.excerpt)) return true;
-      if (fm.categories) {
-        if (typeof fm.categories === 'string') return q.test(fm.categories);
-        return fm.categories.map((it) => { return q.test(it); });
+      if (!tagsOnly) {
+        if (q.test(fm.title) || q.test(fm.description) || q.test(v.slug)) {
+          if (log) console.log(`searched ok [title|desc|slug]: ${v.slug}`);
+          return true;
+        }
+        if (fm.excerpt && q.test(fm.excerpt)) {
+          if (log) console.log(`searched ok [excerpt]: ${v.slug}`);
+          return true;
+        }
+        if (fm.categories) {
+          if (typeof fm.categories === 'string') {
+            if (q.test(fm.categories)) {
+              if (log) console.log(`searched ok (q=${q.toString()}) [category(${fm.categories})]: ${v.slug}`);
+              return true;
+            }
+          } else {
+            let ret = (fm.categories.filter((it) => { return q.test(it); }));
+            const r = (Array.isArray(ret) && ret.length != 0);
+            if (log) console.log(`searched ${r} (q=${q.toString()}) [category[](${fm.categories})]: ${v.slug}`);
+            if (r) return r;
+          }
+        }
       }
       if (fm.tags) {
-        if (typeof fm.tags === 'string') return q.test(fm.tags);
-        return fm.tags.map((it) => { return q.test(it); });
-      }
-      return false;
-    };
-    if (typeof query !== 'string') {
-      for (const key in query) {
-        if (key !== '') {
-          if (test(key)) return (!fm.draft || !prod);
+        if (typeof fm.tags === 'string') {
+          if (q.test(fm.tags)) {
+            if (log) console.log(`searched ok [tag(${fm.tags})]: ${v.slug}`);
+            return true;
+          }
+        } else {
+          let ret = (fm.tags.filter((it) => { return q.test(it); }));
+          const r = (Array.isArray(ret) && ret.length != 0);
+          if (log) console.log(`searched ${r} filter [tags[](${fm.tags})]: ${v.slug}`, ret);
+          // if (log) {
+          //   fm.tags.filter((it) => {
+          //     if (q.test(it)) {
+          //       return true;
+          //     }
+          //     console.log(`searched filter false [${it}]: ${q.toString()}, ${qq}`);
+          //     return false;
+          //   });
+          // }
+          if (r) return r;
         }
       }
       return false;
-    } else if (query !== '') {
-      if (!test(query)) return false;
+    };
+
+    if (log) console.log(`searching for ${v.slug}`);
+    if (typeof query !== 'string') {
+      for (const key in query) {
+        if (key !== '') {
+          if (test(key)) {
+            if (log) console.log(`search test q[] - '${key}' ok, and [draft test == ${(!fm.draft || !prod)}]: ${v.slug}`);
+            return (!fm.draft || !prod);
+          }
+        }
+      }
+      return false;
     }
+    if (query !== '') {
+      if (!test(query)) return false;
+      if (log) console.log(`search test q - '${query}' ok, and [draft test == ${(!fm.draft || !prod)}]: ${v.slug}`);
+      return (!fm.draft || !prod);
+    }
+
+    if (log) console.log(`search final test '${query}' [draft test == ${(!fm.draft || !prod)}]: ${v.slug}`);
     return (!fm.draft || !prod);
   }).sort((a, b) =>
     stringToDate(b?.frontmatter.date ?? "").getTime() -
@@ -275,7 +323,8 @@ export async function getAllBlogs(page: number = 1, perpage: number = 7, query: 
 
   const start = (page - 1) * perpage, stop = page * perpage;
   const pagemax = Math.floor((items.length + perpage - 1) / perpage);
-  console.log(`getAllBlogs: total=${items.length}, pages=${pagemax}, page=${page}, start=${start}, stop=${stop}`);
+
+  // console.log(`getAllBlogs: total=${items.length}, pages=${pagemax}, page=${page}, start=${start}, stop=${stop}`);
 
   items = items.filter((val, idx, allfiles) => {
     // console.log('filtering', val[0], val, idx);
@@ -289,9 +338,9 @@ export async function getAllBlogs(page: number = 1, perpage: number = 7, query: 
     maxpage: pagemax,
     items: items
   };
-}
+});
 
-export async function getBlogForSlug(slug: string) {
+export const getBlogForSlug = cache(async (slug: string) => {
   const blogFolder = path.join(process.cwd(), "/content/blog/");
   const filepath = path.join(blogFolder, slug + '.mdx');
 
@@ -304,4 +353,4 @@ export async function getBlogForSlug(slug: string) {
   };
   // const blogs = await getAllBlogs();
   // return blogs.items.find((it) => it ? it.slug == slug : false);
-}
+});
