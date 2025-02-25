@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { buttonVariants1 } from "@/components/ui/button1";
 import {
   type Author as AuthorT,
+  BlogMdxFrontmatter,
   getAllBlogStaticPaths,
   getBlogForSlug,
 } from "@/lib/markdown";
@@ -10,9 +11,10 @@ import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { formatDate } from "@/lib/utils";
-import { type HTMLAttributes } from "react";
+import { use, type HTMLAttributes } from "react";
 
-export const dynamic = "force-static";
+// export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 type PageProps = {
   params: { slug: string };
@@ -37,32 +39,56 @@ export async function generateStaticParams() {
   return val.map((it) => ({ slug: it }));
 }
 
-export default async function BlogPage(props: {
-  params: Promise<{ slug: string; lang: string }>;
+// export default function page({
+//   params,
+//   searchParams,
+// }: {
+//   params: { slug: string }
+//   searchParams: { [key: string]: string | string[] | undefined }
+// }) {
+// }
+
+export default async function BlogPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{
+    slug: string;
+    lang: string;
+  }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const params = await props.params;
-  const res = await getBlogForSlug(params.slug);
+  const { slug, lang } = await params;
+  const sp = await searchParams;
+  const pageNumber = Number(sp?.page || "1") || 1;
+
+  console.log(`blog p${pageNumber} - `, lang, slug, sp);
+
+  // const prms = await params;
+  // const lang = prms.lang;
+  // const sp = await searchParams;
+  // const pageNumber = Number(sp.page || prms.page) || 1;
+  const res = await getBlogForSlug(slug);
   if (!res) {
     console.log("not found:", res);
     notFound();
   }
 
+  const fm = res.frontmatter;
+
   let tags: string[] = [];
   let categories: string[] = [];
-  if (res.frontmatter.tags)
-    tags = Array.isArray(res.frontmatter.tags)
-      ? res.frontmatter.tags
-      : res.frontmatter.tags.split(/[,; ]/);
-  if (res.frontmatter.categories)
-    categories = Array.isArray(res.frontmatter.categories)
-      ? res.frontmatter.categories
-      : res.frontmatter.categories.split(/[,; ]/);
-  console.log(
-    "blog page ------- | params:",
-    params
-    // "| front:",
-    // res.frontmatter
-  );
+  if (fm.tags) tags = Array.isArray(fm.tags) ? fm.tags : fm.tags.split(/[,; ]/);
+  if (fm.categories)
+    categories = Array.isArray(fm.categories)
+      ? fm.categories
+      : fm.categories.split(/[,; ]/);
+  // console.log(`blog page ${pageNumber} ----`);
+
+  const get = (fm: any, v: string) => {
+    return v in fm ? fm[v] : "";
+  };
+  let lma: string = get(fm, "lastModifiedAt") || get(fm, "last_modified_at");
 
   return (
     <article className="lg:w-[93%] md:[99%] mx-auto mb-32">
@@ -91,13 +117,13 @@ export default async function BlogPage(props: {
       </div>
       <div className="flex flex-col gap-3 pb-7 w-full border-b mb-4">
         <p className="text-muted-foreground text-sm blog-date">
-          {formatDate(res.frontmatter.date, params.lang)}
+          {formatDate(fm.date, lang)}
         </p>
         <h1
-          className={`sm:text-4xl text-3xl font-extrabold blog-title ${res.frontmatter.draft ? "line-through" : ""}`}
+          className={`sm:text-4xl text-3xl font-extrabold blog-title ${fm.draft ? "line-through" : ""}`}
         >
-          {res.frontmatter.title}
-          {res.frontmatter.draft ? (
+          {fm.title}
+          {fm.draft ? (
             <span className="align-top capcapitalize italic text-sm font-medium text-zink-600/76">
               draft
             </span>
@@ -108,10 +134,10 @@ export default async function BlogPage(props: {
         <div className="mt-6 flex flex-col gap-3">
           <p className="text-sm text-muted-foreground">Posted by</p>
           <div className="blog-authors">
-            {res.frontmatter.authors ? (
-              <AuthorCards authors={res.frontmatter.authors} />
-            ) : res.frontmatter.author ? (
-              <AuthorCard author={res.frontmatter.author} />
+            {fm.authors ? (
+              <AuthorCards authors={fm.authors} />
+            ) : fm.author ? (
+              <AuthorCard author={fm.author} />
             ) : (
               <AuthorCard
                 author={{
@@ -127,24 +153,39 @@ export default async function BlogPage(props: {
       </div>
       <div className="blog-content !w-full">
         <Typography>{res.content}</Typography>
-        <div id="blog-tail-row">
-          <div id="blog-categories" className="inline mr-4">
-            {categories.map((it) => {
-              return (
-                <span className="px-1" key={it}>
-                  {it}
-                </span>
-              );
-            })}
-          </div>
-          <div id="blog-tags" className="inline mr-4">
-            {tags.map((it) => {
-              return (
-                <span className="px-1" key={it}>
-                  {it}
-                </span>
-              );
-            })}
+
+        <div className="mt-4">
+          <div id="blog-tail-row">
+            <div id="blog-categories" className="inline mr-4">
+              <div className="inline -m-1">
+                {categories.map((it) => {
+                  return (
+                    <span
+                      className="rounded gap-2 p-2 py-1 m-1 border-1 border-zinc-400 text-sm text-zinc-900 bg-zinc-500"
+                      key={it}
+                    >
+                      {it}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+            <div id="blog-tags" className="inline mr-4">
+              {tags.map((it) => {
+                return (
+                  <Link
+                    href={`/${lang}/blog/?query=%23${it}&page=${pageNumber}`}
+                    className="rounded gap-2 p-2 py-1 m-1 border-1 border-zinc-400 text-sm text-zinc-900 bg-sky-500"
+                    key={it}
+                  >
+                    {it}
+                  </Link>
+                );
+              })}
+            </div>
+            <div id="last-modified" className="my-4 text-sm text-zinc-400">
+              Last Updated At: {lma}
+            </div>
           </div>
         </div>
       </div>
@@ -157,7 +198,7 @@ function AuthorCards({ authors }: { authors: AuthorT[] }) {
     <div className="flex items-center gap-8 flex-wrap">
       {authors.map((author) => {
         return (
-          <AuthorCardCore
+          <AuthorCardItem
             author={author}
             key={author.username || author.name || "(noname)"}
           />
@@ -170,7 +211,7 @@ function AuthorCards({ authors }: { authors: AuthorT[] }) {
 function AuthorCard({ author }: { author: AuthorT }) {
   return (
     <div className="flex items-center gap-8 flex-wrap">
-      <AuthorCardCore
+      <AuthorCardItem
         author={author}
         key={author.username || author.name || "(noname)"}
       />
@@ -178,9 +219,8 @@ function AuthorCard({ author }: { author: AuthorT }) {
   );
 }
 
-export function AuthorCardCore({
+export function AuthorCardItem({
   author,
-  key = "(noname)",
   ...props
 }: HTMLAttributes<HTMLDivElement> & {
   author: AuthorT;
@@ -191,7 +231,7 @@ export function AuthorCardCore({
     <Link
       href={author.handleUrl ?? ""}
       className="flex items-center gap-2"
-      key={key}
+      {...props}
     >
       <Avatar className="w-10 h-10">
         <AvatarImage src={author.avatar || author.picture} />
