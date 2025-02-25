@@ -1,7 +1,7 @@
 "use client";
 
-import React, { ReactNode, useEffect, useState } from "react";
-import { Router, withRouter } from "next/router";
+import React from "react";
+// import { Router, withRouter } from "next/router";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
 // import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import ReactPaginate from "react-paginate";
@@ -12,20 +12,20 @@ export function Pagination({ totalPages }: { totalPages: number }) {
   const searchParams = useSearchParams();
   const currentPage = Number(searchParams.get("page")) || 1;
 
-  const [isLoading, setLoading] = useState(false);
-  const startLoading = () => setLoading(true);
-  const stopLoading = () => setLoading(false);
+  //   const [isLoading, setLoading] = useState(false);
+  //   const startLoading = () => setLoading(true);
+  //   const stopLoading = () => setLoading(false);
 
-  useEffect(() => {
-    //After the component is mounted set router event handlers
-    Router.events.on("routeChangeStart", startLoading);
-    Router.events.on("routeChangeComplete", stopLoading);
+  //   useEffect(() => {
+  //     //After the component is mounted set router event handlers
+  //     Router.events.on("routeChangeStart", startLoading);
+  //     Router.events.on("routeChangeComplete", stopLoading);
 
-    return () => {
-      Router.events.off("routeChangeStart", startLoading);
-      Router.events.off("routeChangeComplete", stopLoading);
-    };
-  }, []);
+  //     return () => {
+  //       Router.events.off("routeChangeStart", startLoading);
+  //       Router.events.off("routeChangeComplete", stopLoading);
+  //     };
+  //   }, []);
 
   //   const createPageURL = (pageNumber: number | string) => {
   //     const params = new URLSearchParams(searchParams);
@@ -34,9 +34,12 @@ export function Pagination({ totalPages }: { totalPages: number }) {
   //   };
   const { push } = useRouter();
   const paginationHandler = (page: { selected: number }) => {
+    //if (!isLoading) {
     const params = new URLSearchParams(searchParams);
     params.set("page", (page.selected + 1).toString());
     push(`${pathname}?${params.toString()}`);
+    console.log(`paginationHandler: push '${pathname}?${params.toString()}'`);
+    //}
   };
 
   return (
@@ -74,7 +77,7 @@ export function Search({ placeholder }: { placeholder: string }) {
       params.delete("query");
     }
     replace(`${pathname}?${params.toString()}`);
-  }, 300);
+  }, 600);
 
   return (
     <div className="relative flex flex-1 flex-shrink-0">
@@ -94,6 +97,7 @@ export function Search({ placeholder }: { placeholder: string }) {
   );
 }
 
+/*
 export const Pager = (props: {
   router: {
     pathname: any;
@@ -184,6 +188,8 @@ export const Pager = (props: {
     />
   );
 };
+
+*/
 
 // Pager.getInitialProps = async ({ query }) => {
 //     const page = query.page || 1; //if page empty we request the first page
