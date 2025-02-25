@@ -50,23 +50,22 @@ export default async function BlogIndexPage({
   params: Promise<{
     lang: string;
     query?: string;
-    page?: string;
   }>;
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const sp = await searchParams;
-
   const query = sp?.query || "";
   const currentPage = Number(sp?.page) || 1;
-
   const perPage = 7;
 
   const blogs = await getAllBlogs(currentPage, perPage, query);
   const lang = (await params).lang;
   const length = Math.min(blogs.items.length, blogs.maxpage);
   // console.log("lang:", lang, "| count:", blogs.items.length);
-  console.log(`blog index ------ lang: ${lang}, total: ${length}`, sp);
+
   let title: string = safeTitle(metadata);
+
+  console.log(`index - page: ${currentPage}, total: ${length}`, sp, lang);
 
   return (
     <div className="w-full flex  flex-col gap-5 sm:min-h-[91vh] min-h-[88vh] md:pt-5 pt-2">
@@ -96,6 +95,7 @@ export default async function BlogIndexPage({
                   slug={blog.slug}
                   lang={lang}
                   key={blog.slug}
+                  page={currentPage}
                 />
               )
             ) : (
@@ -186,7 +186,15 @@ function BlogCard({
   layout,
   tags,
   categories,
-}: BlogMdxFrontmatter & { slug: string; lang?: string; draft?: boolean }) {
+  page,
+  highlight,
+}: BlogMdxFrontmatter & {
+  slug: string;
+  lang?: string;
+  draft?: boolean;
+  page: number;
+  highlight?: string;
+}) {
   // console.log("date:", formatDate2(date, lang), slug, draft, "| title", title);
   return (
     <div className="flex flex-col md:flex-row items-start">
@@ -197,7 +205,7 @@ function BlogCard({
         <CircleIcon className="w-3.5 h-3.5 absolute mt-1.1 -left-[-18.63rem] fill-background text-muted-foreground md:flex hidden" />
         <Link
           className={`flex flex-col gap-3 ${draft ? "line-through italic" : ""}`}
-          href={`/blog/${slug}`}
+          href={`/blog/${slug}/?page=${page}&hilight=${highlight || ""}`}
         >
           <div>
             <Image
