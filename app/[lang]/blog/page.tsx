@@ -15,6 +15,8 @@ import { TemplateString } from "next/dist/lib/metadata/types/metadata-types";
 // import Footer from "@/components/layout/footer";
 // import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
 
+export const dynamic = "force-dynamic";
+
 const SITE_NAME = "hzSomthing";
 export const metadata: Metadata = {
   title: {

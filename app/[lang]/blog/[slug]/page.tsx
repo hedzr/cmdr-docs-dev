@@ -12,6 +12,8 @@ import { notFound } from "next/navigation";
 import { formatDate } from "@/lib/utils";
 import { type HTMLAttributes } from "react";
 
+export const dynamic = "force-static";
+
 type PageProps = {
   params: { slug: string };
 };
@@ -128,12 +130,20 @@ export default async function BlogPage(props: {
         <div id="blog-tail-row">
           <div id="blog-categories" className="inline mr-4">
             {categories.map((it) => {
-              return <span className="px-1" key={it}>{it}</span>;
+              return (
+                <span className="px-1" key={it}>
+                  {it}
+                </span>
+              );
             })}
           </div>
           <div id="blog-tags" className="inline mr-4">
             {tags.map((it) => {
-              return <span className="px-1" key={it}>{it}</span>;
+              return (
+                <span className="px-1" key={it}>
+                  {it}
+                </span>
+              );
             })}
           </div>
         </div>
@@ -146,7 +156,12 @@ function AuthorCards({ authors }: { authors: AuthorT[] }) {
   return (
     <div className="flex items-center gap-8 flex-wrap">
       {authors.map((author) => {
-        return <AuthorCardCore author={author} key={author.username||author.name||'(noname)'} />;
+        return (
+          <AuthorCardCore
+            author={author}
+            key={author.username || author.name || "(noname)"}
+          />
+        );
       })}
     </div>
   );
@@ -155,7 +170,10 @@ function AuthorCards({ authors }: { authors: AuthorT[] }) {
 function AuthorCard({ author }: { author: AuthorT }) {
   return (
     <div className="flex items-center gap-8 flex-wrap">
-      <AuthorCardCore author={author} key={author.username||author.name||'(noname)'} />
+      <AuthorCardCore
+        author={author}
+        key={author.username || author.name || "(noname)"}
+      />
     </div>
   );
 }
@@ -168,7 +186,7 @@ export function AuthorCardCore({
   author: AuthorT;
   key?: string;
 }) {
-  let name = author.username||author.name||'(noname)';
+  let name = author.username || author.name || "(noname)";
   return (
     <Link
       href={author.handleUrl ?? ""}
@@ -176,10 +194,8 @@ export function AuthorCardCore({
       key={key}
     >
       <Avatar className="w-10 h-10">
-        <AvatarImage src={author.avatar||author.picture} />
-        <AvatarFallback>
-          {name.slice(0, 2).toUpperCase()}
-        </AvatarFallback>
+        <AvatarImage src={author.avatar || author.picture} />
+        <AvatarFallback>{name.slice(0, 2).toUpperCase()}</AvatarFallback>
       </Avatar>
       <div className="">
         <p className="text-sm font-medium">{name}</p>
