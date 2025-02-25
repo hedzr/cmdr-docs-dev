@@ -205,7 +205,7 @@ export async function getAllBlogStaticPaths() {
   }
 }
 
-export async function getAllBlogs(page: number = 1, perpage: number = 7) {
+export async function getAllBlogs(page: number = 1, perpage: number = 7, query: string | string[] = '') {
   const blogFolder = path.join(process.cwd(), "/content/blog/");
   const files = await fs.readdir(blogFolder);
   const prod = process.env.NODE_ENV === 'production';
@@ -230,16 +230,54 @@ export async function getAllBlogs(page: number = 1, perpage: number = 7) {
     })
   );
 
+  // const start = (page - 1) * perpage, stop = page * perpage;
+  // const pagemax = Math.floor((items.length + perpage - 1) / perpage);
+  // console.log(`getAllBlogs: total=${items.length}, pages=${pagemax}, page=${page}, start=${start}, stop=${stop}`);
+
+  items = items.filter((v, i, a) => {
+    if (!v) return false;
+
+    const fm = v.frontmatter;
+    const test = (qry: string) => {
+      const qq = qry.replace(/[+-\[\]*\/\\{}()?^$]/g, (v) => { return "\\" + v; });
+      // const qq = RegExp.escape(qry);
+      console.log(qq);
+      const q = new RegExp(qq);
+      // const tt = v.slug == 'time-travle';
+      // if (tt) console.log(fm);
+      if (q.test(fm.title) || q.test(fm.description) || q.test(v.slug)) return true;
+      if (fm.excerpt && q.test(fm.excerpt)) return true;
+      if (fm.categories) {
+        if (typeof fm.categories === 'string') return q.test(fm.categories);
+        return fm.categories.map((it) => { return q.test(it); });
+      }
+      if (fm.tags) {
+        if (typeof fm.tags === 'string') return q.test(fm.tags);
+        return fm.tags.map((it) => { return q.test(it); });
+      }
+      return false;
+    };
+    if (typeof query !== 'string') {
+      for (const key in query) {
+        if (key !== '') {
+          if (test(key)) return (!fm.draft || !prod);
+        }
+      }
+      return false;
+    } else if (query !== '') {
+      if (!test(query)) return false;
+    }
+    return (!fm.draft || !prod);
+  }).sort((a, b) =>
+    stringToDate(b?.frontmatter.date ?? "").getTime() -
+    stringToDate(a?.frontmatter.date ?? "").getTime()
+  );
+
   const start = (page - 1) * perpage, stop = page * perpage;
   const pagemax = Math.floor((items.length + perpage - 1) / perpage);
   console.log(`getAllBlogs: total=${items.length}, pages=${pagemax}, page=${page}, start=${start}, stop=${stop}`);
 
-  items = items.filter((v, i, a) => {
-    return v && (!v.frontmatter.draft || !prod);
-  }).sort((a, b) =>
-    stringToDate(b?.frontmatter.date ?? "").getTime() -
-    stringToDate(a?.frontmatter.date ?? "").getTime()
-  ).filter((val, idx, allfiles) => {
+  items = items.filter((val, idx, allfiles) => {
     // console.log('filtering', val[0], val, idx);
     return start <= idx && idx < stop;
   });

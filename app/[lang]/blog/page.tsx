@@ -30,6 +30,17 @@ export const metadata: Metadata = {
 
 const prodMode = process.env.NODE_ENV === "production";
 
+function safeTitle(md: Metadata): string {
+  let title: string = "The Latest Posts";
+  if (md.title) {
+    if (typeof md.title === "string") title = md.title.toString();
+    else if (typeof md.title === "object") {
+      if ("default" in md.title) title = md.title["default"].toString();
+    }
+  }
+  return title;
+}
+
 export default async function BlogIndexPage({
   params,
   searchParams,
@@ -48,20 +59,12 @@ export default async function BlogIndexPage({
 
   const perPage = 7;
 
-  const blogs = await getAllBlogs(currentPage, perPage);
+  const blogs = await getAllBlogs(currentPage, perPage, query);
   const lang = (await params).lang;
+  const length = Math.min(blogs.items.length, blogs.maxpage);
   // console.log("lang:", lang, "| count:", blogs.items.length);
-  console.log(
-    `blog index ------ params: ${sp}, lang: ${lang}, total: ${blogs.items.length}`
-  );
-  let title: string = "The Latest Posts";
-  if (metadata.title) {
-    if (typeof metadata.title === "string") title = metadata.title.toString();
-    else if (typeof metadata.title === "object") {
-      if ("default" in metadata.title)
-        title = metadata.title["default"].toString();
-    }
-  }
+  console.log(`blog index ------ lang: ${lang}, total: ${length}`, sp);
+  let title: string = safeTitle(metadata);
 
   return (
     <div className="w-full flex  flex-col gap-5 sm:min-h-[91vh] min-h-[88vh] md:pt-5 pt-2">
@@ -72,7 +75,7 @@ export default async function BlogIndexPage({
         </p>
       </div>
       <div className="mt-1 flex items-center justify-between gap-2 md:mt-2">
-        <Search placeholder="Search Posts ..." />
+        <Search placeholder="Search Posts (by such as `cxx`, `go`, `calendar`, etc.) ..." />
         {/* <CreateInvoice /> */}
       </div>
       <Suspense
