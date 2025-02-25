@@ -13,10 +13,12 @@ const geistMono = Geist_Mono({
 });
 
 export default function BlogLayout({
-  params,
+  // params,
+  // searchParams,
   children,
 }: {
-  params: Promise<{ lang: string }>;
+  // params?: Promise<{ lang: string }>;
+  // searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
   children: ReactNode; // PropsWithChildren;
 }) {
   return (
