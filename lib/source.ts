@@ -28,6 +28,7 @@ export const blog = loader({
   baseUrl: '/blog',
   source: createMDXSource(blogPosts),
   // source: blogPosts.toFumadocsSource(),
+  i18n: i18n,
 });
 
 export type Page = InferPageType<typeof source>;
