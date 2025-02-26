@@ -86,8 +86,14 @@ export default async function Page(props: {
     >
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
-      <DocsBody>
-        {/* className="text-fd-foreground/80" */}
+      <DocsBody
+        className={`prose-zinc1 dark:prose-invert md:prose-md lg:prose-lg prose-headings:a:underline:none w-[85vw] sm:w-full sm:mx-auto prose-code:text-sm prose-code:leading-6 prose-headings:scroll-m-20 prose-code:font-code prose-code:p-1 prose-code:rounded-md prose-pre:border pt-2 prose-code:before:content-none prose-code:after:content-none !min-w-full prose-img:rounded-md prose-img:border`}
+      >
+        {/* className="text-fd-foreground/80"
+
+        dark:prose-invert prose-code:font-code dark:prose-code:bg-${ref}-900 dark:prose-pre:bg-${ref}-800 prose-code:bg-${ref}-100 prose-pre:bg-${ref}-100 prose-headings:scroll-m-20 w-[85vw] sm:w-full sm:mx-auto prose-code:text-sm prose-code:leading-6 dark:prose-code:text-${base}-300 prose-code:text-${ref}-700 prose-code:p-1 prose-code:rounded-md prose-pre:border pt-2 prose-code:before:content-none prose-code:after:content-none !min-w-full prose-img:rounded-md prose-img:border
+
+        */}
         {/*{preview ? <PreviewRenderer preview={preview} /> : null}*/}
         <MDX
           components={{

@@ -187,44 +187,117 @@ export default async function BlogPage(props: {
           Back
         </Link>
       </div>
-      <div className="flex flex-col gap-3 pb-7 w-full border-b mb-4">
-        <p className="text-muted-foreground text-sm blog-date">
-          {formatDate(fm.date, lang)}
-        </p>
-        <h1
-          className={`sm:text-4xl text-3xl font-extrabold blog-title ${fm.draft ? "line-through" : ""}`}
-        >
-          {fm.title}
-          {fm.draft ? (
-            <span className="align-top capcapitalize italic text-sm font-medium text-zink-600/76">
-              draft
-            </span>
+      <article
+        className={`container blog flex flex-col px-0 py-8 lg:flex-row lg:px-4min-w-0 prose-zinc1 dark:prose-invert md:prose-md lg:prose-lg prose-headings:a:underline:none w-[85vw] sm:w-full sm:mx-auto prose-code:text-sm prose-code:leading-6 prose-headings:scroll-m-20 prose-code:font-code prose-code:p-1 prose-code:rounded-md prose-pre:border pt-2 prose-code:before:content-none prose-code:after:content-none !min-w-full prose-img:rounded-md prose-img:border`}
+        // prose md:prose-md lg:prose-lg prose-${base} dark:prose-invert dark:prose-code:bg-${ref}-900 dark:prose-pre:bg-${ref}-900 prose-code:bg-${ref}-100 prose-pre:bg-${ref}-100 dark:prose-code:text-${base}-300 prose-code:text-${ref}-700
+      >
+        <div className="min-w-0  flex-1 p-4">
+          {useInlineTOC ? (
+            <InlineTOC items={toc} />
           ) : (
-            <></>
+            <TocPopoverHeader>
+              <TocPopoverTrigger className="w-full" items={toc} />
+              <TocPopoverContent>
+                  {safeget(tocPopoverOptions,'header',<></>)}
+                <TOCScrollArea isMenu>
+                  {tocPopoverOptions.style === "clerk" ? (
+                    <ClerkTOCItems items={toc} />
+                  ) : (
+                    <TOCItems items={toc} />
+                  )}
+                </TOCScrollArea>
+                {safeget(tocPopoverOptions,'footer',<></>)}
+              </TocPopoverContent>
+            </TocPopoverHeader>
           )}
-        </h1>
-        <div className="mt-6 flex flex-col gap-3">
-          <p className="text-sm text-muted-foreground">Posted by</p>
-          <div className="blog-authors">
-            {fm.authors ? (
-              <AuthorCards authors={fm.authors} />
-            ) : fm.author ? (
-              <AuthorCard author={fm.author} />
-            ) : (
-              <AuthorCard
-                author={{
-                  username: "hedzr",
-                  avatar: "",
-                  handle: "",
-                  handleUrl: "",
-                }}
-              />
-            )}
-          </div>
+          <Mdx
+            components={{
+              ...defaultMdxComponents,
+
+              // HTML `ref` attribute conflicts with `forwardRef`
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              pre: ({ ref: _ref, ...props }) => (
+                <CodeBlock ref={_ref} {...props}>
+                  <Pre>{props.children}</Pre>
+                </CodeBlock>
+              ),
+              // img: (props) => <BaseImage {...(props as ImageProps)} />,
+              img: (props) => <ImageZoom {...(props as any)} />,
+
+              Mermaid,
+              // Popup,
+              // PopupContent,
+              // PopupTrigger,
+              Popover,
+              PopoverTrigger,
+              PopoverContent,
+              PopoverClose,
+              TypeTable,
+              // AutoTypeTable,
+              Accordion,
+              Accordions,
+              Wrapper,
+              //     File,
+              //   Folder,
+              // Files,
+              // Tabs,
+              // Tab,
+              Steps,
+              Step,
+              Card,
+              Cards,
+              InlineTOC,
+              // Code,
+              // CodeWithTabs,
+              blockquote: Callout as unknown as FC<
+                ComponentProps<"blockquote">
+              >,
+              APIPage: openapi.APIPage,
+              DocsCategory: () => <DocsCategory page={page} from={source} />,
+
+              File,
+              Files,
+              Folder,
+              Tabs,
+              Tab,
+            }}
+          />
         </div>
-      </div>
-      <div className="blog-content !w-full">
-        <Typography>{res.content}</Typography>
+        <div className="flex flex-col gap-4 border-l p-4 text-sm lg:w-[250px]">
+          <div>
+            <p className="mb-1 text-fd-muted-foreground">Written by</p>
+            <div className="font-medium blog-authors">
+              {/* {page.data.author} */}
+              {isFieldValid(fm,'authors') ? (
+                <AuthorCards authors={safeget(fm,'authors',[])} />
+              ) : isFieldValid(fm,'author') ? (
+                <AuthorCard author={fm.author} />
+              ) : (
+                <AuthorCard
+                  author={{
+                    username: "hedzr",
+                    avatar: "",
+                    handle: "",
+                    handleUrl: "",
+                  }}
+                />
+              )}
+            </div>
+          </div>
+          <div>
+            <p className="mb-1 text-sm text-fd-muted-foreground">Post At</p>
+            <p className="font-medium">
+              {formatDate2(page.data.date ?? page.file.name, lang)}
+              {/* {new Date(page.data.date ?? page.file.name).toDateString()} */}
+            </p>
+            <p className="mb-1 text-sm text-fd-muted-foreground">
+              Last Updated At
+            </p>
+            <p className="font-medium">
+              {/* <div id="last-modified" className="my-4 text-sm text-zinc-400"> */}
+              {lma}
+            </p>
+          </div>
 
           <div className="mt-4">
             <div id="blog-tail-row">
