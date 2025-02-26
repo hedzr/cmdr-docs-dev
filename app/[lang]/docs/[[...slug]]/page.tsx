@@ -45,7 +45,7 @@ import { Mermaid } from "@theguild/remark-mermaid/mermaid"; // pnpm install @the
 import { Rate } from "@/components/rate";
 
 // import { usePostHog } from "posthog-js/react";
-import posthog from "posthog-js";
+// import posthog from "posthog-js";
 
 import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
 
@@ -135,7 +135,10 @@ export default async function Page(props: {
         />
         {/*{page.data.index ? <DocsCategory page={page} from={source} /> : null}*/}
       </DocsBody>
-      <Rate onRateAction={async (url, feedback) => {"use server";}}
+      <Rate
+        onRateAction={async (url, feedback) => {
+          "use server";
+        }}
         // onRateAction={async (url, feedback) => {
         //   "use server";
         //   // const posthog = usePostHog();
