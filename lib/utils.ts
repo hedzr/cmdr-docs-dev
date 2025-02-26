@@ -84,8 +84,11 @@ function dateToString(date: Date, lang: string): string {
 }
 
 //  May 23, 2024
-export function formatDate2(dateStr: string, lang?: string): string {
+export function formatDate2(dateStr: string | Date, lang?: string): string {
   if (!dateStr) return 'Jan 29, 1979';
+  if (dateStr instanceof Date) {
+    return dateToString(dateStr, lang ?? 'en-US');
+  }
   const dta = dateStr.split(" ");
   const [day, month, year] = dta[0].split("-").map(Number);
   if (day > 1970) {
@@ -107,6 +110,24 @@ export function stringToDate(date: string) {
     return new Date(y, m - 1, d);
   }
   return new Date(year, month - 1, day);
+}
+
+export function safe(s:any,defval:string=''):string {
+  if (!s) return defval;
+  if (typeof s === 'string') return s;
+  return s.toString();
+}
+
+export function safeget<T>(cont:any,prop:string,defval:T):T{
+  if (!cont) return defval;
+  if (prop in cont) return cont[prop];
+  return defval;
+}
+
+export function isFieldValid(cont:any,prop:string):boolean {
+  if(!cont) return false;
+  if(prop in cont) return !!cont[prop];
+  return false;
 }
 
 const serverPublicPath = (staticFilePath: string): string => {
