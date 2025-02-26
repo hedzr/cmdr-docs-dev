@@ -1,12 +1,19 @@
 import { source } from "@/lib/source";
+// import {
+//   DocsPage,
+//   DocsBody,
+//   DocsDescription,
+//   DocsTitle,
+//   DocsCategory,
+// } from "fumadocs-ui/page";
+import { notFound } from "next/navigation";
 import {
   DocsPage,
-  DocsBody,
-  DocsDescription,
   DocsTitle,
+  DocsDescription,
+  DocsBody,
   DocsCategory,
-} from "fumadocs-ui/page";
-import { notFound } from "next/navigation";
+} from "@/components/page";
 
 import { openapi } from "@/lib/source";
 
