@@ -80,11 +80,13 @@
   "devDependencies": {
     "@fumadocs/cli": "^0.0.8",
     "@tailwindcss/postcss": "^4.0.6",
+    "@tailwindcss/typography": "0.5.16",
     "@types/mdx": "^2.0.13",
     "@types/node": "22.13.4",
     "@types/react": "^19.0.9",
     "@types/react-dom": "^19.0.3",
     "postcss": "^8.5.2",
+    "tailwindcss-animate": "^1.0.7",
     "tailwindcss": "^4.0.6",
     "typescript": "^5.7.3"
   }
