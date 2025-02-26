@@ -75,7 +75,7 @@ export default async function Page(props: {
         single: false,
       }}
       editOnGithub={{
-        repo: "cmdr-docs",
+        repo: "cmdr-docs-dev",
         owner: "hedzr",
         sha: "master",
         path,
