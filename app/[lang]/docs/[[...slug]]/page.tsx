@@ -54,9 +54,10 @@ export default async function Page(props: {
   const page = source.getPage(params.slug, params.lang);
   if (!page) notFound();
 
+  // page.data.tags
   const MDX = page.data.body;
   const toc = page.data.toc;
-  const lastModified = page.data.lastModified;
+  const lastModified = page.data.lastModified || page.data.last_modified_at;
 
   // const path = `apps/docs/content/docs/${page.file.path}`;
   const path = `content/docs/${page.file.path}`;
