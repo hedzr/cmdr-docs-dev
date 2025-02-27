@@ -1,5 +1,11 @@
 // import { defineDocs, defineConfig } from 'fumadocs-mdx/config';
-import { defineDocs, defineConfig, frontmatterSchema, defineCollections } from 'fumadocs-mdx/config';
+import {
+  defineDocs,
+  defineConfig,
+  frontmatterSchema,
+  defineCollections,
+  metaSchema
+} from 'fumadocs-mdx/config';
 import { z } from "zod";
 import {
   rehypeCodeDefaultOptions,
@@ -9,9 +15,9 @@ import {
   remarkStructure
 } from "fumadocs-core/mdx-plugins";
 import remarkMath from "remark-math";
-// import {remarkInstall} from "fumadocs-docgen";
 import rehypeKatex from "rehype-katex";
 import { remarkMermaid } from "@theguild/remark-mermaid";
+// import {remarkInstall} from "fumadocs-docgen";
 // import { transformerTwoslash } from 'fumadocs-twoslash';
 
 // export const docs = defineDocs({
@@ -24,40 +30,76 @@ import { remarkMermaid } from "@theguild/remark-mermaid";
 //   },
 // });
 
-
-
-
 export const docs = defineDocs({
   dir: 'content/docs',
-  // docs: {
-  //   async: true,
-  //   schema: frontmatterSchema.extend({
-  //     preview: z.string().optional(),
-  //     index: z.boolean().default(true),
-  //     /**
-  //      * API routes only
-  //      */
-  //     method: z.string().optional(),
-  //   }),
-  // },
-  // meta: {
-  //   schema: metaSchema.extend({
-  //     description: z.string().optional(),
-  //   }),
-  // },
+  docs: {
+    // async: true,
+    schema: frontmatterSchema.extend({
+      // preview: z.string().optional(),
+      // index: z.boolean().default(true),
+      // /**
+      //  * API routes only
+      //  */
+      // method: z.string().optional(),
+      // date: z.string().date().or(z.date()).optional(),
+      // // date: z.string().datetime({ offset: true }).or(z.date()).optional(),
+      // last_modified_at: z.string().datetime({ offset: true }).or(z.date()).optional(), // z.string().date().or(z.date()).optional(),
+      // // last_modified_at: z.string().date().or(z.date()).optional(),
+      // // last_modified_at: z.string().datetime({ offset: true }).optional(), // z.string().date().or(z.date()).optional(),
+      draft: z.boolean().default(false),
+      feedback: z.boolean().default(false),
+      excerpt: z.string().optional(),
+      tags: z.array(z.string()).optional(),
+      categories: z.string().optional(),
+    }),
+  },
+  meta: {
+    schema: metaSchema.extend({
+      description: z.string().optional(),
+    }),
+  },
 });
 
 // export const blog = defineDocs({
 //   dir: 'content/blog',
 // });
 
+
 export const blog = defineCollections({
   type: 'doc',
   dir: 'content/blog',
   async: true,
+  // mdxOptions: getDefaultMDXOptions({
+  //   // extended mdx options
+  // }),
   schema: frontmatterSchema.extend({
-    author: z.string(),
+    // author: z.string(),
+    author: z.union([
+      z.string(),
+      z.array(z.object({
+        username: z.string().optional(),
+        name: z.string().optional(),
+        handle: z.string().optional(),
+        handleUrl: z.string().optional(),
+        avatar: z.string().optional(),
+      })),
+    ]),
     date: z.string().date().or(z.date()).optional(),
+    // date: z.string().datetime({ offset: true }).or(z.date()).optional(),
+    // last_modified_at: z.string().datetime({ offset: true }).or(z.date()).optional(), // z.string().date().or(z.date()).optional(),
+    // last_modified_at: z.string().date().or(z.date()).optional(),
+    // toc: z.boolean().default(false),
+    draft: z.boolean().default(false),
+    comment: z.boolean().default(false),
+    feedback: z.boolean().default(false),
+    excerpt: z.string().optional(),
+    tags: z.array(z.string()).optional(),
+    categories: z.string().optional(),
+    header: z.object({
+      teaser: z.string().optional(),
+      overlay_image: z.string().optional(),
+      overlay_filter: z.string().optional(),
+    }).optional(),
   }),
 });
 
