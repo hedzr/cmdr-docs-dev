@@ -81,15 +81,23 @@ const config = {
     "@shikijs/twoslash",
   ],
   images: {
-    unoptimized: true,
-    domains: [
-      "images.unsplash.com",
-      "avatars.githubusercontent.com",
-      "raw.githubusercontent.com",
-      "github.com",
-      "cdn.jsdelivr.net",
-      "upload.wikimedia.org",
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**",
+        port: "",
+        pathname: "**",
+      },
     ],
+    unoptimized: true,
+    // domains: [
+    //   "images.unsplash.com",
+    //   "avatars.githubusercontent.com",
+    //   "raw.githubusercontent.com",
+    //   "github.com",
+    //   "cdn.jsdelivr.net",
+    //   "upload.wikimedia.org",
+    // ],
   },
   // images: {
   //   unoptimized: true,
