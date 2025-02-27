@@ -16,9 +16,7 @@ import {
 } from "@/components/page";
 
 import { openapi } from "@/lib/source";
-
 import { metadataImage } from "@/lib/metadata";
-
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import { ComponentProps, FC } from "react";
 import { Callout } from "fumadocs-ui/components/callout";
