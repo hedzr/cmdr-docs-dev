@@ -41,7 +41,7 @@ import {
 } from "@/components/ui/popover";
 import { InlineTOC } from "fumadocs-ui/components/inline-toc";
 import { Wrapper } from "@/components/preview/wrapper";
-import { ImageZoom } from "fumadocs-ui/components/image-zoom";
+import { ImageZoom } from "@/components/image-zoom";
 import { Step, Steps } from "fumadocs-ui/components/steps";
 import { Mermaid } from "@theguild/remark-mermaid/mermaid"; // pnpm install @theguild/remark-mermaid remark-math fumadocs-twoslash fumadocs-docgen rehype-katex
 import { DocsCategory } from "@/components/page";
