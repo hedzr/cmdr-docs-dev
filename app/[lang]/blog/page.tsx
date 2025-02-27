@@ -1,7 +1,12 @@
 // import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 // import { Button } from "@/components/ui/button2";
 // // import { BlogMdxFrontmatter, getAllBlogs } from "@/lib/markdown";
-import serverPath, {formatDate2, isFieldValid, safeget, stringToDate} from "@/lib/utils";
+import serverPath, {
+  formatDate2,
+  isFieldValid,
+  safeget,
+  stringToDate,
+} from "@/lib/utils";
 import { ChevronRightIcon, CircleIcon } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -19,6 +24,8 @@ import { blog } from "@/lib/source";
 import { LoaderOutput, MetaData, Page } from "fumadocs-core/source";
 import { BaseCollectionEntry, MarkdownProps } from "fumadocs-mdx/config";
 import { objectOutputType, ZodTypeAny } from "zod";
+import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
+import { filterPostsByPage, getPosts, prodMode } from "./util";
 
 export const dynamic = "force-dynamic";
 
@@ -36,8 +43,6 @@ export const metadata: Metadata = {
   description: SITE_SLOGAN,
 };
 
-const prodMode = process.env.NODE_ENV === "production";
-
 function safeTitle(md: Metadata): string {
   let title: string = "The Latest Posts";
   if (md.title) {
@@ -47,194 +52,6 @@ function safeTitle(md: Metadata): string {
     }
   }
   return title;
-}
-
-function getPosts(
-  blog: LoaderOutput<{
-    source: {
-      pageData: {
-        title: string;
-        author: string;
-        description?: string | undefined;
-        date?: string | Date | undefined;
-        icon?: string | undefined;
-        full?: boolean | undefined;
-        _openapi?: objectOutputType<{}, ZodTypeAny, "passthrough"> | undefined;
-      } & BaseCollectionEntry & { load: () => Promise<MarkdownProps> };
-      metaData: MetaData & BaseCollectionEntry;
-    };
-    i18n: true;
-  }>,
-  lang: string,
-  query: string | string[]
-) {
-  const posts = [...blog.getPages(lang)]
-    .filter((v, i, a) => {
-      if (!v) return false;
-
-      // console.log(v, i);
-
-      const fm = v.data;
-      const slug = v.slugs.join("-");
-      const log = false; // /(golang)/i.test(slug);
-
-      const test = (qry: string): boolean => {
-        const qq = qry.replace(/[+-\[\]*\/\\{}()?^$]/g, (v) => {
-          return "\\" + v;
-        });
-        // const qq = RegExp.escape(qry);
-        // console.log(qq);
-        const tagsOnly = qq.startsWith("#");
-        const q = tagsOnly
-          ? new RegExp(qq.substring(1))
-          : new RegExp("\\b" + qq); // `\bgo` will match 'go', 'golang', but `algo`
-        // const tt = v.slug == 'time-travle';
-        // if (tt) console.log(fm);
-        if (!tagsOnly) {
-          if (q.test(fm.title) || q.test(fm.description||'') || q.test(slug)) {
-            if (log) console.log(`searched ok [title|desc|slug]: ${slug}`);
-            return true;
-          }
-          if (q.test(safeget(fm,'excerpt',''))) {
-            if (log) console.log(`searched ok [excerpt]: ${slug}`);
-            return true;
-          }
-          if (isFieldValid(fm,'categories')) {
-            const t = safeget(fm,'categories','');
-            if (q.test(t)) {
-              if (log)
-                console.log(
-                    `searched ok (q=${q.toString()}) [category(${t})]: ${slug}`
-                );
-              return true;
-            }
-            // if (typeof fm['categories'] === "string") {
-            //   if (q.test(fm.categories)) {
-            //     if (log)
-            //       console.log(
-            //         `searched ok (q=${q.toString()}) [category(${fm.categories})]: ${slug}`
-            //       );
-            //     return true;
-            //   }
-            // } else {
-            //   let ret = fm.categories.filter((it) => {
-            //     return q.test(it);
-            //   });
-            //   const r = Array.isArray(ret) && ret.length != 0;
-            //   if (log)
-            //     console.log(
-            //       `searched ${r} (q=${q.toString()}) [category[](${fm.categories})]: ${slug}`
-            //     );
-            //   if (r) return r;
-            // }
-          }
-        }
-        if (isFieldValid(fm,'tags')) {
-          const t = safeget(fm,'tags','');
-          if (q.test(t)) {
-            if (log) console.log(`searched ok [tag(${t})]: ${slug}`);
-            return true;
-          }
-          // if (typeof fm.tags === "string") {
-          //   if (q.test(fm.tags)) {
-          //     if (log) console.log(`searched ok [tag(${fm.tags})]: ${slug}`);
-          //     return true;
-          //   }
-          // } else {
-          //   let ret = fm.tags.filter((it) => {
-          //     return q.test(it);
-          //   });
-          //   const r = Array.isArray(ret) && ret.length != 0;
-          //   if (log)
-          //     console.log(
-          //       `searched ${r} filter [tags[](${fm.tags})]: ${slug}`,
-          //       ret
-          //     );
-          //   // if (log) {
-          //   //   fm.tags.filter((it) => {
-          //   //     if (q.test(it)) {
-          //   //       return true;
-          //   //     }
-          //   //     console.log(`searched filter false [${it}]: ${q.toString()}, ${qq}`);
-          //   //     return false;
-          //   //   });
-          //   // }
-          //   if (r) return r;
-          // }
-        }
-        return false;
-      };
-
-      if (log) console.log(`searching for ${slug}`);
-      if (typeof query !== "string") {
-        for (const key in query) {
-          if (key !== "") {
-            if (test(key)) {
-              const draft = safeget(fm,'draft',false);
-              if (log)
-                console.log(
-                  `search test q[] - '${key}' ok, and [draft test == ${!draft || !prodMode}]: ${slug}`
-                );
-              return !draft || !prodMode;
-            }
-          }
-        }
-        return false;
-      }
-      if (query !== "") {
-        if (!test(query)) return false;
-        const draft = safeget(fm,'draft',false);
-        if (log)
-          console.log(
-            `search test q - '${query}' ok, and [draft test == ${!draft || !prodMode}]: ${slug}`
-          );
-        return !draft || !prodMode;
-      }
-
-      const draft = safeget(fm,'draft',false);
-      if (log)
-        console.log(
-          `search final test '${query}' [draft test == ${!draft || !prodMode}]: ${slug}`
-        );
-      return !draft || !prodMode;
-    })
-    .sort(
-      (a, b) =>
-        new Date(b.data.date ?? b.file.name).getTime() -
-        new Date(a.data.date ?? a.file.name).getTime()
-    );
-  return posts;
-}
-
-function filterPostsByPage(
-  posts: Page<
-    {
-      title: string;
-      author: string;
-      date?: string | Date | undefined;
-      description?: string | undefined;
-      icon?: string | undefined;
-      full?: boolean | undefined;
-      _openapi?: objectOutputType<{}, ZodTypeAny, "passthrough"> | undefined;
-    } & BaseCollectionEntry & { load: () => Promise<MarkdownProps> }
-  >[],
-  page: number,
-  perpage: number
-) {
-  const start = (page - 1) * perpage,
-    stop = page * perpage;
-  const pagemax = Math.floor((posts.length + perpage - 1) / perpage);
-
-  // console.log(`getAllBlogs: total=${items.length}, pages=${pagemax}, page=${page}, start=${start}, stop=${stop}`);
-
-  const items = posts.filter((val, idx, allfiles) => {
-    // console.log('filtering', val[0], val, idx);
-    return start <= idx && idx < stop;
-  });
-
-  // console.log(items);
-
-  return { posts: items, maxPage: pagemax };
 }
 
 export default async function BlogIndexPage({
@@ -252,6 +69,8 @@ export default async function BlogIndexPage({
   const currentPage = Number(sp?.page) || 1;
   const perPage = 7;
   const lang = (await params).lang;
+
+  // const ppp = pf(blog);
 
   const { posts, maxPage } = filterPostsByPage(
     getPosts(blog, lang, query),
@@ -309,7 +128,7 @@ export default async function BlogIndexPage({
         {/* <BlogTable query={query} currentPage={currentPage} /> */}
         <div>
           {posts.map((post) => {
-            const draft = safeget(post.data,'draft',false);
+            const draft = safeget(post.data, "draft", false);
             return draft && prodMode ? (
               <></>
             ) : (
@@ -323,7 +142,10 @@ export default async function BlogIndexPage({
                   <div>
                     <Image
                       className="w-42 ml-2 float-right rounded-lg shadow-lg"
-                      src={safeget(post.data,'header',{teaser:''}).teaser || spot}
+                      src={
+                        safeget(post.data, "header", { teaser: "" }).teaser ||
+                        spot
+                      }
                       alt={post.slugs.join(" ")}
                       width="200"
                       height="160"
@@ -333,7 +155,8 @@ export default async function BlogIndexPage({
                     </h3>
                     {/* <p className="font-medium">{post.data.title}</p> */}
                     <p className="text-sm text-fd-muted-foreground">
-                      {post.data.description || safeget(post.data,'excerpt','')}
+                      {post.data.description ||
+                        safeget(post.data, "excerpt", "")}
                     </p>
 
                     <p className="mt-auto pt-4 text-xs text-fd-muted-foreground">
@@ -347,6 +170,7 @@ export default async function BlogIndexPage({
         </div>
         <div className="mt-1 flex w-full justify-center">
           <Pagination totalPages={maxPage} />
+          <HandlingKeyboardLeftAndRight />
         </div>
       </Suspense>
     </main>

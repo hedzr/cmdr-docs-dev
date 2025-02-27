@@ -55,6 +55,11 @@ import {
 import ClerkTOCItems from "@/components/layout/toc-clerk";
 import { TocPopoverHeader } from "@/page.client";
 import { buttonVariants1 } from "@/components/ui/button1";
+import { z } from "zod";
+import { LoaderOutput, MetaData } from "fumadocs-core/source";
+import { BaseCollectionEntry, MarkdownProps } from "fumadocs-mdx/config";
+import { getPosts } from "../util";
+import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
 // import { Edit, Text } from "lucide-react";
 // import { I18nLabel } from "fumadocs-ui/provider";
 
@@ -126,18 +131,39 @@ export function generateStaticParams(): { slug: string }[] {
 export default async function BlogPage(props: {
   params: Promise<{ slug: string; lang: string }>;
 }) {
+  // const schema = z.union([
+  //   z.string(),
+  //   z.array(
+  //     z.object({
+  //       username: z.string().optional(),
+  //       name: z.string().optional(),
+  //       handle: z.string().optional(),
+  //       handleUrl: z.string().optional(),
+  //       avatar: z.string().optional(),
+  //     })
+  //   ),
+  // ]);
+
+  // console.log(1, "zod", schema.parse("uxx"));
+  // // console.log(2, "zod", schema.parse({}), "bad");
+  // console.log(3, "zod", schema.parse([{ name: "xxx" }]));
+
   const params = await props.params;
   const page = blog.getPage([params.slug]);
-  const lang = params.lang;
 
   if (!page) notFound();
-  const { body: Mdx, toc } = await page.data.load();
 
+  const lang = params.lang;
   const fm = page.data;
+  // const body = fm.body;
+  // const toc = page.data.toc;
+  const { body: Mdx, toc } = await fm.load();
+
   let tags: string[] = [];
   let categories: string[] = [];
-  if ('tags' in fm) tags = Array.isArray(fm.tags) ? fm.tags : safe(fm.tags).split(/[,; ]/);
-  if ('categories' in fm)
+  if ("tags" in fm)
+    tags = Array.isArray(fm.tags) ? fm.tags : safe(fm.tags).split(/[,; ]/);
+  if ("categories" in fm)
     categories = Array.isArray(fm.categories)
       ? fm.categories
       : safe(fm.categories).split(/[,; ]/);
@@ -173,7 +199,7 @@ export default async function BlogPage(props: {
         }}
       >
         <h1
-          className={`mb-2 text-3xl font-bold text-white ${safeget(page.data,'draft',false) ? "line-through italic" : ""}`}
+          className={`mb-2 text-3xl font-bold text-white ${safeget(page.data, "draft", false) ? "line-through italic" : ""}`}
         >
           {page.data.title}
         </h1>
@@ -196,7 +222,7 @@ export default async function BlogPage(props: {
             <TocPopoverHeader>
               <TocPopoverTrigger className="w-full" items={toc} />
               <TocPopoverContent>
-                  {safeget(tocPopoverOptions,'header',<></>)}
+                {safeget(tocPopoverOptions, "header", <></>)}
                 <TOCScrollArea isMenu>
                   {tocPopoverOptions.style === "clerk" ? (
                     <ClerkTOCItems items={toc} />
@@ -204,7 +230,7 @@ export default async function BlogPage(props: {
                     <TOCItems items={toc} />
                   )}
                 </TOCScrollArea>
-                {safeget(tocPopoverOptions,'footer',<></>)}
+                {safeget(tocPopoverOptions, "footer", <></>)}
               </TocPopoverContent>
             </TocPopoverHeader>
           )}
@@ -260,15 +286,32 @@ export default async function BlogPage(props: {
               Tab,
             }}
           />
+          <div className="mt-32 w-full">
+            {prev ? (
+              <div className="left prev">
+                <Link href={prev.url}>Prev: {prev.data.title || ""}</Link>
+              </div>
+            ) : (
+              <></>
+            )}
+            {next ? (
+              <div className="float-right right next">
+                <Link href={next.url}>Next: {next.data.title}</Link>
+              </div>
+            ) : (
+              <></>
+            )}
+          </div>
+          <HandlingKeyboardLeftAndRight />
         </div>
         <div className="flex flex-col gap-4 border-l p-4 text-sm lg:w-[250px]">
           <div>
             <p className="mb-1 text-fd-muted-foreground">Written by</p>
             <div className="font-medium blog-authors">
               {/* {page.data.author} */}
-              {isFieldValid(fm,'authors') ? (
-                <AuthorCards authors={safeget(fm,'authors',[])} />
-              ) : isFieldValid(fm,'author') ? (
+              {isFieldValid(fm, "authors") ? (
+                <AuthorCards authors={safeget(fm, "authors", [])} />
+              ) : isFieldValid(fm, "author") ? (
                 <AuthorCard author={fm.author} />
               ) : (
                 <AuthorCard
@@ -514,9 +557,9 @@ function AuthorCards({ authors }: { authors: AuthorT[] }) {
   );
 }
 
-function AuthorCard({ author }: { author: AuthorT|string }) {
-  if(typeof author === 'string') {
-    author = {username: author};
+function AuthorCard({ author }: { author: AuthorT | string }) {
+  if (typeof author === "string") {
+    author = { username: author };
   }
   return (
     <div className="flex items-center gap-8 flex-wrap">
