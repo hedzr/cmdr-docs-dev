@@ -172,7 +172,18 @@ export default async function BlogPage(props: {
   const get = (fm: any, v: string) => {
     return v in fm ? fm[v] : "";
   };
-  let lma: string = get(fm, "lastModifiedAt") || get(fm, "last_modified_at");
+  let lma: string = get(fm, "last_modified_at") || get(fm, "lastModifiedAt");
+
+  const posts = getPosts(blog, lang, "");
+  let prev: typeof page, next: typeof page, last: typeof page;
+  posts.map((it) => {
+    if (it.url === page.url) {
+      prev = last;
+    } else if (last && last.url === page.url) {
+      next = it;
+    }
+    last = it;
+  });
 
   const tocPopoverOptions = {
     style: "clerk", // normal, clerk
