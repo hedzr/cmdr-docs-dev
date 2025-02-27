@@ -27,7 +27,7 @@ export const metadata = createMetadata({
     },
   },
   openGraph: {
-    images: "/og-image.png",
+    images: "/docs-og/og-image.png",
   },
 });
 
