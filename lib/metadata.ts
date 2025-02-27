@@ -5,7 +5,7 @@ import * as process from "node:process";
 
 export const site = {
   title: 'cmdr.docs',
-  desc: '',
+  desc: "The Documentations and News of hedzr's Open Source Projects",
 };
 
 export const metadataImage = createMetadataImage({
