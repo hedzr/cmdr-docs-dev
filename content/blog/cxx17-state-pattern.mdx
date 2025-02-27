@@ -1,10 +1,23 @@
 ---
 layout: single
 title: "谈 C++17 里的 State 模式之一"
-date: 2021-09-29 05:00:00 +0800
-last_modified_at: 2021-09-29 20:00:00 +0800
-Author: hedzr
-tags: [c++,c++11,c++17,state pattern,fsm,fsm-cxx,state machine,state chart,design patterns,状态模式,设计模式]
+date: 2021-09-29T05:00:00+08:00
+last_modified_at: 2021-09-29T20:00:00+08:00
+author: hedzr
+tags:
+  [
+    c++,
+    c++11,
+    c++17,
+    state pattern,
+    fsm,
+    fsm-cxx,
+    state machine,
+    state chart,
+    design patterns,
+    状态模式,
+    设计模式,
+  ]
 categories: c++ algorithm
 comments: true
 toc: true
@@ -16,9 +29,7 @@ excerpt: >-
   关于状态模式的研究，以及状态机的 C++17 中的通用实现，介绍 fsm-cxx ...
 ---
 
-
 > 介绍 [fsm-cxx](https://github.com/hedzr/fsm-cxx) 的实现
-
 
 回顾状态模式，考虑实作它的各种问题——特别是有关如何实现一个状态机的问题。同时，这一篇呢，可能不得不分几篇，因为写的时候脑壳在发散嘛，于是就关联得到的、能想起来的都提了一嘴，就多了。但是最后还是会给出代码的，我喜欢写代码的。
 
@@ -50,8 +61,6 @@ excerpt: >-
 
 提到状态机，它首先表示的是一个对象拥有一系列状态，并且能够在状态之间相互状态，而当发生转换时则会触发特定的动作 Action（分为进入动作 Entry Action 和退出动作 Exit Action，以及输入动作 Input Action，有时候也包括转移动作 Transition Action），并表现出不同的外在形象。
 
-
-
 #### 分类
 
 状态机/自动机（Automaton）可以被分为多种类别：
@@ -64,8 +73,6 @@ excerpt: >-
 例如分类器 Classfiers 和序列（时序/音序等）测定器/生成器 Sequencers。将多个接受器按照确定性与否，则可划分为 DFA 与 NFA 等。在确定型自动机（DFA）中，每个状态对每个可能输入只有精确的一个转移。在非确定型自动机（NFA）中，给定状态对给定可能输入可以没有或有多于一个转移。
 
 等等。
-
-
 
 ##### Moore Machine
 
@@ -83,8 +90,6 @@ Moore Machine 的特点是只使用进入动作，就是说输出只依赖于当
 
 对于 Moore 机来说，状态转换需要一个推动力，这是通常的状态机教材没有显示提及的。通常状态机不可能自行驱动自身从一个状态变迁到另一状态，所以它需要一个驱动力。在上例电梯门的 Moore 机中，Somebody 按下开门关门钮就是这个驱动信号。
 
-
-
 ##### Mealy Machine
 
 Mealy Machine 的状态切换依赖于输入动作以及当前状态，它比摩尔机更复杂一点，但同时也常常因此而使得其状态图更简单简约。例如电梯门被开闭的状态图：
@@ -96,8 +101,6 @@ Mealy Machine 的状态切换依赖于输入动作以及当前状态，它比摩
 和摩尔机的示例有所不同，这个例子中视角聚焦在电梯门是如何受到传感器信号的触发而改变的。
 
 同样的道理，这个例子也有驱动信号的存在：尽管同样是开门关门按钮按下导致门开门关，但驱动信号在这个例子中是门开门关传感器所产生的信号，传感器检测到门开门关动作后发出信号，以标示电梯门进入到新的状态（门已开，门已关）。所以同一个事件，精细考察不同的局部，会得到不同的结论。
-
-
 
 #### TCP 的状态跃迁图
 
@@ -111,7 +114,7 @@ TCP 的状态跃迁图能够很好地展示状态的切换：
 
 ![img](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/tcpfsm.png)
 
-> FROM:  [The TCP/IP Guide - TCP Operational Overview and the TCP Finite State Machine (FSM)](http://tcpipguide.com/free/t_TCPOperationalOverviewandtheTCPFiniteStateMachineF-2.htm) 
+> FROM: [The TCP/IP Guide - TCP Operational Overview and the TCP Finite State Machine (FSM)](http://tcpipguide.com/free/t_TCPOperationalOverviewandtheTCPFiniteStateMachineF-2.htm)
 
 #### 实现方法介绍
 
@@ -166,8 +169,6 @@ int main(void) {
 
 稍后再粗略谈论 FSM（编译原理中的 FSM）和 DFA 技术的实现概要。
 
-
-
 #### 查表法
 
 状态机的转换规则可以表示为一张二维的状态转移表，像这样：
@@ -177,8 +178,6 @@ int main(void) {
 在实际场景中，这张表往往是比较稀疏的，很多交叉点是没有到下一状态的跃迁可能性的，所以这张表所映射到的二维数组通常都可以采取一定的措施以将其压缩下来，压缩的结果除了能显著降低表的存储空间之外，也有可能明显地降低扫描这张表的速度。
 
 对于无需参考输入条件的 Moore 机来说，没有纵向的条件表，替代它的是一个单调的信号，该信号促使状态机发生步进动作，因此条件表依然是有效的。
-
-
 
 #### FSM，NFA 和 DFA
 
@@ -224,8 +223,6 @@ OK，在本文中，我们采用 FSM 术语来暗指 FSM 以及 NFA 以及 DFA �
 
 但是在其它文章中，FSM 可能仅仅只是包含状态机而不必上升到 DFA 计算层次。
 
-
-
 #### 进一步的分类
 
 在经典的状态机理论之上，UML 规范提供了增强的状态机算法模型。相比较而言，UML 状态机（绘制成 UML 图时就叫做 state chart）的增强之处在于：
@@ -254,10 +251,6 @@ HFSM 在游戏开发领域中、芯片设计、FPGA 设计、PLC 设计等场所
 
 游戏业中喜欢讲行为树我的实现多么有特点，多么 AI，是的，从不同的角度完成 FSM 是非常有价值的，它使得状态迁移的规则更易于被管理，不过这玩意和 AI 还是搭不上界的。
 
-
-
-
-
 #### 小小结
 
 一般来说，我们认为状态模式就是状态机的一种实现范式。因此本文中会将状态模式与如何实现一个状态机等同起来。
@@ -270,8 +263,6 @@ HFSM 在游戏开发领域中、芯片设计、FPGA 设计、PLC 设计等场所
 
 像 TCP 的状态变迁，规模不大，完全可以手写，除非你希望做严格的理论推导或者学术研究，否则泰半无需兴师动众。但是对于现代化的 RegExp 进行翻译和解释，手写通常行不通（也不绝对，确实曾有团队是硬撸的），只能借助于 Kleene 闭包的手段完成到 DFA 的翻译后完成构造，而那是非常省力的。
 
-
-
 ### 下一部分
 
 只能留待下一篇再来谈论具体的实现案例了。
@@ -280,7 +271,4 @@ HFSM 在游戏开发领域中、芯片设计、FPGA 设计、PLC 设计等场所
 
 未完待续。
 
-
-
 :end:
-

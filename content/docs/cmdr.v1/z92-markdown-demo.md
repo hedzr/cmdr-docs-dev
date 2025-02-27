@@ -1,8 +1,8 @@
 ---
 layout: single
 title: "Markdown Demo"
-date: 2020-07-13 12:15:11 +0800
-Author: hedzr
+date: 2020-07-13T12:15:11+08:00
+author: hedzr
 tags: [commander, command-line, "command-line-parser", command-line-interface,  getops, posix, posix-compatible, hierarchical-configuration, hierarchy, cli, golang, markdown, demo]
 categories: golang cmdr others
 comments: true
@@ -27,20 +27,14 @@ excerpt: >-
 
 # Markdown Demo
 
-
-
 ## 元素
 
 ### 上标、下标
-
-
 
 ```markdown
 ~SUB~
 ^SUP^
 ```
-
-
 
 ~SUB~
 ^SUP^
@@ -48,10 +42,6 @@ excerpt: >-
 29^th^
 
 H~2~O
-
-
-
-
 
 ### Footnote
 
@@ -74,10 +64,6 @@ Here is a footnote reference,[^1] and another.[^longnote]
 
     Subsequent paragraphs are indented to show that they
 belong to the previous footnote.
-
-
-
-
 
 [//]: # (### Abbreviation)
 
@@ -104,15 +90,9 @@ belong to the previous footnote.
 
 [//]: # (is maintained by the W3C.)
 
-
-
 ### Mark
 
-
-
 ==marked==
-
-
 
 [//]: # (### Definition Lists)
 
@@ -159,22 +139,12 @@ belong to the previous footnote.
 [//]: # (    )
 [//]: # (    Third paragraph of definition 2.)
 
-
-
 ### Insert
 
 ```markdown
 ++inserted++
 ```
 
-
-
 ++inserted++
 
-
-
-
-
-
 🔚
-

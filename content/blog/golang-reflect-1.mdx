@@ -1,9 +1,9 @@
 ---
 layout: single
-title: 'Golang Reflect 系列一 - 和 deepcopy 有关的'
-date: 2020-11-03 10:08:00 +0800
-last_modified_at: 2020-11-05 15:01:00 +0800
-Author: hedzr
+title: "Golang Reflect 系列一 - 和 deepcopy 有关的"
+date: 2020-11-03T10:08:00+08:00
+last_modified_at: 2020-11-05T15:01:00+08:00
+author: hedzr
 tags: [reflect, deepcopy, clone, golang]
 categories: golang reflect
 comments: true
@@ -18,29 +18,18 @@ excerpt: >-
 > **May 2H22** 补记: 时隔一年半，终于还是造了一个 deepcopy 类：
 >
 > 1. [容易定制的 deepcopy 反射库 evendeep](https://hedzr.com/golang/reflect/deepcopy-with-go-reflect/)
->
 > 2. 和 [https://github.com/hedzr/evendeep](https://github.com/hedzr/evendeep)
 >
 > 算是对历年来对反射情有独钟的一种交待吧。
-
-
 
 > 本阶段讨论反射共两篇：
 >
 > 1. [Golang Reflect 系列一 - 和 deepcopy 有关的](https://hedzr.com/golang/reflect/golang-reflect-1/)
 > 2. [Golang Reflect 系列二 - 和 Map 操作有关的](https://hedzr.com/golang/reflect/golang-reflect-2/)
 
-
-
 近期在考虑 deepcopy 功能，所以有下面的一些收集与思考。
 
-
-
 ## 和 deepcopy 有关的
-
-
-
-
 
 ### 对结构赋值
 
@@ -68,8 +57,6 @@ Line 6 取得一个指向结构对象的指针的 reflect.Value 构造体，然�
 
 所以 Line10 和 11 将能够顺利地通过结构体的成员反射对象 fld 对其进行赋值。
 
-
-
 #### 反射法则3
 
 这也是所谓的**反射法则3**:
@@ -93,7 +80,7 @@ func (u *User) SetName(n string) { u.Name = n }
 
 很多人觉得 go 坑多，此言甚善。但是反过来看，其实也是因为大家将自己已经习惯的 C++、Java 的 class，struct 等概念代入了 golang 之中，这当是舒适区之外的愤慨，就很缹。
 
-> 所谓的反射三法则，源于  [The Laws of Reflection - The Go Blog](https://blog.golang.org/laws-of-reflection) 一文，总论如下：
+> 所谓的反射三法则，源于 [The Laws of Reflection - The Go Blog](https://blog.golang.org/laws-of-reflection) 一文，总论如下：
 >
 > - Reflection goes from interface value to reflection object.
 > - Reflection goes from reflection object to interface value.
@@ -102,8 +89,6 @@ func (u *User) SetName(n string) { u.Name = n }
 > 想要深入了解这些法则，请直达原文。
 >
 > 三法则的前两条都是教程性质、只在讲述 Go 反射是如何抽象出来的，唯有第三条是涉及到内存中具体数据类型布局的真正法则，融会贯通了计组、编译原理的人应当理解此语。
-
-
 
 #### 进一步理解：CanAddr 和 CanSet
 
@@ -123,8 +108,6 @@ CanSet 表示说一个给定的 reflect.Value 是可寻址的（addressable）�
 还有一些特殊的时态，例如已回收但尚未无效化的变量等等。所谓我们需要知道，使用 go 进行开发和编码，要尊重约定、尊重惯用法。反面的例子可以是这样：用两个指针指向同一个变量，并且在超出作用域之后通过这些指针去非法访问已经无效的原变量；更有说服力的案例是再次访问已经 close 掉的 channel。
 
 这些例子中之所以有非法操作的存在，本质上说正是因为原始变量已经被回收，但你仍然通过手段试图对其进行操作——绝对安全的高级编程语言是不可能存在的，除非这种语言不支持“高级”操作。
-
-
 
 #### Helper：`reflectValue`
 
@@ -158,8 +141,6 @@ vou := reflect.ValueOf(&user)
 vou = reflect.Indirect(vou)
 ```
 
-
-
 ### Deep Copy：针对 unexported 成员
 
 我们已经知道的各种 deepcopy 开源库，一律包含了一个限制：对于结构体的非导出的字段无法实现复制。这是因为 CanSet 的安全性设定：既然非导出的字段在内部被定义为不可赋值的，那么 Set(value) 对其就是无意义的，在 reflect 包中针对这类情况会以 panic 返回，所以开源的 deepcopy 库们无法完成这一功能。
@@ -173,8 +154,6 @@ vou = reflect.Indirect(vou)
 1. 实现 Cloneable 接口
 2. 通过 unsafe pointer
 3. 通过 reflect 反射
-
-
 
 #### Cloneable 接口
 
@@ -214,8 +193,6 @@ func (u U) Clone() interface{} {
 
 > [hedzr/ref](https://github.com/hedzr/ref) 是一个和 refelct 有关的库，有待正式开源，尚未完成。
 
-
-
 #### unsafe pointer 方式
 
 我们一直没有真正提及过 `unsafe pointer`，这是 Golang 中的指向某个内存地址的裸指针。它之所以重要，是因为你可以通过它越过 Golang 的一切明面上的约定，包括对 unexported 字段赋值。
@@ -248,7 +225,7 @@ func testSetFieldValueUnsafe(t *testing.T) {
 
 	c2 := (*CatX)(unsafe.Pointer(cat))
 	c2.Name = "ohmygod"
-	
+
 	t.Logf("cat  : %+v", cat)
 	t.Logf("cat 2: %+v", c2)
 }
@@ -261,8 +238,6 @@ type Cat struct {
 ```
 
 这样的手段，真的不要滥用，实际上可能是非常可怕的。
-
-
 
 #### 通过 reflect 方式
 
@@ -298,82 +273,64 @@ func SetUnexportedField(field reflect.Value, value interface{}) {
 }
 ```
 
-
-
-
-
-
-
 ### 所谓的已知的 deepcopy 开源库
 
 大体上在 Github 上可以搜索到的是这些库，排名无分先后，大体上源于 Github 自身列举出来的顺序：
-
-
 
 [jinzhu/copier](https://github.com/jinzhu/copier)
 
 Copier for golang, copy value from struct to struct and more
 
-[mohae/*deepcopy*](https://github.com/mohae/deepcopy)
+[mohae/_deepcopy_](https://github.com/mohae/deepcopy)
 
-*Deep* *copy* things
+_Deep_ _copy_ things
 
-[ulule/*deepcopier*](https://github.com/ulule/deepcopier)
+[ulule/_deepcopier_](https://github.com/ulule/deepcopier)
 
-simple struct *copying* for golang
+simple struct _copying_ for golang
 
-[mitchellh/*copystructure*](https://github.com/mitchellh/copystructure)
+[mitchellh/_copystructure_](https://github.com/mitchellh/copystructure)
 
-Go (golang) library for *deep* *copying* values in Go.
+Go (golang) library for _deep_ _copying_ values in Go.
 
-[globusdigital/*deep*-*copy*](https://github.com/globusdigital/deep-copy)
+[globusdigital/_deep_-_copy_](https://github.com/globusdigital/deep-copy)
 
-*Deep* *copy* generator
+_Deep_ _copy_ generator
 
-[getlantern/*deepcopy*](https://github.com/getlantern/deepcopy)
+[getlantern/_deepcopy_](https://github.com/getlantern/deepcopy)
 
-*Deep* *copying* for Go
+_Deep_ _copying_ for Go
 
-[antlabs/*deepcopy*](https://github.com/antlabs/deepcopy)
+[antlabs/_deepcopy_](https://github.com/antlabs/deepcopy)
 
 deepcopy库支持dst, src间的深度拷贝，类型从struct,map,slice基本都支持，支持过滤条件[从零实现]
 
 [go-toolsmith/astcopy](https://github.com/go-toolsmith/astcopy)
 
-Package astcopy implements Go AST *deep* *copy* operations.
+Package astcopy implements Go AST _deep_ _copy_ operations.
 
 [qdm12/reprint](https://github.com/qdm12/reprint)
 
-Golang *deep* *copying*, THE RIGHT WAY ™️
+Golang _deep_ _copying_, THE RIGHT WAY ™️
 
-[ybriffa/*deepcopy*](https://github.com/ybriffa/deepcopy)
+[ybriffa/_deepcopy_](https://github.com/ybriffa/deepcopy)
 
-library to make *deep* *copies* in go
+library to make _deep_ _copies_ in go
 
-[volio/go-*copy*](https://github.com/volio/go-copy)
+[volio/go-_copy_](https://github.com/volio/go-copy)
 
-Go *deep* *copy* library, support circular reference
+Go _deep_ _copy_ library, support circular reference
 
-[huandu/go-*clone*](https://github.com/huandu/go-clone)
+[huandu/go-_clone_](https://github.com/huandu/go-clone)
 
-*Deep* *clone* any Go data.
+_Deep_ _clone_ any Go data.
 
-[wzshiming/*deepclone*](https://github.com/wzshiming/deepclone)
+[wzshiming/_deepclone_](https://github.com/wzshiming/deepclone)
 
 deepclone
 
-[davidwalter0/go-*clone*](https://github.com/davidwalter0/go-clone)
+[davidwalter0/go-_clone_](https://github.com/davidwalter0/go-clone)
 
-recursive *deep* copy of go object
-
-
-
-
-
-
-
-
-
-
+recursive _deep_ copy of go object
 
 🔚

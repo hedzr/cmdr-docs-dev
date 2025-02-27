@@ -1,10 +1,10 @@
 ---
 layout: single
 title: "cxx17 尾随返回类型"
-date: 2022-08-28 05:00:00 +0800
-last_modified_at: 2022-08-28 23:23:00 +0800
-Author: hedzr
-tags: [c++,c++11,c++17,basics]
+date: 2022-08-28T05:00:00+08:00
+last_modified_at: 2022-08-28T23:23:00+08:00
+author: hedzr
+tags: [c++, c++11, c++17, basics]
 categories: c++ algorithm
 comments: true
 toc: true
@@ -16,8 +16,6 @@ excerpt: >-
   C++11 起的“尾随返回类型”之我见...
 ---
 
-
-
 多数情况下，我都很少会用到尾随返回类型。
 
 这是因为习惯的力量。
@@ -26,11 +24,7 @@ excerpt: >-
 
 所以关于尾随返回类型，我也有一些看法，可以记录一下。
 
-
-
 ## 尾随返回类型
-
-
 
 ### 何者？
 
@@ -66,8 +60,6 @@ auto func_name(int x, int y) -> int;
 ```
 
 它看起来就好像只不过是一支语法糖而已，是吗？
-
-
 
 ### 强调自动推定从这时候开始
 
@@ -164,7 +156,7 @@ struct base{
 class derived : public base {
   public:
   using base::base;
-  
+
   derived(base const& o);
   derived() = default;
   virtual ~derived() = default;
@@ -186,8 +178,6 @@ auto which_one_case2() -> derived {
 嗯，上面连续设法制造了三个示例，不过都有点不怎么好。
 
 就这样吧。
-
-
 
 ### Pros
 
@@ -228,11 +218,11 @@ auto which_one_case2() -> derived {
    ```cpp
    struct A {
      std::vector<int> a;
-   
+
      // OK, works as expected
      auto begin() const -> decltype(a.begin()) { return a.begin(); }
-   
-     // FAIL, does not work: "decltype(a.end())" will be "iterator", but 
+
+     // FAIL, does not work: "decltype(a.end())" will be "iterator", but
      // the return statement returns "const_iterator"
      decltype(a.end()) end() const { return a.end(); }
    };
@@ -251,7 +241,7 @@ auto which_one_case2() -> derived {
    private:
        PersonType _person_type;
    };
-   
+
    // UGLY: Person::PersonType Person::getPersonType () { return _person_type; }
    auto Person::getPersonType () -> PersonType {
        return _person_type;
@@ -284,25 +274,23 @@ auto which_one_case2() -> derived {
        using Second = std::vector<Item>;
        using Maps = std::unordered_map<First, Second>;
        using Guard = typename Item::Guard;
-   
+
        Maps m_;
-   
+
        transition_t() {}
        ~transition_t() {}
-   
+
        // ...
-       
+
        public:
        // NOT REALLY GOOD: std::tuple<bool, Item const &> get(std::string const &event_name, EventT const &ev, Context &ctx, Payload const &payload) const { return _get(event_name, ev, ctx, payload); }
        auto get(std::string const &event_name, EventT const &ev, Context &ctx, Payload const &payload) const -> std::tuple<bool, Item const &> { return _get(event_name, ev, ctx, payload); }
-   
+
        // ...
      };
    ```
 
    比较一下上面的 transition_t::get() 的两种写法，无疑后一种更具可读性；如果我们是分离地定义它时，会获得更多好处。
-
-
 
 ### Cons
 
@@ -313,17 +301,15 @@ class Builder {
   public:
   Builder() = default;
   ~Builder() = default;
-  
+
   // auto house_type(HouseType typ) -> Builder;
   Builder& house_type(HouseType typ);
-  
+
   House Build();
 }
 ```
 
 因为前置的返回类型 `Buidler&` 更能提醒读者这是一个 builder pattern，如同 house_type() 那样。
-
-
 
 其次来说，对于
 
@@ -338,17 +324,8 @@ auto do_something(int a) -> void { ... }
 auto do_something(int a) { ... }
 ```
 
-
-
 ## REFs
 
-- [函数声明 - cppreference.com](https://zh.cppreference.com/w/cpp/language/function) 
-
-
-
-
-
-
+- [函数声明 - cppreference.com](https://zh.cppreference.com/w/cpp/language/function)
 
 :end:
-

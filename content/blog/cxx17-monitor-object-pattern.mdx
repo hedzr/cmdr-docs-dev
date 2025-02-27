@@ -1,10 +1,9 @@
 ---
-
 layout: single
-title: 'C++17 Monitor Object 模式'
-date: 2023-7-30 05:00:00 +0800
-last_modified_at: 2023-8-11 09:15:00 +0800
-Author: hedzr
+title: "C++17 Monitor Object 模式"
+date: 2023-7-30T05:00:00+08:00
+last_modified_at: 2023-8-11T09:15:00+08:00
+author: hedzr
 tags: [c++, monitor]
 categories: c++ algorithm
 comments: true
@@ -18,19 +17,12 @@ excerpt: >-
 ---
 
 > 监视器对象模式（Monitor Object Pattern）是一种并发编程领域的设计模式。它的理论基础来自于监视器（Monitors）模型，即管程（Monitors）。
->
-
-
 
 Monitor Object 能够保证在对象内部任意时刻只能运行一个方法，使线程可以获得对共享资源的独占访问，防止多个线程同时访问它。当线程想要访问共享资源时，它必须先获得监视器对象上的锁。如果锁已经被另一个线程持有，则请求线程将被阻塞，直到锁被释放。
-
-
 
 监视器（Monitors）模型是并发编程中的一种概念，由 [东尼·霍尔](https://zh.wikipedia.org/wiki/東尼·霍爾) 与 [泊·派克·汉森](https://zh.wikipedia.org/wiki/泊·派克·漢森) 提出的，并由泊·派克·汉森首次在并行Pascal中实现。当时（约1972）监视器模型的扩展体也被用在单操作系统环境中为进程间通信提供支持。
 
 同时，监视器模型，多被称作管程，又是操作系统中的一种基础结构和概念。一个现代化的操作系统，一定支持线程（POSIX级别或专有类型）和管程（管程首先需要线程的存在），这是多任务操作系统的本职工作。同时它与现代 PL 的发展也相互交融：现代 PL 多半需要线程（或其等价物）和并发编程等特性作为基础设施之一。无法想象一种现代的高级编程语言在不具备这些特性的前提下向它的用户，即程序员，提供编程接口，而且还能流行起来——除非它将这些特性包装为更高层的编程接口。
-
-
 
 ### 表述
 
@@ -45,14 +37,12 @@ Monitor Object 能够保证在对象内部任意时刻只能运行一个方法�
 
 > 在表述部分的定义比较官方，它来自于 Wiki 中译文。
 >
-> - [Monitor (synchronization) - Wikipedia](https://en.wikipedia.org/wiki/Monitor_(synchronization))
+> - [Monitor (synchronization) - Wikipedia](<https://en.wikipedia.org/wiki/Monitor_(synchronization)>)
 > - [Concurrency pattern - Wikipedia](https://en.wikipedia.org/wiki/Concurrency_pattern)
 
 用图示来看它：
 
 ![image-20230811092120144](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/image-20230811092120144.png)
-
-
 
 ### 在 Java 中认识管程
 
@@ -105,8 +95,6 @@ synchronized 是粗暴锁定的典范，通常它锁定 this 对象实例。但�
 synchronized 可以被视作为 object.lock. unlock, wait, notify 的包装后的语法糖。下面会以 C++ 的方式来讨论起替代实现样例。值得注意的是，C++ 当然具有各种各样、各种粒度的锁与同步能力，但还是那句话，本文限定于 Monitor Pattern/Monitor Object Pattern 中来讨论问题。
 
 最后，应该注意到的是，Java 以 sychronized 为代表的监视器模式是比较重的一种实现。尽管历年来 Java 对其实现做了诸多升级来降低其负载，并试图准许更随机地唤醒等待队列中的某个成员，但包装好的东西那就意味着你的操控能力和自由度会更低。
-
-
 
 ### 以 C++ 的方式认识管程
 
@@ -243,8 +231,6 @@ int main() {
 
 那么，C++ 方式完全展示了 Monitor Object 的实现原理。在这个基本的结构之上，还可以做各种各样的扩展、变形。这就留待实际需要的时候在自行衍生了。
 
-
-
 ### Conclusion
 
 所以，线程安全（Thread-safe）是这么一种概念：即面对公共资源 CR，在多个线程中对其操作时，应该采取某种互斥的手段来保证 CR 不被同时读写。这是由于现代 CPU 的多核特性或者是堆叠 CPU 的主板都准许同时访问的可能，但如果有一个或者多个线程正在写入 CR，而其它线程尝试读取时，则会因为 CPU 流水线，CPU 时钟周期，总线时钟周期等多方面因素而导致读取失败，并且多个写入线程也会导致写入失败（或者违例，取决于 CPU 设计）。
@@ -257,10 +243,8 @@ Monitor Object 正是这种场景下的一种惯用手段。事实上诸如生�
 
 因为拖延，所以本文草草结束了，尚缺一个章节，即模板化的 Monitor 的实现。以后择机再补吧。
 
-
-
 ### References
 
-- [Monitor (synchronization) - Wikipedia](https://en.wikipedia.org/wiki/Monitor_(synchronization))
+- [Monitor (synchronization) - Wikipedia](<https://en.wikipedia.org/wiki/Monitor_(synchronization)>)
 - [Monitor Object – MC++ BLOG](https://www.modernescpp.com/index.php/monitor-oject/)
 - [C++ Monitor Pattern - C++ Blog](https://cppguru.wordpress.com/2009/01/05/c-monitor-pattern/)

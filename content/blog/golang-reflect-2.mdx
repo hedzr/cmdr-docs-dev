@@ -1,9 +1,9 @@
 ---
 layout: single
-title: 'Golang Reflect 系列二 - 和 Map 操作有关的'
-date: 2020-11-08 10:08:00 +0800
-last_modified_at: 2020-11-08 10:08:00 +0800
-Author: hedzr
+title: "Golang Reflect 系列二 - 和 Map 操作有关的"
+date: 2020-11-08T10:08:00+08:00
+last_modified_at: 2020-11-08T10:08:00+08:00
+author: hedzr
 tags: [reflect, map, clone, golang]
 categories: golang reflect
 comments: true
@@ -18,12 +18,9 @@ excerpt: >-
 > **May 2H22** 补记: 时隔一年半，终于还是造了一个 deepcopy 类：
 >
 > 1. [容易定制的 deepcopy 反射库 evendeep](https://hedzr.com/golang/reflect/deepcopy-with-go-reflect/)
->
 > 2. 和 [https://github.com/hedzr/evendeep](https://github.com/hedzr/evendeep)
 >
 > 算是对历年来对反射情有独钟的一种交待吧。
-
-
 
 > 本阶段讨论反射共两篇：
 >
@@ -50,19 +47,11 @@ excerpt: >-
 - `reflect.MakeMap(typ Type) Value`
 - `reflect.MakeMapWithSize(typ Type, n int) Value`
 
-
-
 ## 和 Map 操作有关的
-
-
 
 对于 Map (`reflect.Map`) 类型来说，通过反射的方式对其进行操作，并不困难。
 
-
-
 ### 用样例说话
-
-
 
 #### 获取 map 的类型
 
@@ -77,8 +66,6 @@ var mv = reflect.ValueOf(mi)
 typ := mv.Type()
 t.Log(typ)
 ```
-
-
 
 #### 通过 type 构造 map 新实例
 
@@ -98,14 +85,6 @@ MakeMap会创建一个 map 新实例 ins，并返回 `ins` 的 Value 表示。�
 newInstanceValue.SetMapIndex(reflect.ValueOf("1"), reflect.ValueOf(1))
 ```
 
-
-
-
-
-
-
-
-
 #### 取得 map 实例的 Value 表示
 
 ```go
@@ -118,8 +97,6 @@ m := reflect.ValueOf(mm)
 ```
 
 这和其它的数据类型及其实例的反射操作是完全相同的。
-
-
 
 #### 取得 map 实例的 keys
 
@@ -137,8 +114,6 @@ for i, k := range keys {
 
 > 但，如果你无需针对 map key 作深度的值的操作、转换，那么你可以直接使用 `interface{}` 状态的 `k` 而不必一定要对其进行拆箱操作。
 
-
-
 #### 取得 map 的 key，value 类型
 
 ```go
@@ -146,8 +121,6 @@ kt, vt := typ.Key(), typ.Elem()
 ```
 
 通过 `typ.Key()`, `typ.Elem()` 可以取得 map 对象所被定义的 k， v 类型。例如对于 `map[string]bool` 来说，`typ.Key()` 将会为 `reflect.String`，`typ.Elem()` 将会为 `reflect.Int`。
-
-
 
 #### 取得 map 的值
 
@@ -165,8 +138,6 @@ kt, vt := typ.Key(), typ.Elem()
   t.Logf("map[%q] = %q", key.String(), val.String())
 ```
 
-
-
 #### 对 map 进行 range 迭代
 
 `m.MapRange()` 可以返回一个 `*reflect.MapIter` 对象。
@@ -182,13 +153,9 @@ kt, vt := typ.Key(), typ.Elem()
 		}
 ```
 
-
-
-
-
 #### 复制/设置 Map 对象 / 用 (k,v) 对 map 赋值
 
-通过 `reflect.SetMapIndex(k, v)` 我们可以对 map 进行赋值设置。它相当于 `m1[k1] = v1`  这样的操作。
+通过 `reflect.SetMapIndex(k, v)` 我们可以对 map 进行赋值设置。它相当于 `m1[k1] = v1` 这样的操作。
 
 > 此时，m1 = m.Interface(), k1 = k.Interface(), v1 = v.Interface()。请注意这只是一个简略的表示，因为对于基本类型来说，k.Interface() 是无意义的，但我们的意图在于用一个 Value 对象，也就是 k，的 Interface() 方法来表示 k 这个 Value 对象所表示的实际数值，对于 int 来说它其实应该是 k.Int()，对于 float64 来说它其实应该是 k.Float()，但为了叙述文字的简单性，我们统一用 k.Interface() 调用来指示我们想要 Value 对象的底层数值。
 
@@ -214,8 +181,6 @@ func testMap_basics(t *testing.T) {
 	}
 }
 ```
-
-
 
 #### 从零开始构造 map 新实例
 
@@ -280,9 +245,5 @@ func testMap_d2(t *testing.T) {
 	t.Logf("m2 = %v", m2)
 }
 ```
-
-
-
-
 
 🔚

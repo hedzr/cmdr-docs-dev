@@ -1,9 +1,9 @@
 ---
 layout: single
 title: "工具函数 (Helpers)"
-date: 2020-07-13 11:45:11 +0800
+date: 2020-07-13T11:45:11+08:00
 last-modified: 2020-08-17 12:52:01 +0800
-Author: hedzr
+author: hedzr
 tags: [commander, command-line, "command-line-parser", command-line-interface,  getops, posix, posix-compatible, hierarchical-configuration, hierarchy, cli, golang]
 categories: golang cmdr guide config-file
 comments: true

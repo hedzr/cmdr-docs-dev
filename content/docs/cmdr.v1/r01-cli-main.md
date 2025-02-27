@@ -1,8 +1,8 @@
 ---
 layout: single
 title: "CLI App 代码布局 (App Layout)"
-date: 2020-07-13 11:16:11 +0800
-Author: hedzr
+date: 2020-07-13T11:16:11+08:00
+author: hedzr
 tags: [commander, command-line, "command-line-parser", command-line-interface,  getops, posix, posix-compatible, hierarchical-configuration, hierarchy, cli, golang]
 categories: golang cmdr guide cli
 comments: true

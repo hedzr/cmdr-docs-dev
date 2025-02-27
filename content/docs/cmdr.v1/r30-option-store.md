@@ -1,9 +1,9 @@
 ---
 layout: single
 title: "选项管理器 (Option Store)"
-date: 2020-07-13 12:10:11 +0800
+date: 2020-07-13T12:10:11+08:00
 last-modified: 2020-08-17 01:40:01 +0800
-Author: hedzr
+author: hedzr
 tags: [commander, command-line, "command-line-parser", command-line-interface,  getops, posix, posix-compatible, hierarchical-configuration, hierarchy, cli, golang]
 categories: golang cmdr guide option-store
 comments: true

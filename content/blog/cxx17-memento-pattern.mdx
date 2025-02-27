@@ -1,10 +1,20 @@
 ---
 layout: single
 title: "谈 C++17 里的 Memento 模式"
-date: 2021-10-07 09:02:00 +0800
-last_modified_at: 2021-10-17 11:00:00 +0800
-Author: hedzr
-tags: [c++,c++11,c++17,undo,memento pattern,design patterns,备忘录模式,设计模式]
+date: 2021-10-07T09:02:00+08:00
+last_modified_at: 2021-10-17T11:00:00+08:00
+author: hedzr
+tags:
+  [
+    c++,
+    c++11,
+    c++17,
+    undo,
+    memento pattern,
+    design patterns,
+    备忘录模式,
+    设计模式,
+  ]
 categories: c++ algorithm
 comments: true
 toc: true
@@ -15,10 +25,6 @@ header:
 excerpt: >-
   介绍备忘录模式及其 C++ 实作，介绍 undo-cxx 的实现...
 ---
-
-
-
-
 
 > 备忘录模式：介绍相关概念并实现一个较全面的 Undo Manager 类库。
 
@@ -37,8 +43,6 @@ Memento 模式会掩盖编辑器编辑命令的实现细节，例如编辑位置
 这就是理想中的 Memento 模式应该要达到的效果。
 
 ![dp-memento](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/dp-memento-3225977.png)
-
-
 
 ### 轻量的古典定义
 
@@ -144,10 +148,6 @@ int main() {
 
 这个实现代码中对于负责人部分的职责进行了简化，将相当多的任务交给其他人去完成，目的是在于让使用者的编码能够更简单。使用者只需要像 `caretaker` 那样去操作 `originator_t<State>` 就能够完成 memento 模式的运用。
 
-
-
-
-
 ### 应用场景
 
 简单的场景可以直接复用上面的 `memento_t<State>` 和 `originator_t<State>` 模板，它们虽然简易，但足以应付一般场景了。
@@ -161,8 +161,6 @@ int main() {
 Memento 模式通常并不能独立存在，它多半是作为 Command Pattern 的一个子系统（又或是并立而协作的模块）而存在的。
 
 所以典型的编辑器架构设计里，总是将文字操作设计为 Command 模式，例如前进一个 word，键入几个字符，移动插入点到某个位置，粘贴一段剪贴板内容，等等，都是由一系列的 Commands 来具体实施的。在此基础上，Memento 模式才有工作空间，它将能够利用 EditCommand 来实现编辑状态的存储和重播——通过反向播放与重播一条（组）Edit Commands 的方式。
-
-
 
 ### Undo Manager
 
@@ -195,8 +193,6 @@ UndoRedo 模型原本是一种交互性技术，为用户提供反悔的能力�
 
 好，无论宇宙怎么看，我，仍然认为现在我制造的新的 memento pattern 的 Non-linear Undo Subsystem 是有意义的，而且将会在下面给你做出展示来。:)
 
-
-
 #### 进一步的分类
 
 作为一个附加的思考，还可以对分类进一步做出组织。在前文的基本划分之上，还可以进一步做区分：
@@ -205,12 +201,6 @@ UndoRedo 模型原本是一种交互性技术，为用户提供反悔的能力�
 2. 可分组的 Undo
 
 大体上，可选的 Undo 是非线性 Undo 的一种增强的操作体现，它允许用户在回退历史操作记录中勾选某些记录予以撤销。而可分租的 Undo 是指命令可以被分组，于是用户可能必需在已经被分组的操作记录上整体回退，但这会是 Command Pattern 要去负责管理的事情，只是在 Undo 系统上被体现出来而已。
-
-
-
-
-
-
 
 ### C++ 实现
 
@@ -222,13 +212,9 @@ Undo Manager 实现中，可以有一些典型的实现方案：
 
 但是，对于一个元编程实现的通用 Undo 子系统来说，上面提到的方案并不归属于 Undo Manager 来管理，它们是划归 Command Pattern 去管理的，并且事实上其具体实现由开发者自行完成。Undo Manager 只是负责 states 的存储、定位和回放等等事务。
 
-
-
 #### 主要设计
 
 下面开始真正介绍 [undo-cxx](https://github.com/hedzr/undo-cxx) 开源库的实现思路。
-
-
 
 ##### undoable_cmd_system_t
 
@@ -264,7 +250,7 @@ typename Cmd>
     using Iterator = typename Container::iterator;
 
     using size_type = typename Container::size_type;
-    
+
     // ...
   };
 
@@ -363,11 +349,9 @@ namespace word_processor {
 
 基于此，do_execute 应该是对当前编辑器中的选择文字做字体样式设置（如粗体），save_state_impl 应该是将选择文字的元信息以及 Command 的元信息打包到 `State` 中，undo 应该是反向设置字体样式（如去掉粗体），redo 应该是依据 memento 的 `State` 信息再次设置字体样式（粗体）。
 
-> 但在本例中，出于演示目的，这些具体细节都被一个 _info 字符串所代表了。
+> 但在本例中，出于演示目的，这些具体细节都被一个 \_info 字符串所代表了。
 >
 > 尽管 FontStyleCmd 保留了 State 模板参数，但演示代码中 State 只会等于 std::string。
-
-
 
 ##### 使用：提供 UndoCmd 和 RedoCmd
 
@@ -409,7 +393,7 @@ namespace word_processor {
 }
 ```
 
-注意对于它们来说，相应的基类被限制为 base_(undo/redo)_cmd_t ，并且你必需在 do_execute 实现中包含到基类方法的调用，如同这样：
+注意对于它们来说，相应的基类被限制为 base\_(undo/redo)\_cmd_t ，并且你必需在 do_execute 实现中包含到基类方法的调用，如同这样：
 
 ```cpp
     void do_execute(CmdSP &sender, ContextT &ctx) override {
@@ -442,8 +426,6 @@ undo/redo 的特殊之处在于它们的基类有特别的重载函数：
 其目的在于不会考虑该命令的 memento 存档问题。
 
 所以同时也注意 save_state_impl/undo_impl/redo_impl 是不必要的。
-
-
 
 ##### actions_controller
 
@@ -491,8 +473,6 @@ namespace word_processor {
 } // namespace word_processor
 ```
 
-
-
 ##### 最后是测试函数
 
 借助于改进过的工厂模式，controller 可以调用编辑命令，注意使用者在发出 undo/redo 时，controller 同样地通过调用 UndoCmd/RedoCmd 的方式来完成相应的业务逻辑。
@@ -527,8 +507,6 @@ void test_undo_sys() {
 }
 ```
 
-
-
 #### 特性
 
 在 undoable_cmd_system_t 的实现中，包含了基本的 Undo/Redo 能力：
@@ -542,15 +520,11 @@ void test_undo_sys() {
 - 定制你的 context_t 扩展版本以容纳自定义对象引用
 - 如果有必要，你可以定制 base_cmd_t 或 cmd_t 来达到你的特别目的
 
-
-
 ##### 分组命令
 
 通过基类 `class composite_cmd_t` 你可以对命令分组，它们在 Undo 历史记录中被视为单条记录，这允许你批量 Undo/Redo。
 
 除了在构造时立即建立组合式命令之外，可以在 composite_cmd_t 的基础上构造一个 `class GroupableCmd`，很容易通过这个类提供运行时就地组合数条命令的能力，这样，你可以获得更灵活的命令组。
-
-
 
 ##### 受限制的非线性
 
@@ -562,13 +536,9 @@ void test_undo_sys() {
 
 更全功能的非线性 undo 可能需要一个更复杂的 tree 状历史记录而不是当前的 list，尚须留待将来实现。
 
-
-
 #### 小结
 
 限于篇幅，不能完整介绍 [undo-cxx](https;//github.com/hedzr/undo-cxx) 的能力，所以感兴趣的小伙伴直接检阅 Github 源码好了。
-
-
 
 ## 后记
 
@@ -580,7 +550,4 @@ void test_undo_sys() {
 
 过段时间再 review，就这么定了先。
 
-
-
 :end:
-

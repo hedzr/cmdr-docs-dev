@@ -1,10 +1,10 @@
 ---
 layout: single
 title: "谈 C++17 里的 Command 模式"
-date: 2021-10-20 05:20:00 +0800
-last_modified_at: 2021-10-20 06:20:00 +0800
-Author: hedzr
-tags: [c++,c++11,c++17,command pattern,design patterns,命令模式,设计模式]
+date: 2021-10-20T05:20:00+08:00
+last_modified_at: 2021-10-20T06:20:00+08:00
+author: hedzr
+tags: [c++, c++11, c++17, command pattern, design patterns, 命令模式, 设计模式]
 categories: c++ algorithm
 comments: true
 toc: true
@@ -16,17 +16,9 @@ excerpt: >-
   跟随前文备忘录模式而继续介绍关联者：命令模式...
 ---
 
-
-
-
-
 > 命令模式：介绍相关概念。实作参考上回的 Memento
 
-
-
 ## Command Pattern
-
-
 
 ### 关于本系列文章
 
@@ -36,23 +28,17 @@ excerpt: >-
 
 这对于我们来讲，对个人来讲，也是一个审视和再思考的过程。而对于你来说，换个角度看看他人的理解，说不定其实是有用处的。
 
-
-
 ### 关于命令模式
 
 在 [谈 C++17 里的 Memento 模式](https://hedzr.com/c++/algorithm/cxx17-memento-pattern/) 一文中我提到过备忘录模式和命令模式往往是联动协同工作的，并且在给出的传统实现以及 Undo Manager 实现（类库 [undo-cxx](https://github.com/hedzr/undo-cxx)）中居包含了命令模式部分。
 
 所以本文算是凑数的意思。
 
-
-
 ### 动机
 
 命令模式是一种行为模式。这种设计模式把多种多样的动作抽象为命令，Client 通过执行器 Caller/Invoker/Executor 执行这些命令而不必关心调用的细节。一个具体的命令对象 ConcreteCommand 负责解释命令执行动作的全部细节，包括命令的接收者。接收者 Receiver 是命令执行的承受者，例如在字处理器中，接收者是当前编辑器的当前选择文字，而字体样式命令会对该接收者做出样式设定。
 
 这段描述的 UML 图是这样的：
-
-
 
 ![img](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/2880px-Command_pattern.svg.png)
 
@@ -62,9 +48,7 @@ excerpt: >-
 
 ![img](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/command-pattern.png)
 
-> FROM:  [The Command Pattern - fjp.github.io](https://fjp.at/design-patterns/command) 
-
-
+> FROM: [The Command Pattern - fjp.github.io](https://fjp.at/design-patterns/command)
 
 ### 场景
 
@@ -81,8 +65,6 @@ excerpt: >-
 游戏开发中 Command 模式也非常常用，基本上是必需品。
 
 通讯协议解析器是另一种你可能没有深思的命令模式运用场景。通讯协议通常都包含一系列 tokens 的识别，一系列指令指示，一系列数据汇报信息，这些内容都可以被抽象和组织到命令模式中去进行具体处理。
-
-
 
 ### 代码实现
 
@@ -103,8 +85,6 @@ excerpt: >-
 2. :)
 
 本文中就不重复摘取片段了。
-
-
 
 ### Tricks
 
@@ -129,7 +109,7 @@ excerpt: >-
 class X {
   public:
   void chilling_out() { this->chilling_out_impl(); }
-  
+
   protected:
   virtual void chilling_out_impl() = 0;
 };
@@ -138,8 +118,6 @@ class X {
 算不算很无理？
 
 或许吧。
-
-
 
 ##### private virtual function
 
@@ -210,16 +188,10 @@ namespace {
 
 如上，在 struct A 中重载了 chilling_out_impl() 并改为 protected，所以在派生类 B 中要直接使用它也不会报错了。这是一个有用的特性，别人的类库有时候我们也可以有条件地重载某些细节；同时这也是一个有用的 Bug，话说这样的漏洞真的不会带来隐患吗？
 
-
-
-
-
-
-
 ### Refs
 
-- [命令设计模式](https://refactoringguru.cn/design-patterns/command) 
-- [Command pattern - Wikipedia](https://en.wikipedia.org/wiki/Command_pattern) 
+- [命令设计模式](https://refactoringguru.cn/design-patterns/command)
+- [Command pattern - Wikipedia](https://en.wikipedia.org/wiki/Command_pattern)
 
 ## 后记
 
@@ -228,4 +200,3 @@ namespace {
 那样很好。
 
 :end:
-

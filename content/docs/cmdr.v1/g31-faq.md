@@ -1,8 +1,8 @@
 ---
 layout: single
 title: "FAQ"
-date: 2020-07-13 12:15:11 +0800
-Author: hedzr
+date: 2020-07-13T12:15:11+08:00
+author: hedzr
 tags: [commander, command-line, "command-line-parser", command-line-interface,  getops, posix, posix-compatible, hierarchical-configuration, hierarchy, cli, golang]
 categories: golang cmdr faq
 comments: true

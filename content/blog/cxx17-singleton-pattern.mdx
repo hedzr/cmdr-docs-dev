@@ -1,10 +1,11 @@
 ---
 layout: single
 title: "谈 C++17 里的 Singleton 模式"
-date: 2021-09-03 05:00:00 +0800
-last_modified_at: 2021-09-03 19:43:00 +0800
-Author: hedzr
-tags: [c++,c++11,c++17,singleton pattern,design patterns,单件模式,设计模式]
+date: 2021-09-03T05:00:00+08:00
+last_modified_at: 2021-09-03T19:43:00+08:00
+author: hedzr
+tags:
+  [c++, c++11, c++17, singleton pattern, design patterns, 单件模式, 设计模式]
 categories: c++ algorithm
 comments: true
 toc: true
@@ -15,9 +16,6 @@ header:
 excerpt: >-
   回顾单件模式的各种可能的实现，尝试建立其 C++17 中的可能的最优解，...
 ---
-
-
-
 
 ## Singleton Pattern
 
@@ -31,19 +29,15 @@ excerpt: >-
 
 很明显，静态类只不过是开始，它不是特别好的解决手段，因为除了能够集中在一处这一优点之外，这些静态变量还是是予取予求的，此外，早期（C++11以前）的编译器没有明确和统一的静态变量初始化顺序约定，所以你较难处理这些变量的初始化时机，再一个问题是，没有任何手段能够让你实现这些变量的懒加载（lazyinit），除非你将它们统统变成指针，那样的话，还会搞出多少事来只有天知道了。
 
-
-
 ### 理论基础
 
-Singleton 模式是 [Creational Patterns](https://en.wikipedia.org/wiki/Creational_pattern) 中的一种。在  [谈 C++17 里的 Factory 模式](https://hedzr.com/c++/algorithm/cxx17-factory-pattern/) 中，我们已经介绍过创建型模式了，所以本文不再赘述了。
+Singleton 模式是 [Creational Patterns](https://en.wikipedia.org/wiki/Creational_pattern) 中的一种。在 [谈 C++17 里的 Factory 模式](https://hedzr.com/c++/algorithm/cxx17-factory-pattern/) 中，我们已经介绍过创建型模式了，所以本文不再赘述了。
 
 单件模式的意图，及其基本实现，都是非常简单的，因而也不必耗费笔墨凑字数，直接略过。
 
-
-
 ### Goal
 
-我们想要的是一个能够 lazyinit 或者能够控制起初始化时机的、线程安全的单件模式。 
+我们想要的是一个能够 lazyinit 或者能够控制起初始化时机的、线程安全的单件模式。
 
 所以下面会介绍 C++11（包括 C++0x）以来的若干能够实际运用的 Singleton 实现方案，但略过了更早期的实现手法，以及略过了那些顾头不顾尾的示例性实现。嗯，其中一个是这样的：
 
@@ -68,8 +62,6 @@ class singleton {
 
 所以，下面正文开始了。
 
-
-
 ### Meyers' Singleton in C++
 
 Scott Meyers 是 Effective C++系列的作者，他最早提供了简洁版本的 Singletion 模型：
@@ -89,7 +81,7 @@ Singleton 模式已经流传了多年，有很多不同目的的实现方法，�
 
 #### Backstage
 
-编译器对函数中的静态变量采用了符合 [C++11 Initialization](https://en.cppreference.com/w/cpp/language/initialization#Dynamic_initialization) 特性的初始化和析构绑定，以确保该静态变量将能够在满足 thread-safe 的前提下唯一地被构造和析构。关于确保静态变量初始化和析构的线程安全被细分为多种类型，C++11 保证来有序性，而 C++17 起又支持 *Partially-ordered dynamic initialization* 。当然这么细节的技术规范不必去抠了，就上面的 `instance()` 中的 instance 变量来说，实际上编译器为此会引入一个隐藏变量来帮助识别初始化与否：
+编译器对函数中的静态变量采用了符合 [C++11 Initialization](https://en.cppreference.com/w/cpp/language/initialization#Dynamic_initialization) 特性的初始化和析构绑定，以确保该静态变量将能够在满足 thread-safe 的前提下唯一地被构造和析构。关于确保静态变量初始化和析构的线程安全被细分为多种类型，C++11 保证来有序性，而 C++17 起又支持 _Partially-ordered dynamic initialization_ 。当然这么细节的技术规范不必去抠了，就上面的 `instance()` 中的 instance 变量来说，实际上编译器为此会引入一个隐藏变量来帮助识别初始化与否：
 
 ```c++
 static bool __guard = false;
@@ -177,17 +169,11 @@ int main() {
 
 基本上说，你复制它，改个类名，就可以开始了。这是大多数 class GlobalVar 的做法。
 
-
-
 ### 更多实现方法参考
 
 关于 C++ Singleton Pattern 的更多讨论见诸 [于此](https://stackoverflow.com/questions/1008019/c-singleton-design-pattern)。
 
 至于说那些弄 double-check 还是别的什么的，都是渣渣。因为 C++11 以来 Singleton 的线程安全问题已经无需额外的编码考虑了。
-
-
-
-
 
 ### 模板化实现
 
@@ -249,8 +235,6 @@ int main() {
 
 如果不在意可否手动实例化的编码防范，你可以简化派生类的书写，但模板类中需要去掉 token 的使用。
 
-
-
 #### 变参 Singleton 模板
 
 如果你的类需要构造参数，问题就稍微复杂一点，可以使用我们的 `singleton_with_optional_construction_args`，它也是 C++11 起能被直接支持的，无需 hack：
@@ -305,15 +289,13 @@ void test_singleton_with_optional_construction_args() {
 
 留在这里，只是为了提供一个参考范本，我不会建议你在工程中直接实作它，除非你能够自行完善。
 
-
-
 ### Epilogue
 
 严格地说，上面的模板化实现只需要 c++11 支持即可。但是考虑到我已经写了一篇关于 c++ design patterns 的文字了，而我又决定了不关心 c++11 的特性（老话题了，它比起 17 来不够工程诱惑力），所以还是就冠这个标题名算了。
 
 #### 话题 2：关于 main 之前的初始化
 
-在 Turbo C 年代，main 之前从 OS（例如 DOS/Linux 经过 EXE/PE/ELF）发起一个执行文件的执行动作是通过 c0.asm 来完成的。它接收到 OS 移交到代码执行控制权之后，完成 C 环境的准备，完成 _atexit 注册的回调函数的登记，然后移交执行控制权到 _main。这个时期里，我们可以通过指定代码段（`_DATA`，`_BSS` 之类）的方式来指明一个编译单元中的变量被放在何处，并且通过指明编译顺序的方式来控制变量的初始化优先顺序。
+在 Turbo C 年代，main 之前从 OS（例如 DOS/Linux 经过 EXE/PE/ELF）发起一个执行文件的执行动作是通过 c0.asm 来完成的。它接收到 OS 移交到代码执行控制权之后，完成 C 环境的准备，完成 \_atexit 注册的回调函数的登记，然后移交执行控制权到 \_main。这个时期里，我们可以通过指定代码段（`_DATA`，`_BSS` 之类）的方式来指明一个编译单元中的变量被放在何处，并且通过指明编译顺序的方式来控制变量的初始化优先顺序。
 
 后来，C++ 的时代，以 Visual C++ 为例，除了完成 C 环境准备之外，还需要做 CRT 库准备（c0crt.asm）。VC 的 CRT 库在很大程度上就是它的标准库了。对于 gcc 来说，可能是 libstdc++ 之类。这一段时期里，一些非标扩展甚至允许我们指定某个静态变量在 CRT 库之前就能被初始化。
 
@@ -323,7 +305,4 @@ void test_singleton_with_optional_construction_args() {
 
 不过就到这里吧，因为很早以前写 singleton 真的是一个野蛮生长的年代啊，所以简单聊聊这些话题。
 
-
-
 :end:
-

@@ -1,10 +1,10 @@
 ---
 layout: single
 title: "谈 C++17 里的 Factory 模式之二"
-date: 2021-10-18 05:10:00 +0800
-last_modified_at: 2021-10-19 07:40:00 +0800
-Author: hedzr
-tags: [c++,c++11,c++17,factory pattern,design patterns,工厂模式,设计模式]
+date: 2021-10-18T05:10:00+08:00
+last_modified_at: 2021-10-19T07:40:00+08:00
+author: hedzr
+tags: [c++, c++11, c++17, factory pattern, design patterns, 工厂模式, 设计模式]
 categories: c++ algorithm
 comments: true
 toc: true
@@ -16,8 +16,6 @@ excerpt: >-
   改进后的工厂模式，以及 type_name 等等...
 ---
 
-
-
 ## 前言
 
 ### 回顾上回
@@ -25,8 +23,6 @@ excerpt: >-
 回想上回为了写一个 memento 模式（请看 [谈 C++17 里的 Memento 模式](https://hedzr.com/c++/algorithm/cxx17-memento-pattern/)），觉得仅仅 memento 太干瘪了，干脆就写了个类库 [undo-cxx](https://github.com/hedzr/undo-cxx)，也真是没谁了。
 
 这两日想来想去，愈发觉得这事干得太那啥了。今后还是不必如此的吧？话说这两天头发都不长长了，担忧啊。
-
-
 
 ### 本文缘起
 
@@ -68,16 +64,16 @@ namespace cmdr::util::factory {
             // T data;
         };
         using named_products = std::tuple<clz_name_t<products>...>;
-        
+
         template<typename... Args>
         static auto create(string const &id, Args &&...args) {
             std::unique_ptr<product_base> result{};
-            
+
             std::apply([](auto &&...it) {
                 ((it.static_check() /*static_check<decltype(it.data)>()*/), ...);
             },
                        named_products{});
-            
+
             std::apply([&](auto &&...it) {
                 ((it.id == id ? result = it.gen(args...) : result), ...);
             },
@@ -116,15 +112,9 @@ namespace cmdr::util::factory {
 
 幸运的是，一般情况下这并不会真是个问题。
 
-
-
 ### 改进版的 type_name，以及 id_name
 
 在 `factory<>` 新版本中使用了新的 id 名算法 id_name，它从类型 T 抽出其类型名表述（如同 `word_processor::FontStyleCmd<State>` 这样），然后去掉泛型参数部分，留下 `word_processor::FontStyleCmd`，这样更适合于被其他场所所使用。 /
-
- 
-
-
 
 #### 改进的 type_name
 
@@ -251,8 +241,6 @@ std::string              : std::__1::basic_string<char>
 std::vector<std::string> : std::__1::vector<std::__1::basic_string<char>, std::__1::allocator<std::__1::basic_string<char> > >
 ```
 
-
-
 #### Id_name
 
 在 type_name 的基础上，id_name 能够将部分修饰词去掉，另外对于 `std::__1::basic_string<char>` 它会去掉其泛型参数部分：
@@ -280,13 +268,8 @@ namespace cmdr::util {
 
 修饰词是指 `void func()::` 这样的前缀，如果你在函数体中声明一个 struct，就可能得到这样的前缀。
 
-
-
 ## 后记
 
 称得上技巧的就只有一个了，本文目的是延续和让系列化文章完整，免得过时的实现遭到诟病。
 
-
-
 :end:
-

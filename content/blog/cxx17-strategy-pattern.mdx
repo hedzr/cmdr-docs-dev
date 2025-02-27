@@ -1,10 +1,10 @@
 ---
 layout: single
 title: "谈 C++17 里的 Strategy 模式"
-date: 2021-10-03 04:03:00 +0800
-last_modified_at: 2021-10-03 07:00:00 +0800
-Author: hedzr
-tags: [c++,c++11,c++17,strategy pattern,design patterns,策略模式,设计模式]
+date: 2021-10-03T04:03:00+08:00
+last_modified_at: 2021-10-03T07:00:00+08:00
+author: hedzr
+tags: [c++, c++11, c++17, strategy pattern, design patterns, 策略模式, 设计模式]
 categories: c++ algorithm
 comments: true
 toc: true
@@ -15,10 +15,6 @@ header:
 excerpt: >-
   重新思考状态模式的实作可能性...
 ---
-
-
-
-
 
 > 策略模式
 
@@ -107,10 +103,6 @@ void test_strategy_basic() {
 
 ![dp-strategy](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/dp-strategy-3221408.svg)
 
-
-
-
-
 ### 整理
 
 根据上面的示例，我们可以重新整理出策略模式的若干要点：
@@ -125,8 +117,6 @@ void test_strategy_basic() {
 8. 策略计算器可以在公共结果类的基础上派生出自己的特殊实现，但为了管理者能够抽取结果，此时要约定一个公有的抽取结果的接口。
 
 在示例代码中提供了一个模板类的中间层 `router_t<T>`，我们正是打算在这个位置为 routers 引入工厂创建和注册机制，以便能够在一个管理器中收集全部 routers 的唯一实例，稍后可以在 router_guide 中使用它们。
-
-
 
 ### Policy-based Programming
 
@@ -179,8 +169,6 @@ void test_policy_1() {
 
    为了做到运行期动态切换，你可能需要特别附加若干代码来提供数个 writers，它们分别对不同的笔型进行展开，以备运行期可用。
 
-
-
 ### 可能恰当的场所
 
 按照通常的理解，你或许会觉得前一种方法才是标准的策略模式。而且，怎么会有什么场景需要我选择一种策略在编译期就固化下来呢？
@@ -196,7 +184,7 @@ class non_blocked {
   public:
   void connect(){}
   void disconnect(){}
-  
+
 };
 
 class blocked {
@@ -215,12 +203,12 @@ class socket_man {
   public:
   void connect(){}
   void disconnect(){}
-  
+
   protected:
   virtual void on_connect(...);
   virtual void on_recv(...);
   virtual void on_send(...);
-  
+
   protected:
   static void runner_routine(){
     // ...
@@ -232,8 +220,6 @@ class socket_man {
 
 类似的，你还可以在使用这个通信库时选择时 TCP 还是 UDP 通信，数据报的编码解码采用何种算法等等，这些都可以通过 socket_man 的模板参数以 policy 的方式完成策略模式的选择。
 
-
-
 ## 后记
 
 文中提供了两种典型的实作方法，分别代表着策略模式的编译期展开和运行期展开方案。
@@ -244,7 +230,4 @@ class socket_man {
 
 另：这一次倒是没用到 C++17 的专有特性。奈何咱们这标题需要系列化嘛。
 
-
-
 :end:
-

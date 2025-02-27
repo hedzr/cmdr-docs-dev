@@ -1,10 +1,23 @@
 ---
 layout: single
 title: "谈 C++17 里的 State 模式之二"
-date: 2021-09-30 05:00:00 +0800
-last_modified_at: 2021-09-30 20:00:00 +0800
-Author: hedzr
-tags: [c++,c++11,c++17,state pattern,fsm,fsm-cxx,state machine,state chart,design patterns,状态模式,设计模式]
+date: 2021-09-30T05:00:00+08:00
+last_modified_at: 2021-09-30T20:00:00+08:00
+author: hedzr
+tags:
+  [
+    c++,
+    c++11,
+    c++17,
+    state pattern,
+    fsm,
+    fsm-cxx,
+    state machine,
+    state chart,
+    design patterns,
+    状态模式,
+    设计模式,
+  ]
 categories: c++ algorithm
 comments: true
 toc: true
@@ -15,10 +28,6 @@ header:
 excerpt: >-
   关于状态模式的研究，以及状态机的 C++17 中的通用实现，介绍 fsm-cxx ...
 ---
-
-
-
-
 
 > 这是第二部分，有关有限状态机（FSM）的 C++ 实作部分，也等同于状态模式实现。
 > 介绍 [fsm-cxx](https://github.com/hedzr/fsm-cxx) 的实现
@@ -44,8 +53,6 @@ excerpt: >-
 - 负载：Payload
 
 有的时候，Input Action 也被称作 Transition Condition/Guard。它的内涵始终如一，是指在进入下一状态前通过条件进行判定状态变迁是否被许可。
-
-
 
 ### 状态机
 
@@ -99,8 +106,6 @@ namespace fsm_cxx {
 
 你一定要明白，多数人，和我一样，都是那种脑容量普通的人，我们做设计时一开始都是简陋的，然后不断修正枝蔓、改善设计后才能得到看起来似乎还算完备的结果，如同上面给出的主机器定义那样。
 
-
-
 ##### 早期版本
 
 作为一个信心增强，下面给出首次跑通一个事件触发和状态推进时的 [machine_t 定义](https://github.com/hedzr/fsm-cxx/blob/648fde035a98e67b9aa06efae65a90b7bfe5d34d/include/fsm_cxx/fsm-sm.hh#L221)：
@@ -122,7 +127,7 @@ namespace fsm_cxx {
         using Transition = transition_t<StateT, ActionT>;
         using TransitionTable = std::unordered_map<StateT, Transition>;
         using on_action = std::function<void(State const &, std::string const &, State const &, typename Transition::Second const &)>;
-      
+
       // ...
     };
 ```
@@ -131,13 +136,9 @@ namespace fsm_cxx {
 
 不会有多少人能够一次性将其设计并编码到位。除非这个人脑容量特大，再不然就是他习惯于首先做完备的 UML 图，然后 convert to C++ codes...，不过这种功能应该是在 IBM Rational Rose 时代才比较行得通的步骤了，现在已经不太可能借助什么 UML 工具这样来做设计了，我不清楚 PlantUML 今天的发展情况，但我自己是很久没有画过 UML 图了，还不如我手写出 classes 来得直观呢，至少对我的脑路是这样的。
 
-
-
 ##### 阐释
 
 `machine_t` 的头部定义了一堆模板参数。我觉得无需要什么额外的解释，它们的用意大约是能够直白地传递给你的，如果不能，你可能需要回顾一下状态机的各种背景，嗯，问题绝对不会在我身上。
-
-
 
 ###### `S` 和 `StateT`
 
@@ -146,8 +147,6 @@ namespace fsm_cxx {
 这是一种防御性的编程手法。
 
 假如未来我们想要引入其他机制，例如一个状态类体系而不是枚举类型的值表示，那么我们可以提供一个不同的 state_t 包装方案，从而将新的机制无破坏地引入到现有的 machine_t 体系中。甚至于我们连 state_t 也可以不必破坏，仅仅是对其做带有 enable_if 的模板特化就足矣。
-
-
 
 ###### `StateT` 和 `State`
 
@@ -170,8 +169,6 @@ using State = std::optional<StateT>;
 
 也是行得通的。当然实际工程中这么做没有什么必要性。
 
-
-
 ###### `CharT` 和 `InT`
 
 它们会在未来某一时间点有用。
@@ -180,21 +177,11 @@ using State = std::optional<StateT>;
 
 但目前只是停留在念头上。
 
-
-
 ###### `OnAction` 以及 `OnErrorAction`
 
 `OnAction` 实际上是 on_transition_made / on_state_changed 的意思。暂时来讲我们没有 rename 令其更显著，因为当初只想着要有一个可以调试输出的 callback，还没有想过 on_state_changed 的 Hook 的必要性。直到后来做了 OnErrorAction 的设计之后才察觉到有必要关联两个 callbacks。
 
-
-
-
-
-
-
 ### 其它定义以及如何使用
-
-
 
 #### 状态集合
 
@@ -227,7 +214,7 @@ enum class my_state {
                       Initial,
                       Terminated,
                       Opened,
-                      Closed  
+                      Closed
 }
 ```
 
@@ -265,8 +252,6 @@ terminated，error 状态是可选的。而且暂时来讲它们没有显著的�
 
 对于每一个状态枚举量来说，你可以根据需要为它们关联 entry/exit_action，如同上面的 `entry_action()/exit_action()` 调用所展示的那样。
 
-
-
 ##### guards
 
 对于一个将要转进的 state，你也可以为其定义 guards。和 Transition Guards 相同地，一个 State guard 是一个可以返回 bool 结果的函数。而且，该 guard 的用途也相似：在将要转进某个 state 时，根据上下文环境做出判断，以决定是否应该转进到该 state 中。返回 false 时转进动作将不会执行。
@@ -280,13 +265,11 @@ m.state().set(my_state::Opened)
   .guard([](M::Event const &, M::Context &, M::State const &, M::Payload const &p) -> bool { return p._ok; })
 ```
 
-你可以为一个 state 定义多条 guards。在上面的实例中，第二条 guard 将会根据 payload 中携带的 _ok 布尔类型值来决定要不要转进到 Opened 状态。
+你可以为一个 state 定义多条 guards。在上面的实例中，第二条 guard 将会根据 payload 中携带的 \_ok 布尔类型值来决定要不要转进到 Opened 状态。
 
 如果 guard 表示不可以转进，则状态机停留在原位置，`machine_t::on_error()` 回调函数将会获得一个 `reason == Reasion::FailureGuard` 的通知，你可以在此时操纵 context 转进到另一状态，但要注意这时候将会是一个内部操作：通过 `context.current(new_state)` 进行到内部转进操作是不会触发任何条件约束和回调机会的。
 
 同样道理，在 `guard()` 所添加的 guard 函数中你也可以操作 context 去修改新的转进状态而不会触发进一步的条件约束和回调机会。
-
-
 
 #### 事件
 
@@ -362,10 +345,6 @@ FSM_DEFINE_EVENT(open);
 FSM_DEFINE_EVENT(closed);
 ```
 
-
-
-
-
 #### 上下文
 
 在 machine_t 中维持一份内部的上下文环境 Context，这在发生状态转换时是非常重要的核心结构。
@@ -373,8 +352,6 @@ FSM_DEFINE_EVENT(closed);
 Context 提供了当前所处的状态位置，并允许你修改该位置。但要注意如果你通过这个能力进行状态修改的话，条件约束和回调函数将会被你的操作所略过。
 
 > 如果查看 `context_t` 的源代码你会发现在这个上下文环境中 fsm-cxx 还管理了和 states 相关的 entry/exit_action 及其校验代码。这个设计本来是为未来的 HFSM 而准备的。
-
-
 
 #### 负载
 
@@ -399,8 +376,6 @@ struct my_payload: public fsm_cxx::payload_type<my_payload> {
 至于 machine_t 的模板参数无需做什么修改。
 
 使用时通过 `m.step_by(event, payload)` 直接传递 my_payload 实例即可。
-
-
 
 #### 转换表
 
@@ -485,10 +460,6 @@ m.builder()
 
 一条转换表条目代表着从 from_state 因为事件 ev 的激励而转进到 to_state。我们既不限制 from 到 (ev, to_state) 的转换路径，而是利用 guard 条件进行选择（但实际上是一个顺序优先的选择）。具体情况可以参考源码的 `transition_t::get()` 部分。
 
-
-
-
-
 #### 推动状态机运行
 
 当上述的主要定义完成之后，状态机就处于可工作状态。此时你需要某种机制来推动状态机运行。例如当接收到一个鼠标事件时，你可以调用 m.step_by() 去推动状态机。如果推动成功，则状态机将会变换到新的状态。
@@ -533,8 +504,6 @@ m.step_by(end{});
 
 注意推动代码中的第二行会因为 guard 的缘故导致推动不成功，所以输出行中会有 `Error: reason = Reason::FailureGuard` 这样的输出信息。
 
-
-
 #### 线程安全
 
 如果你需要一个线程安全的状态机，那么可以给 machine_t 传入第三个模板参数为 `std::mutex`。如同这样：
@@ -552,8 +521,6 @@ fsm_cxx::safe_machine_t<my_state> m;
 但是在定义功能中（例如定义 state/guard/transition 的时候）并没有进行保护，所以线程安全仅适用于 machine_t 开始运行之后。
 
 另外，如果你自定义、或者扩展了你的上下文类，在上下文的内部操作中必需进行竞态条件保护。
-
-
 
 ### 示例代码完整一览
 
@@ -651,8 +618,6 @@ namespace fsm_cxx { namespace test {
 }}
 ```
 
-
-
 ## Epilogue
 
 这一次，代码的细节太多，所以我们偏重于解释如何使用 fsm-cxx。并且由于篇幅的原因，也没有足够的地盘提供完整的代码，所以请参考 repo: [https://github.com/hedzr/fsm-cxx](https://github.com/hedzr/fsm-cxx)。
@@ -661,9 +626,4 @@ namespace fsm_cxx { namespace test {
 
 这种文章总是会非常无趣的吧，不管怎么写都觉得一片散乱。
 
-
-
-
-
 :end:
-

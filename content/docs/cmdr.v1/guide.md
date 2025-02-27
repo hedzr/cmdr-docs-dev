@@ -2,9 +2,9 @@
 sidebarDepth: 3
 #layout: single
 title: "News"
-date: 2020-07-13 09:15:11 +0800
+date: 2020-07-13T09:15:11+08:00
 last-modified: 2020-08-16 09:12:12 +0800
-Author: hedzr
+author: hedzr
 tags: [commander, command-line, "command-line-parser", command-line-interface,  getops, posix, posix-compatible, hierarchical-configuration, hierarchy, cli, golang]
 categories: golang cmdr home
 comments: true

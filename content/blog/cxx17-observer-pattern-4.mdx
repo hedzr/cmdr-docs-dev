@@ -1,10 +1,24 @@
 ---
 layout: single
 title: "谈 C++17 里的 Observer 模式 - 4 - 信号槽模式"
-date: 2021-09-22 05:00:00 +0800
-last_modified_at: 2021-09-22 19:33:00 +0800
-Author: hedzr
-tags: [c++,c++11,c++17,observer pattern,pub-sub,publish,subcription,signal-slot,qt,design patterns,观察者模式,设计模式]
+date: 2021-09-22T05:00:00+08:00
+last_modified_at: 2021-09-22T19:33:00+08:00
+author: hedzr
+tags:
+  [
+    c++,
+    c++11,
+    c++17,
+    observer pattern,
+    pub-sub,
+    publish,
+    subcription,
+    signal-slot,
+    qt,
+    design patterns,
+    观察者模式,
+    设计模式,
+  ]
 categories: c++ algorithm
 comments: true
 toc: true
@@ -16,9 +30,7 @@ excerpt: >-
   关于观察者模式之四，Qt 的 Slot-Signal 模式的单独实现，...
 ---
 
-
-
-> 上上上回的  [谈 C++17 里的 Observer 模式](https://hedzr.com/c++/algorithm/cxx17-observer-pattern/) 介绍了该模式的基本构造。后来在 [谈 C++17 里的 Observer 模式 - 补/2](https://hedzr.com/c++/algorithm/cxx17-observer-pattern-2/) 里面提供了改进版本，主要聚焦于针对多线程环境的暴力使用的场景。再后来又有一篇 [谈 C++17 里的 Observer 模式 - 再补/3](https://hedzr.com/c++/algorithm/cxx17-observer-pattern-3/)，谈的是直接绑定 lambda 作为观察者的方案。
+> 上上上回的 [谈 C++17 里的 Observer 模式](https://hedzr.com/c++/algorithm/cxx17-observer-pattern/) 介绍了该模式的基本构造。后来在 [谈 C++17 里的 Observer 模式 - 补/2](https://hedzr.com/c++/algorithm/cxx17-observer-pattern-2/) 里面提供了改进版本，主要聚焦于针对多线程环境的暴力使用的场景。再后来又有一篇 [谈 C++17 里的 Observer 模式 - 再补/3](https://hedzr.com/c++/algorithm/cxx17-observer-pattern-3/)，谈的是直接绑定 lambda 作为观察者的方案。
 >
 > **C++17 系列的 Design Patterns 文章也被同步发表在 InfoQ，掘金，Segmentfault 平台。**
 
@@ -27,8 +39,6 @@ excerpt: >-
 所以嘛，我觉得这个第四篇，无论如何也要复刻一份 Qt 的 Slot 信号槽模型的独立实现了吧。而且这次复刻做完之后，观察者模式必须告一段落了，毕竟我在这个 Pattern 上真还是费了老大的神了，该结束了。
 
 > 要不要做 Rx 轻量版呢？这是个问题。
-
-
 
 ### 原始参考
 
@@ -57,9 +67,9 @@ bool QObject::connect ( const QObject * sender, const char * signal, const QObje
 Qt 使用一个关键字 signals 来指定信号：
 
 ```cpp
-signals: 
-		void mySignal(); 
-		void mySignal(int x); 
+signals:
+		void mySignal();
+		void mySignal(int x);
 		void mySignalParam(int x,int y);
 ```
 
@@ -70,25 +80,19 @@ signals:
 一个例子片段来展现信号槽的使用方式：
 
 ```cpp
-QLabel     *label  = new QLabel; 
-QScrollBar *scroll = new QScrollBar; 
-QObject::connect( scroll, SIGNAL(valueChanged(int)), 
+QLabel     *label  = new QLabel;
+QScrollBar *scroll = new QScrollBar;
+QObject::connect( scroll, SIGNAL(valueChanged(int)),
                   label,  SLOT(setNum(int)) );
 ```
 
 SIGNAL 与 SLOT 是宏，它们将会借助 Qt 内部实现来完成转换工作。
 
-
-
 #### 小小结
 
 我们不打算教授 Qt 开发知识，更不关心 Qt 的内部实现机制，所以例子摘取这么一个也就够了。
 
-如果你正在学习或想了解 Qt 开发知识，请查阅它们的官网，并可以着重了解 元对象编译器  MOC（meta object compiler），Qt 依赖这个东西来解决它的专有的非 c++ 的 扩展，例如 signals 等等。
-
-
-
-
+如果你正在学习或想了解 Qt 开发知识，请查阅它们的官网，并可以着重了解 元对象编译器 MOC（meta object compiler），Qt 依赖这个东西来解决它的专有的非 c++ 的 扩展，例如 signals 等等。
 
 ### 基本实现
 
@@ -100,7 +104,7 @@ SIGNAL 与 SLOT 是宏，它们将会借助 Qt 内部实现来完成转换工作
 
 可以首先肯定的是，一个 observable 对象也就是一个 slot 管理器、同时也是一个信号发射器。作为一个 slot 管理器，每一个 slot 中可以包含 M 个被连接的 slot entries，也就是观察者。由于一个 observable 对象管理一个单个到 slot，所以若是你想要很多槽（slots），你就需要派生出多个 observable 对象。
 
-无论如何，找回信号槽的本质之后，我们的 signal-slot 实现其实和上一篇的  [谈 C++17 里的 Observer 模式 - 再补](https://hedzr.com/c++/algorithm/cxx17-observer-pattern-3/) 几乎完全相同——除了 signal-slot 需要支持可变的函数参数表之外。
+无论如何，找回信号槽的本质之后，我们的 signal-slot 实现其实和上一篇的 [谈 C++17 里的 Observer 模式 - 再补](https://hedzr.com/c++/algorithm/cxx17-observer-pattern-3/) 几乎完全相同——除了 signal-slot 需要支持可变的函数参数表之外。
 
 #### `signal<SignalSubject...>`
 
@@ -113,14 +117,14 @@ namespace hicc::util {
 
   /**
    * @brief A covered pure C++ implementation for QT signal-slot mechanism
-   * @tparam SignalSubjects 
+   * @tparam SignalSubjects
    */
   template<typename... SignalSubjects>
   class signal {
     public:
     virtual ~signal() { clear(); }
     using FN = std::function<void(SignalSubjects &&...)>;
-    
+
     template<typename _Callable, typename... _Args>
     signal &connect(_Callable &&f, _Args &&...args) {
       FN fn = std::bind(std::forward<_Callable>(f), std::forward<_Args>(args)...);
@@ -136,7 +140,7 @@ namespace hicc::util {
 
     /**
      * @brief fire an event along the observers chain.
-     * @param event_or_subject 
+     * @param event_or_subject
      */
     signal &emit(SignalSubjects &&...event_or_subjects) {
       for (auto &fn : _callbacks)
@@ -160,8 +164,6 @@ connect() 模仿 Qt 的接口名，但我们更建议其同义词 on() 来做函
 上面的实现不像已知的开源实现那样复杂。其实现在的很多精妙的 C++ 开源元编程代码有点走火入魔，traits 什么的用的太多，拆分的过于厉害，我脑力内存小，有点跑不过来。
 
 还是说回我们的实现，基本没什么好说的，秉承上一回的实现思路，抛弃显式的 slot 实体的设计方案，简单地将用户函数包装为 `FN` 就当作是槽函数了。这样做没有了 Qt 的某些全面性，但实际上现代社会里并不需要哪些为了满足 Qt 类体系而制造的精巧之处。纯粹是过度设计。
-
-
 
 #### Tests
 
@@ -273,8 +275,6 @@ void test_observer_slots_args() {
 同样的，熟悉的 std::bind 支撑能力，不再赘述。
 
 test_observer_slots 就是无参数信号的示例，而 test_observer_slots_args 演示了带有四个参数时信号如何发射，稍稍有点遗憾的是你可能有时候不得不带上 std::move ，这个问题我可能未来某一天才会找个时间段来解决，但欢迎通过 hicc-cxx 的 ISSUE 系统投 PR 给我。
-
-
 
 ### 优化
 
@@ -432,8 +432,6 @@ namespace hicc::util::cool {
 
 对于静态成员函数，没有做额外测试，但它和普通函数对象是相同的，所以也能正确工作。
 
-
-
 ## 后记
 
 这一次，Observer Pattern 的计划出乎意料的加长了。
@@ -443,4 +441,3 @@ namespace hicc::util::cool {
 这一批观察者模式的完整的代码，请直达 [repo](https://github.com/hedzr/hicc) 的 [hz-common.hh](https://github.com/hedzr/hicc/blob/master/libs/hicc/include/hicc/hz-common.hh) 和 [dp-observer.cc](https://github.com/hedzr/hicc/blob/master/tests/dp-observer.cc)。忽略 github actions 常常 hung up 的超时问题。
 
 :end:
-

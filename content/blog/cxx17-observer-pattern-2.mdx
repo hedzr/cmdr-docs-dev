@@ -1,10 +1,22 @@
 ---
 layout: single
 title: "谈 C++17 里的 Observer 模式 - 补"
-date: 2021-09-18 05:00:00 +0800
-last_modified_at: 2021-09-18 04:33:00 +0800
-Author: hedzr
-tags: [c++,c++11,c++17,observer pattern,pub-sub,publish,subcription,design patterns,观察者模式,设计模式]
+date: 2021-09-18T05:00:00+08:00
+last_modified_at: 2021-09-18T04:33:00+08:00
+author: hedzr
+tags:
+  [
+    c++,
+    c++11,
+    c++17,
+    observer pattern,
+    pub-sub,
+    publish,
+    subcription,
+    design patterns,
+    观察者模式,
+    设计模式,
+  ]
 categories: c++ algorithm
 comments: true
 toc: true
@@ -16,13 +28,9 @@ excerpt: >-
   关于观察者模式上一 POST 的补充与改进，...
 ---
 
-
-
-> 上一回的  [谈 C++17 里的 Observer 模式](https://hedzr.com/c++/algorithm/cxx17-observer-pattern/) 还是有点慌张，所以需要补充完善一下下
+> 上一回的 [谈 C++17 里的 Observer 模式](https://hedzr.com/c++/algorithm/cxx17-observer-pattern/) 还是有点慌张，所以需要补充完善一下下
 
 ## Observer Pattern - Part II
-
-
 
 ### 多种 event (types) 问题
 
@@ -62,8 +70,6 @@ store.emit(mouse_move_event{});
 
 放心，我们的 observable 具有足够的容纳能力。
 
-
-
 ### 在观察者中修改被观察者
 
 **请不要那么做**。
@@ -74,13 +80,9 @@ store.emit(mouse_move_event{});
 
 如果某个事件的被观察是无副作用的，那么也可以直接做修改操作。这种情况在 DOS 时代叫做可重入的中断程序。对的，那时候的中断程序实际上就是一种观察者模式，只不过它是以汇编语言的形式组织的。
 
-
-
 ### 生命周期问题
 
 采用 weak_ptr 保证了即使 observer 被提前释放，也不会影响到 observable 的 emit 动作。反过来呢，observable 如果提前释放了，则毫无任何可能的副作用。
-
-
 
 ### 动态修改观察者链问题 - 改进后的新版本
 
@@ -100,9 +102,9 @@ namespace hicc::util {
   };
 
   /**
-   * @brief 
-   * @tparam S 
-   * @tparam Observer 
+   * @brief
+   * @tparam S
+   * @tparam Observer
    * @tparam AutoLock  thread-safe even if modifying observers chain dynamically
    * @tparam CNS       use Copy-and-Swap to shorten locking time.
    */
@@ -188,7 +190,7 @@ namespace hicc::util {
     public:
     /**
          * @brief fire an event along the observers chain.
-         * @param event_or_subject 
+         * @param event_or_subject
          */
     void emit(subject_t const &event_or_subject) {
       if (AutoLock) {
@@ -285,10 +287,6 @@ void test_observer_basic() {
 }
 ```
 
-
-
-
-
 ## 后记
 
 这次补充之后，总算是看得过去了，也稍微具有了点实用价值。
@@ -299,9 +297,4 @@ void test_observer_basic() {
 
 也或许不。
 
-
-
-
-
 :end:
-

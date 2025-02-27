@@ -1,10 +1,22 @@
 ---
 layout: single
 title: "谈 C++17 里的 Observer 模式 - 再补"
-date: 2021-09-18 05:00:00 +0800
-last_modified_at: 2021-09-18 04:33:00 +0800
-Author: hedzr
-tags: [c++,c++11,c++17,observer pattern,pub-sub,publish,subcription,design patterns,观察者模式,设计模式]
+date: 2021-09-18T05:00:00+08:00
+last_modified_at: 2021-09-18T04:33:00+08:00
+author: hedzr
+tags:
+  [
+    c++,
+    c++11,
+    c++17,
+    observer pattern,
+    pub-sub,
+    publish,
+    subcription,
+    design patterns,
+    观察者模式,
+    设计模式,
+  ]
 categories: c++ algorithm
 comments: true
 toc: true
@@ -16,9 +28,7 @@ excerpt: >-
   关于观察者模式之三，直接绑定函数对象，...
 ---
 
-
-
-> 上上回的  [谈 C++17 里的 Observer 模式](https://hedzr.com/c++/algorithm/cxx17-observer-pattern/) 介绍了该模式的基本构造。后来在 [谈 C++17 里的 Observer 模式 - 补](https://hedzr.com/c++/algorithm/cxx17-observer-pattern-2/) 里面提供了改进版本，主要聚焦于针对多线程环境的暴力使用的场景。
+> 上上回的 [谈 C++17 里的 Observer 模式](https://hedzr.com/c++/algorithm/cxx17-observer-pattern/) 介绍了该模式的基本构造。后来在 [谈 C++17 里的 Observer 模式 - 补](https://hedzr.com/c++/algorithm/cxx17-observer-pattern-2/) 里面提供了改进版本，主要聚焦于针对多线程环境的暴力使用的场景。
 
 ## Observer Pattern - Part III
 
@@ -38,7 +48,7 @@ namespace hicc::util {
   /**
    * @brief an observable object, which allows a lambda or a function to be bound as the observer.
    * @tparam S subject or event will be emitted to all bound observers.
-   * 
+   *
    */
   template<typename S>
   class observable_bindable {
@@ -60,7 +70,7 @@ namespace hicc::util {
 
     /**
      * @brief fire an event along the observers chain.
-     * @param event_or_subject 
+     * @param event_or_subject
      */
     void emit(subject_t const &event_or_subject) {
       for (auto &fn : _callbacks)
@@ -82,8 +92,6 @@ namespace hicc::util {
 然后借助于 std::bind 函数（整个绑定乃至于类型推导等等至少 c++14，建议 c++17）的推导能力，我们提供了一个强力有效的 add_callback 实现，另外，on() 是它的同义词。
 
 所谓强力有效，是指，我们在这个单一的函数签名上实现了各种各样的函数对象的通用绑定，匿名函数也好、成员函数也好、或者普通函数等，都可以借助于 add_callback() 被绑定到 observable_bindable 对象中去。
-
-
 
 #### 新的测试代码
 
@@ -115,7 +123,7 @@ void test_observer_cb() {
   store.add_callback([](event const &e) {
     hicc_print("event CB lamdba: %s", e.to_string().c_str());
   }, _1);
-  
+
   struct eh1 {
     void cb(event const &e) {
       hicc_print("event CB member fn: %s", e.to_string().c_str());
@@ -124,7 +132,7 @@ void test_observer_cb() {
       hicc_print("event CB member operator() fn: %s", e.to_string().c_str());
     }
   };
-  
+
   store.on(&eh1::cb, eh1{}, _1);
   store.on(&eh1::operator(), eh1{}, _1);
 
@@ -142,8 +150,8 @@ void test_observer_cb() {
 --- BEGIN OF test_observer_cb                         ----------------------
 09/19/21 08:38:02 [debug]: event CB lamdba: event ...
 09/19/21 08:38:02 [debug]: event CB member fn: event ...
-09/19/21 08:38:02 [debug]: event CB member operator() fn: event 
-09/19/21 08:38:02 [debug]: event CB regular function: event 
+09/19/21 08:38:02 [debug]: event CB member operator() fn: event
+09/19/21 08:38:02 [debug]: event CB regular function: event
 --- END OF test_observer_cb                           ----------------------
 
 It took 465.238us
@@ -152,8 +160,6 @@ It took 465.238us
 所以没有什么意外，甚至于无论是 observable_bindable 还是用例代码都是出乎意料的简洁明快，符合直觉。
 
 这个例子能够提醒我们，GoF 当然是经典里的经典（没办法，它出的早，它出的时候我们的脑子根本没往这种总结方向上去转，只好是它经典了，我那时候在干啥哩，哦，我在贵州一个鸟不生蛋的深山里的变电所搞什么 scada 调试吧，陷入细节之中），但也**未必就要祖宗之法不可易**。
-
-
 
 ### 改进
 
@@ -203,8 +209,6 @@ observable_bindable &add_callback(_Callable &&f, _Args &&...args) {
 
 善战者赫赫无功，说的是就是平平无奇。
 
-
-
 ### 优缺点
 
 总之，我们已经实现了这个主打函数式风格的观察者模式。你仍然需要从 `observable_bindable` 派生出来你的被观察者，但你可以随时随地就地建立对其的观察，你可以使用匿名的 lambda，也可以使用各种风格的具名的函数对象。
@@ -236,7 +240,4 @@ Callable 技术，我在 pool，ticker 等之中也有同样的应用，但是�
 
 不过这些也都无所谓。
 
-
-
 :end:
-

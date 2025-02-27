@@ -1,8 +1,8 @@
 ---
 layout: single
 title: "References"
-date: 2020-07-13 11:15:11 +0800
-Author: hedzr
+date: 2020-07-13T11:15:11+08:00
+author: hedzr
 tags: [commander, command-line, "command-line-parser", command-line-interface,  getops, posix, posix-compatible, hierarchical-configuration, hierarchy, cli, golang]
 categories: golang cmdr guide
 comments: true
