@@ -89,7 +89,7 @@ export function formatDate2(dateStr: string | Date, lang?: string): string {
   if (dateStr instanceof Date) {
     return dateToString(dateStr, lang ?? 'en-US');
   }
-  const dta = dateStr.split(" ");
+  const dta = dateStr.split(/[ T]/);
   const [day, month, year] = dta[0].split("-").map(Number);
   if (day > 1970) {
     const y = day, m = month, d = year;
@@ -112,21 +112,21 @@ export function stringToDate(date: string) {
   return new Date(year, month - 1, day);
 }
 
-export function safe(s:any,defval:string=''):string {
+export function safe(s: any, defval: string = ''): string {
   if (!s) return defval;
   if (typeof s === 'string') return s;
   return s.toString();
 }
 
-export function safeget<T>(cont:any,prop:string,defval:T):T{
+export function safeget<T>(cont: any, prop: string, defval: T): T {
   if (!cont) return defval;
   if (prop in cont) return cont[prop];
   return defval;
 }
 
-export function isFieldValid(cont:any,prop:string):boolean {
-  if(!cont) return false;
-  if(prop in cont) return !!cont[prop];
+export function isFieldValid(cont: any, prop: string): boolean {
+  if (!cont) return false;
+  if (prop in cont) return !!cont[prop];
   return false;
 }
 
