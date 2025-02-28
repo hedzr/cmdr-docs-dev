@@ -64,7 +64,7 @@ import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
 // import { I18nLabel } from "fumadocs-ui/provider";
 
 // export const dynamic = "force-static";
-export const dynamic = "force-dynamic";
+// export const dynamic = "force-dynamic";
 
 type AuthorT = {
   username?: string;
@@ -143,12 +143,15 @@ export default async function BlogPage(props: {
   //     })
   //   ),
   // ]);
-
+  //
   // console.log(1, "zod", schema.parse("uxx"));
   // // console.log(2, "zod", schema.parse({}), "bad");
   // console.log(3, "zod", schema.parse([{ name: "xxx" }]));
 
   const params = await props.params;
+
+  console.log(`cwd: ${process.cwd()}, params: `, params);
+
   const page = blog.getPage([params.slug]);
 
   if (!page) notFound();
