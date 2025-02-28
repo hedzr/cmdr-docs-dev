@@ -10,6 +10,20 @@ export default function HandlingKeyboardLeftAndRight({
 }) {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.shiftKey || event.ctrlKey || event.altKey) return;
+
+      if (event.key === "ArrowUp" && event.metaKey) {
+        const q = document.body;
+        const e = q.querySelector("a > span.back"); // click `back to list` button
+        if (e) {
+          event.preventDefault();
+          e.parentElement?.click();
+        }
+        return;
+      }
+
+      if (event.metaKey) return;
+
       if (event.key === "ArrowRight") {
         event.preventDefault();
         console.log("onKeyDown, right");
@@ -20,12 +34,13 @@ export default function HandlingKeyboardLeftAndRight({
           const el = q.querySelector(
             "ul.pagination > li.next:not(disabled) > a"
           );
-          if (el) { // @ts-ignore
+          if (el) {
+            // @ts-ignore
             el.click();
-          }
-          else {
+          } else {
             const el = q.querySelector(".next.right > a");
-            if (el) { // @ts-ignore
+            if (el) {
+              // @ts-ignore
               el.click();
             }
           }
@@ -40,12 +55,13 @@ export default function HandlingKeyboardLeftAndRight({
           const el = q.querySelector(
             "ul.pagination > li.previous:not(disabled) > a"
           );
-          if (el) { // @ts-ignore
+          if (el) {
+            // @ts-ignore
             el.click();
-          }
-          else {
+          } else {
             const el = q.querySelector(".prev.left > a");
-            if (el) { // @ts-ignore
+            if (el) {
+              // @ts-ignore
               el.click();
             }
           }
