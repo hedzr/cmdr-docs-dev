@@ -100,6 +100,11 @@ export default async function BlogIndexPage({
   console.log(`index - page: ${currentPage}, total: ${posts.length}`, sp, lang);
   // console.log(blog.getLanguages());
 
+  const bundle = (url: string, page: number): string => {
+    if (page != 1) return `${url}?page=${page}`;
+    return url;
+  };
+
   return (
     <main className="container max-sm:px-0 md:py-12">
       <div
@@ -135,7 +140,7 @@ export default async function BlogIndexPage({
             ) : (
               <div key={post.url}>
                 <Link
-                  href={post.url}
+                  href={bundle(post.url, currentPage)}
                   className={`flex flex-col bg-fd-card p-4 transition-colors hover:bg-fd-accent hover:text-fd-accent-foreground ${
                     draft ? "line-through italic" : ""
                   }`}

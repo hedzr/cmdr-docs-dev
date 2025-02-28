@@ -21,6 +21,7 @@ export default function BlogLayout({
   // searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
   children: ReactNode; // PropsWithChildren;
 }) {
+  console.log(`--- [BlogLayout] cwd: ${process.cwd()}`);
   return (
     <div
       className={`flex flex-col items-start justify-center pt-8 pb-10 md:w-[87%] mx-auto ${geistSans.variable} ${geistMono.variable} antialiased`}

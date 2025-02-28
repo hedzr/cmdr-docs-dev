@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { blog, openapi, source } from "@/lib/source";
+import { blog, openapi, source, usingCollection } from "@/lib/source";
 import { formatDate2, isFieldValid, safe, safeget } from "@/lib/utils";
 import { createMetadata } from "@/lib/metadata";
 // import {
@@ -56,10 +56,11 @@ import ClerkTOCItems from "@/components/layout/toc-clerk";
 import { TocPopoverHeader } from "@/page.client";
 import { buttonVariants1 } from "@/components/ui/button1";
 import { z } from "zod";
-import { LoaderOutput, MetaData } from "fumadocs-core/source";
+import { LoaderOutput, MetaData, PageData } from "fumadocs-core/source";
 import { BaseCollectionEntry, MarkdownProps } from "fumadocs-mdx/config";
 import { getPosts } from "../util";
 import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
+import { lang2iso } from "@/lib/i18n";
 // import { Edit, Text } from "lucide-react";
 // import { I18nLabel } from "fumadocs-ui/provider";
 
@@ -128,8 +129,62 @@ export function generateStaticParams(): { slug: string }[] {
 // }) {
 // }
 
+const calcTags = (fm) => {
+  let tags: string[] = [];
+  let categories: string[] = [];
+  if ("tags" in fm)
+    tags = Array.isArray(fm.tags) ? fm.tags : safe(fm.tags).split(/[,; ]/);
+  if ("categories" in fm)
+    categories = Array.isArray(fm.categories)
+      ? fm.categories
+      : safe(fm.categories).split(/[,; ]/);
+  return { tags, categories };
+};
+
+const calcPrevNext = (
+  blog: any,
+  lang: string,
+  pageNum: number,
+  perPage: number,
+  page
+) => {
+  const pages = [...blog.getPages(lang)];
+  const posts = getPosts(pages, lang, "");
+  let prev: typeof page, next: typeof page, last: typeof page;
+  let prevNumber: number = 1,
+    nextNumber: number = 1,
+    n: number = 1;
+  posts.map((it) => {
+    if (it.url === page.url) {
+      prev = last;
+      prevNumber = Math.floor((n + perPage - 1) / perPage);
+    } else if (last && last.url === page.url) {
+      next = it;
+      nextNumber = Math.floor((n + perPage - 1) / perPage);
+    }
+    last = it;
+    n++;
+  });
+  return { prev, next, prevNumber, nextNumber };
+};
+
+const get = (fm: any, v: string) => {
+  return v in fm ? fm[v] : "";
+};
+
+const tocPopoverOptions = {
+  style: "clerk", // normal, clerk
+  single: false,
+};
+const useInlineTOC = false;
+
+// const tocOptions = {
+//   style: "clerk", // normal, clerk
+// };
+
 export default async function BlogPage(props: {
   params: Promise<{ slug: string; lang: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   // const schema = z.union([
   //   z.string(),
@@ -149,55 +204,64 @@ export default async function BlogPage(props: {
   // console.log(3, "zod", schema.parse([{ name: "xxx" }]));
 
   const params = await props.params;
-
-  console.log(`cwd: ${process.cwd()}, params: `, params);
-
-  const page = blog.getPage([params.slug]);
-
-  if (!page) notFound();
-
   const lang = params.lang;
+
+  console.log(`--- [BlogPage] cwd: ${process.cwd()}, params: `, params);
+
+  // if (!usingCollection) {
+  //   const page = blog.getPage([params.slug], params.lang);
+  //   if (!page) {
+  //     console.log(`--- not found`);
+  //     const pages = [...blog.getPages(lang)];
+  //     console.log(`--- pages:`, pages, blog);
+  //     notFound();
+  //   }
+  //   const Mdx = fm.body;
+  //   const toc = fm.toc;
+  //   const lastModified = fm.lastModified || page.data.last_modified_at;
+  //   return <></>;
+  // }
+
+  const page = blog.getPage([params.slug], lang);
+  if (!page) {
+    console.log(`--- not found`);
+    notFound();
+  }
+
   const fm = page.data;
-  // const body = fm.body;
-  // const toc = page.data.toc;
-  const { body: Mdx, toc } = await fm.load();
+  const sp = await props.searchParams;
+  console.log(`--- blog page ${lang} / ${sp?.page} ----`);
+  const { body: Mdx, toc, lastModified } = await fm.load();
+  // console.log(`--- blog page ${params} 1 ----`);
+  const { tags, categories } = calcTags(fm);
+  let lma: string =
+    lastModified || get(fm, "last_modified_at") || get(fm, "lastModifiedAt");
 
-  let tags: string[] = [];
-  let categories: string[] = [];
-  if ("tags" in fm)
-    tags = Array.isArray(fm.tags) ? fm.tags : safe(fm.tags).split(/[,; ]/);
-  if ("categories" in fm)
-    categories = Array.isArray(fm.categories)
-      ? fm.categories
-      : safe(fm.categories).split(/[,; ]/);
-  // console.log(`blog page ${pageNumber} ----`);
+  const currrentPage =
+    typeof sp?.page === "string"
+      ? Number(sp?.page)
+      : Array.isArray(sp?.page)
+        ? Number(sp?.page[0])
+        : 1;
+  const perPage =
+    typeof sp?.perpage === "string"
+      ? Number(sp?.perpage)
+      : Array.isArray(sp?.perpage)
+        ? Number(sp?.perpage[0])
+        : 7;
+  const { prev, next, prevNumber, nextNumber } = calcPrevNext(
+    blog,
+    lang,
+    currrentPage,
+    perPage,
+    page
+  );
 
-  const get = (fm: any, v: string) => {
-    return v in fm ? fm[v] : "";
+  // console.log(`--- blog page ${params} 2 ----`);
+  const bundle = (url: string, page: number): string => {
+    if (page != 1) return `${url}?page=${page}`;
+    return url;
   };
-  let lma: string = get(fm, "last_modified_at") || get(fm, "lastModifiedAt");
-
-  const pages = [...blog.getPages(lang)];
-  const posts = getPosts(pages, lang, "");
-  let prev: typeof page, next: typeof page, last: typeof page;
-  posts.map((it) => {
-    if (it.url === page.url) {
-      prev = last;
-    } else if (last && last.url === page.url) {
-      next = it;
-    }
-    last = it;
-  });
-
-  const tocPopoverOptions = {
-    style: "clerk", // normal, clerk
-    single: false,
-  };
-  const useInlineTOC = false;
-
-  // const tocOptions = {
-  //   style: "clerk", // normal, clerk
-  // };
 
   return (
     <>
@@ -220,10 +284,17 @@ export default async function BlogPage(props: {
         </h1>
         <p className="mb-4 text-white/80">{page.data.description}</p>
         <Link
-          href="/blog"
+          href={`/blog?page=${sp?.page || ""}`}
           className={buttonVariants1({ size: "sm", variant: "secondary" })}
         >
-          Back
+          <span className="back">Back to list</span>
+        </Link>{" "}
+        |{" "}
+        <Link
+          href="/"
+          className={buttonVariants1({ size: "sm", variant: "secondary" })}
+        >
+          <span className="top">Site</span>
         </Link>
       </div>
       <article
@@ -304,14 +375,18 @@ export default async function BlogPage(props: {
           <div className="mt-32 w-full">
             {prev ? (
               <div className="left prev">
-                <Link href={prev.url}>Prev: {prev.data.title || ""}</Link>
+                <Link href={bundle(prev.url, currrentPage)}>
+                  Prev: {prev.data.title || ""}
+                </Link>
               </div>
             ) : (
               <></>
             )}
             {next ? (
               <div className="float-right right next">
-                <Link href={next.url}>Next: {next.data.title}</Link>
+                <Link href={bundle(next.url, currrentPage)}>
+                  Next: {next.data.title}
+                </Link>
               </div>
             ) : (
               <></>
@@ -319,6 +394,7 @@ export default async function BlogPage(props: {
           </div>
           <HandlingKeyboardLeftAndRight />
         </div>
+
         <div className="flex flex-col gap-4 border-l p-4 text-sm lg:w-[250px]">
           <div>
             <p className="mb-1 text-fd-muted-foreground">Written by</p>
@@ -343,7 +419,7 @@ export default async function BlogPage(props: {
           <div>
             <p className="mb-1 text-sm text-fd-muted-foreground">Post At</p>
             <p className="font-medium">
-              {formatDate2(page.data.date ?? page.file.name, lang)}
+              {formatDate2(page.data.date || "", lang2iso[lang])}
               {/* {new Date(page.data.date ?? page.file.name).toDateString()} */}
             </p>
             <p className="mb-1 text-sm text-fd-muted-foreground">
@@ -351,7 +427,7 @@ export default async function BlogPage(props: {
             </p>
             <p className="font-medium">
               {/* <div id="last-modified" className="my-4 text-sm text-zinc-400"> */}
-              {lma}
+              {formatDate2(lma, lang2iso[lang])}
             </p>
           </div>
 
@@ -376,7 +452,7 @@ export default async function BlogPage(props: {
                   {tags.map((it) => {
                     return (
                       <Link
-                        href={`/${lang}/blog/?query=%23${it}&page=${page}`}
+                        href={`/${lang}/blog/?query=%23${encodeURIComponent(it)}&page=${currrentPage}`}
                         className="rounded gap-2 p-2 py-1 m-1 border-1 border-zinc-400 text-sm text-zinc-900 bg-sky-500"
                         key={it}
                       >

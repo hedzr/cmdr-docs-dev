@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { I18nProvider, Translations } from "fumadocs-ui/i18n";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { PostHogProvider } from "../provider";
-import { lang2iso } from "@/lib/i18n";
+import { lang2display, lang2iso } from "@/lib/i18n";
 import { baseUrl } from "@/lib/metadata";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Analytics } from "@vercel/analytics/react";
@@ -21,6 +21,28 @@ const cn: Partial<Translations> = {
   // other translations
 };
 
+// prodMode or dev/preview mode --------------------------------
+
+export const prodMode = process.env.NODE_ENV === "production";
+
+// Root Layout Here --------------------------------
+
+function wrapMonitorOrNot(children: ReactNode): ReactNode {
+  return prodMode ? <PostHogProvider>{children}</PostHogProvider> : children;
+}
+
+function wrapAnalyticsOrNot(): ReactNode {
+  return prodMode ? (
+    <>
+      <SpeedInsights />
+      <GoogleAnalytics gaId="G-301DLP27SS" />
+      <Analytics />
+    </>
+  ) : (
+    <></>
+  );
+}
+
 export default async function Layout({
   params,
   children,
@@ -29,6 +51,7 @@ export default async function Layout({
   children: ReactNode;
 }) {
   const lang = (await params).lang;
+  console.log(`--- [SiteLayout] cwd: ${process.cwd()}, lang: `, lang);
   return (
     <html
       lang={lang2iso[lang]}
@@ -44,20 +67,12 @@ export default async function Layout({
       <body className="flex flex-col min-h-screen">
         <I18nProvider
           locale={(await params).lang}
-          locales={[
-            { locale: "en", name: "English" },
-            { locale: "cn", name: "Simplified Chinese" },
-            { locale: "tw", name: "Traditional Chinese" },
-          ]}
+          locales={lang2display}
           translations={{ cn }[lang]}
         >
-          <PostHogProvider>
-            <RootProvider>{children}</RootProvider>
-          </PostHogProvider>
+          {wrapMonitorOrNot(<RootProvider>{children}</RootProvider>)}
         </I18nProvider>
-        <SpeedInsights />
-        <GoogleAnalytics gaId="G-301DLP27SS" />
-        <Analytics />
+        {wrapAnalyticsOrNot()}
       </body>
     </html>
   );
