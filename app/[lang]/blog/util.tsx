@@ -95,47 +95,12 @@ const test = (
   return false;
 };
 
-export function getPosts(
-  blog: LoaderOutput<{
-    source: {
-      pageData: {
-        draft: boolean;
-        title: string;
-        author:
-          | string
-          | {
-              username?: string | undefined;
-              name?: string | undefined;
-              handle?: string | undefined;
-              handleUrl?: string | undefined;
-              avatar?: string | undefined;
-            }[];
-        comment: boolean;
-        feedback: boolean;
-        description?: string | undefined;
-        categories?: string | undefined;
-        tags?: string[] | undefined;
-        excerpt?: string | undefined;
-        icon?: string | undefined;
-        full?: boolean | undefined;
-        _openapi?: objectOutputType<{}, ZodTypeAny, "passthrough"> | undefined;
-        date?: string | Date | undefined;
-        header?:
-          | {
-              teaser?: string | undefined;
-              overlay_image?: string | undefined;
-              overlay_filter?: string | undefined;
-            }
-          | undefined;
-      } & BaseCollectionEntry & { load: () => Promise<MarkdownProps> };
-      metaData: MetaData & BaseCollectionEntry;
-    };
-    i18n: true;
-  }>,
+export function getPosts<T>(
+  pages: T[],
   lang: string,
   query: string | string[]
 ) {
-  const posts = [...blog.getPages(lang)]
+  const posts = pages
     .filter((v, i, a) => {
       if (!v) return false;
 

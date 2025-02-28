@@ -177,7 +177,8 @@ export default async function BlogPage(props: {
   };
   let lma: string = get(fm, "last_modified_at") || get(fm, "lastModifiedAt");
 
-  const posts = getPosts(blog, lang, "");
+  const pages = [...blog.getPages(lang)];
+  const posts = getPosts(pages, lang, "");
   let prev: typeof page, next: typeof page, last: typeof page;
   posts.map((it) => {
     if (it.url === page.url) {

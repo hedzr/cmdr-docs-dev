@@ -72,8 +72,9 @@ export default async function BlogIndexPage({
 
   // const ppp = pf(blog);
 
+  const pages = [...blog.getPages(lang)];
   const { posts, maxPage } = filterPostsByPage(
-    getPosts(blog, lang, query),
+    getPosts(pages, lang, query),
     currentPage,
     perPage
   );
