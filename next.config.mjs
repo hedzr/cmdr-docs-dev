@@ -1,4 +1,5 @@
 import { createMDX } from "fumadocs-mdx/next";
+// import { withContentCollections } from '@content-collections/next';
 
 import createBundleAnalyzer from "@next/bundle-analyzer";
 
@@ -143,14 +144,16 @@ const config = {
       });
     }
 
-    // HookWebpackError: /.../react.work/next/my-fuma/static/css/fb5ee875f83d1deb.css:2:58850: Unclosed block
-    if (!dev) {
-      if (!config.optimization) {
-        config.optimization = {};
-      }
-      config.optimization.minimize = false;
-      config.optimization.minimizer = [];
-    }
+    // // HookWebpackError: .../my-fuma/static/css/fb5ee875f83d1deb.css:2:58850: Unclosed block
+    // if (!dev) {
+    //   if (!config.optimization) {
+    //     config.optimization = {};
+    //   }
+    //   config.optimization.minimize = false;
+    //   config.optimization.minimizer = [];
+    //   // delete config.optimization.['mini'];
+    // }
+
     // if (isServer) {
     //   config.externals = {
     //     ...config.externals,
@@ -165,6 +168,7 @@ const config = {
 // export default withMDX(config);
 export default withAnalyzer(
   withMDX(
+    // withContentCollections(
     config ||
       (config.output === "export"
         ? {
@@ -176,5 +180,6 @@ export default withAnalyzer(
             // },
           }
         : null)
+    // )
   )
 );
