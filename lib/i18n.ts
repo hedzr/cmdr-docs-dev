@@ -12,6 +12,12 @@ export const iso2lang: { [key: string]: string } = {
   'zh-TW': 'tw',
 };
 
+export const lang2display = [
+  { locale: "en", name: "English" },
+  { locale: "cn", name: "Simplified Chinese" },
+  { locale: "tw", name: "Traditional Chinese" },
+];
+
 export const i18n: I18nConfig = {
   defaultLanguage: 'cn',
   languages: ['en', 'cn', 'tw'],
