@@ -24,12 +24,30 @@ export const source = loader({
 
 export const openapi = createOpenAPI();
 
+export const usingCollection = true;
+
 export const blog = loader({
   baseUrl: '/blog',
   source: createMDXSource(blogPosts),
-  // source: blogPosts.toFumadocsSource(),
+  // source: createMDXSource(docs.docs, docs.meta),
   i18n: i18n,
 });
+
+// ' : loader({
+//   baseUrl: '/blog',
+//   source: createMDXSource(blogPosts.docs, blogPosts.meta),
+//   // source: blogPosts.toFumadocsSource(),
+//   //
+//   // icon(icon) {
+//   //   if (icon && icon in icons)
+//   //     return createElement(icons[icon as keyof typeof icons]);
+//   // },
+//   // pageTree: {
+//   //   attachFile,
+//   // },
+//   i18n: i18n
+// });
+
 
 export type Page = InferPageType<typeof source>;
 export type Meta = InferMetaType<typeof source>;
