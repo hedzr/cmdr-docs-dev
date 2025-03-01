@@ -2,12 +2,17 @@ import { createMDX } from "fumadocs-mdx/next";
 // import { withContentCollections } from '@content-collections/next';
 
 import createBundleAnalyzer from "@next/bundle-analyzer";
+import {fileURLToPath} from "node:url";
+import path from "path";
 
 const withAnalyzer = createBundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
 });
 
 const withMDX = createMDX();
+
+const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
+const __dirname = path.dirname(__filename); // get the name of the directory
 
 // /** @type {import('next').NextConfig} */
 // const config = {
@@ -21,6 +26,7 @@ const config = {
   reactStrictMode: true,
 
   serverRuntimeConfig: {
+    PROJECT_ROOT: __dirname,
     // PROJECT_ROOT: process.env.pwd(),
     mySecret: "secret",
     secondSecret: process.env.SECOND_SECRET,
@@ -97,7 +103,7 @@ const config = {
     //   "raw.githubusercontent.com",
     //   "github.com",
     //   "cdn.jsdelivr.net",
-    //   "upload.wikimedia.org",
+    //   "upload.wikimedia.org","communities.vmware.com",
     // ],
   },
   // images: {
