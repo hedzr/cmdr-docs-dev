@@ -1,7 +1,11 @@
 import { Metadata } from "next";
-import { blog, openapi, source, usingCollection } from "@/lib/source";
+import { blog, openapi, source } from "@/lib/source";
+import { Page } from "fumadocs-core/source";
 import { formatDate2, isFieldValid, safe, safeget } from "@/lib/utils";
 import { createMetadata } from "@/lib/metadata";
+import { getPosts } from "../util";
+import { lang2iso } from "@/lib/i18n";
+import { z } from "zod";
 // import {
 //   type Author as AuthorT,
 //   BlogMdxFrontmatter,
@@ -12,6 +16,7 @@ import { createMetadata } from "@/lib/metadata";
 // import { ArrowLeftIcon } from "lucide-react";
 import { notFound } from "next/navigation";
 import { type HTMLAttributes } from "react";
+import { BaseCollectionEntry, MarkdownProps } from "fumadocs-mdx/config";
 
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import Link from "next/link";
@@ -55,12 +60,7 @@ import {
 import ClerkTOCItems from "@/components/layout/toc-clerk";
 import { TocPopoverHeader } from "@/page.client";
 import { buttonVariants1 } from "@/components/ui/button1";
-import { z } from "zod";
-import { LoaderOutput, MetaData, PageData } from "fumadocs-core/source";
-import { BaseCollectionEntry, MarkdownProps } from "fumadocs-mdx/config";
-import { getPosts } from "../util";
 import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
-import { lang2iso } from "@/lib/i18n";
 // import { Edit, Text } from "lucide-react";
 // import { I18nLabel } from "fumadocs-ui/provider";
 
@@ -77,10 +77,10 @@ type AuthorT = {
 };
 
 export async function generateMetadata(props: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; lang: string }>;
 }): Promise<Metadata> {
   const params = await props.params;
-  const page = blog.getPage([params.slug]);
+  const page = blog.getPage([params.slug], params.lang);
 
   if (!page) notFound();
 
@@ -129,7 +129,7 @@ export function generateStaticParams(): { slug: string }[] {
 // }) {
 // }
 
-const calcTags = (fm) => {
+const calcTags = (fm: blogPageProps) => {
   let tags: string[] = [];
   let categories: string[] = [];
   if ("tags" in fm)
@@ -141,16 +141,50 @@ const calcTags = (fm) => {
   return { tags, categories };
 };
 
+type blogPageProps = {
+  draft: boolean;
+  title: string;
+  comment: boolean;
+  feedback: boolean;
+  tags?: string[] | undefined;
+  categories?: string | undefined;
+  description?: string | undefined;
+  icon?: string | undefined;
+  full?: boolean | undefined;
+  _openapi?: z.objectOutputType<{}, z.ZodTypeAny, "passthrough"> | undefined;
+  date?: string | Date | undefined;
+  author?:
+    | string
+    | {
+        username?: string | undefined;
+        name?: string | undefined;
+        handle?: string | undefined;
+        handleUrl?: string | undefined;
+        avatar?: string | undefined;
+      }[]
+    | undefined;
+  excerpt?: string | undefined;
+  header?:
+    | {
+        teaser?: string | undefined;
+        overlay_image?: string | undefined;
+        overlay_filter?: string | undefined;
+      }
+    | undefined;
+} & BaseCollectionEntry & { load: () => Promise<MarkdownProps> };
+
 const calcPrevNext = (
   blog: any,
   lang: string,
   pageNum: number,
   perPage: number,
-  page
+  page: Page<blogPageProps>
 ) => {
   const pages = [...blog.getPages(lang)];
   const posts = getPosts(pages, lang, "");
-  let prev: typeof page, next: typeof page, last: typeof page;
+  let prev: typeof page | undefined,
+    next: typeof page | undefined,
+    last: typeof page;
   let prevNumber: number = 1,
     nextNumber: number = 1,
     n: number = 1;
