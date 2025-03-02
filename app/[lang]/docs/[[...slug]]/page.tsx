@@ -58,10 +58,11 @@ export default async function Page(props: {
   const page = source.getPage(params.slug, params.lang);
   if (!page) notFound();
 
+  const { body: MDX, toc, lastModified } = await page.data.load();
   // page.data.tags
-  const MDX = page.data.body;
-  const toc = page.data.toc;
-  const lastModified = page.data.lastModified || get(page.data,'last_modified_at');
+  // const MDX = page.data.body;
+  // const toc = page.data.toc;
+  // const lastModified = page.data.lastModified || get(page.data,'last_modified_at');
 
   // const path = `apps/docs/content/docs/${page.file.path}`;
   const path = `content/docs/${page.file.path}`;

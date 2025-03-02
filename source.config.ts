@@ -64,7 +64,7 @@ const extensions = {
 export const docs = defineDocs({
   dir: 'content/docs',
   docs: {
-    // async: true,
+    async: true,
     schema: frontmatterSchema.extend(
       {
         // preview: z.string().optional(),
@@ -127,7 +127,6 @@ export const blog = useCollection ? defineCollections({
 export default defineConfig({
   lastModifiedTime: 'git',
   // generateManifest: true,
-
   mdxOptions: {
     rehypeCodeOptions: {
       lazy: true,
