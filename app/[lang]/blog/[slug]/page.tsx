@@ -61,6 +61,7 @@ import ClerkTOCItems from "@/components/layout/toc-clerk";
 import { TocPopoverHeader } from "@/page.client";
 import { buttonVariants1 } from "@/components/ui/button1";
 import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
+import getConfig from "next/config";
 // import { Edit, Text } from "lucide-react";
 // import { I18nLabel } from "fumadocs-ui/provider";
 
@@ -240,7 +241,8 @@ export default async function BlogPage(props: {
   const params = await props.params;
   const lang = params.lang;
 
-  console.log(`--- [BlogPage] cwd: ${process.cwd()}, params: `, params);
+  const { serverRuntimeConfig } = getConfig();
+  console.log(`--- [BlogPage] cwd: ${process.cwd()} / __dirname: ${serverRuntimeConfig.PROJECT_ROOT}, params: `, params);
 
   // if (!usingCollection) {
   //   const page = blog.getPage([params.slug], params.lang);
@@ -262,8 +264,8 @@ export default async function BlogPage(props: {
     notFound();
   }
 
-  const fm = page.data;
   const sp = await props.searchParams;
+  const fm = page.data;
   console.log(`--- blog page ${lang} / ${sp?.page} ----`);
   const { body: Mdx, toc, lastModified } = await fm.load();
   // console.log(`--- blog page ${params} 1 ----`);
@@ -271,7 +273,7 @@ export default async function BlogPage(props: {
   let lma: string =
     lastModified || get(fm, "last_modified_at") || get(fm, "lastModifiedAt");
 
-  const currrentPage =
+  const currentPage =
     typeof sp?.page === "string"
       ? Number(sp?.page)
       : Array.isArray(sp?.page)
@@ -286,7 +288,7 @@ export default async function BlogPage(props: {
   const { prev, next, prevNumber, nextNumber } = calcPrevNext(
     blog,
     lang,
-    currrentPage,
+    currentPage,
     perPage,
     page
   );
@@ -297,7 +299,9 @@ export default async function BlogPage(props: {
     return url;
   };
 
-  return (
+  // @ts-ignore
+    // @ts-ignore
+    return (
     <>
       <div
         className="container rounded-xl border py-12 md:px-8"
@@ -409,7 +413,7 @@ export default async function BlogPage(props: {
           <div className="mt-32 w-full">
             {prev ? (
               <div className="left prev">
-                <Link href={bundle(prev.url, currrentPage)}>
+                <Link href={bundle(prev.url, prevNumber)}>
                   Prev: {prev.data.title || ""}
                 </Link>
               </div>
@@ -418,7 +422,7 @@ export default async function BlogPage(props: {
             )}
             {next ? (
               <div className="float-right right next">
-                <Link href={bundle(next.url, currrentPage)}>
+                <Link href={bundle(next.url, nextNumber)}>
                   Next: {next.data.title}
                 </Link>
               </div>
@@ -486,7 +490,7 @@ export default async function BlogPage(props: {
                   {tags.map((it) => {
                     return (
                       <Link
-                        href={`/${lang}/blog/?query=%23${encodeURIComponent(it)}&page=${currrentPage}`}
+                        href={`/${lang}/blog/?query=%23${encodeURIComponent(it)}&page=${currentPage}`}
                         className="rounded gap-2 p-2 py-1 m-1 border-1 border-zinc-400 text-sm text-zinc-900 bg-sky-500"
                         key={it}
                       >
@@ -682,7 +686,13 @@ function AuthorCards({ authors }: { authors: AuthorT[] }) {
   );
 }
 
-function AuthorCard({ author }: { author: AuthorT | string }) {
+function AuthorCard({ author }: { author: AuthorT | AuthorT[] | string | undefined }) {
+  if (typeof author === "undefined") {
+    return <></>;
+  }
+  if (Array.isArray(author)) {
+    return <AuthorCards authors={author}/>;
+  }
   if (typeof author === "string") {
     author = { username: author };
   }

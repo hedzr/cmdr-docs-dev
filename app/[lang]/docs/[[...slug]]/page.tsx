@@ -47,6 +47,10 @@ import { Rate } from "@/components/rate";
 
 import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
 
+const get = (fm: any, v: string) => {
+    return v in fm ? fm[v] : "";
+};
+
 export default async function Page(props: {
   params: Promise<{ lang: string; slug?: string[] }>;
 }) {
@@ -57,7 +61,7 @@ export default async function Page(props: {
   // page.data.tags
   const MDX = page.data.body;
   const toc = page.data.toc;
-  const lastModified = page.data.lastModified || page.data.last_modified_at;
+  const lastModified = page.data.lastModified || get(page.data,'last_modified_at');
 
   // const path = `apps/docs/content/docs/${page.file.path}`;
   const path = `content/docs/${page.file.path}`;

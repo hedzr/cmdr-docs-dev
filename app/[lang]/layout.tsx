@@ -9,6 +9,7 @@ import { lang2display, lang2iso } from "@/lib/i18n";
 import { baseUrl } from "@/lib/metadata";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Analytics } from "@vercel/analytics/react";
+import getConfig from "next/config";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -51,7 +52,9 @@ export default async function Layout({
   children: ReactNode;
 }) {
   const lang = (await params).lang;
-  console.log(`--- [SiteLayout] cwd: ${process.cwd()}, lang: `, lang);
+
+  const { serverRuntimeConfig } = getConfig();
+  console.log(`--- [SiteLayout] cwd: ${process.cwd()}, __dirname: ${serverRuntimeConfig.PROJECT_ROOT}, lang: `, lang);
   return (
     <html
       lang={lang2iso[lang]}

@@ -6,7 +6,7 @@ import {
   TooltipTrigger,
   TooltipProvider,
 } from "@radix-ui/react-tooltip";
-import { useState } from "react";
+import React, { useState } from "react";
 import { cn } from "@/lib/cn";
 // import { buttonVariants } from "@/components/ui/button";
 import { buttonVariants1 } from "@/components/ui/button1";
