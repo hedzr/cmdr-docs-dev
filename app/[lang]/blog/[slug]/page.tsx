@@ -61,7 +61,7 @@ import ClerkTOCItems from "@/components/layout/toc-clerk";
 import { TocPopoverHeader } from "@/page.client";
 import { buttonVariants1 } from "@/components/ui/button1";
 import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
-import getConfig from "next/config";
+// import getConfig from "next/config";
 // import { Edit, Text } from "lucide-react";
 // import { I18nLabel } from "fumadocs-ui/provider";
 
@@ -155,8 +155,8 @@ export default async function BlogPage(props: {
   const params = await props.params;
   const lang = params.lang;
 
-  const { serverRuntimeConfig } = getConfig();
-  console.log(`--- [BlogPage] cwd: ${process.cwd()} / __dirname: ${serverRuntimeConfig.PROJECT_ROOT}, params: `, params);
+  // const { serverRuntimeConfig } = getConfig();
+  // console.log(`--- [BlogPage] cwd: ${process.cwd()} / __dirname: ${serverRuntimeConfig.PROJECT_ROOT}, params: `, params);
 
   // if (!usingCollection) {
   //   const page = blog.getPage([params.slug], params.lang);
