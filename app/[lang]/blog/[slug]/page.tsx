@@ -66,16 +66,7 @@ import getConfig from "next/config";
 // import { I18nLabel } from "fumadocs-ui/provider";
 
 // export const dynamic = "force-static";
-// export const dynamic = "force-dynamic";
-
-type AuthorT = {
-  username?: string;
-  name?: string;
-  avatar?: string;
-  picture?: string;
-  handle?: string;
-  handleUrl?: string;
-};
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata(props: {
   params: Promise<{ slug: string; lang: string }>;
@@ -129,83 +120,6 @@ export function generateStaticParams(): { slug: string }[] {
 //   searchParams: { [key: string]: string | string[] | undefined }
 // }) {
 // }
-
-const calcTags = (fm: blogPageProps) => {
-  let tags: string[] = [];
-  let categories: string[] = [];
-  if ("tags" in fm)
-    tags = Array.isArray(fm.tags) ? fm.tags : safe(fm.tags).split(/[,; ]/);
-  if ("categories" in fm)
-    categories = Array.isArray(fm.categories)
-      ? fm.categories
-      : safe(fm.categories).split(/[,; ]/);
-  return { tags, categories };
-};
-
-type blogPageProps = {
-  draft: boolean;
-  title: string;
-  comment: boolean;
-  feedback: boolean;
-  tags?: string[] | undefined;
-  categories?: string | undefined;
-  description?: string | undefined;
-  icon?: string | undefined;
-  full?: boolean | undefined;
-  _openapi?: z.objectOutputType<{}, z.ZodTypeAny, "passthrough"> | undefined;
-  date?: string | Date | undefined;
-  author?:
-    | string
-    | {
-        username?: string | undefined;
-        name?: string | undefined;
-        handle?: string | undefined;
-        handleUrl?: string | undefined;
-        avatar?: string | undefined;
-      }[]
-    | undefined;
-  excerpt?: string | undefined;
-  header?:
-    | {
-        teaser?: string | undefined;
-        overlay_image?: string | undefined;
-        overlay_filter?: string | undefined;
-      }
-    | undefined;
-} & BaseCollectionEntry & { load: () => Promise<MarkdownProps> };
-
-const calcPrevNext = (
-  blog: any,
-  lang: string,
-  pageNum: number,
-  perPage: number,
-  page: Page<blogPageProps>
-) => {
-  const pages = [...blog.getPages(lang)];
-  const posts = getPosts(pages, lang, "");
-  let prev: typeof page | undefined,
-    next: typeof page | undefined,
-    last: typeof page;
-  let prevNumber: number = 1,
-    nextNumber: number = 1,
-    n: number = 1;
-  posts.map((it) => {
-    if (it.url === page.url) {
-      prev = last;
-      prevNumber = Math.floor((n + perPage - 1) / perPage);
-    } else if (last && last.url === page.url) {
-      next = it;
-      nextNumber = Math.floor((n + perPage - 1) / perPage);
-    }
-    last = it;
-    n++;
-  });
-  return { prev, next, prevNumber, nextNumber };
-};
-
-const get = (fm: any, v: string) => {
-  return v in fm ? fm[v] : "";
-};
 
 const tocPopoverOptions = {
   style: "clerk", // normal, clerk
@@ -539,9 +453,9 @@ export default async function BlogPage(props: {
 //   const { slug, lang } = await params;
 //   const sp = await searchParams;
 //   const pageNumber = Number(sp?.page || "1") || 1;
-
+//
 //   console.log(`blog p${pageNumber} - `, lang, slug, sp);
-
+//
 //   // const prms = await params;
 //   // const lang = prms.lang;
 //   // const sp = await searchParams;
@@ -551,9 +465,9 @@ export default async function BlogPage(props: {
 //     console.log("not found:", res);
 //     notFound();
 //   }
-
+//
 //   const fm = res.frontmatter;
-
+//
 //   let tags: string[] = [];
 //   let categories: string[] = [];
 //   if (fm.tags) tags = Array.isArray(fm.tags) ? fm.tags : fm.tags.split(/[,; ]/);
@@ -562,12 +476,12 @@ export default async function BlogPage(props: {
 //       ? fm.categories
 //       : fm.categories.split(/[,; ]/);
 //   // console.log(`blog page ${pageNumber} ----`);
-
+//
 //   const get = (fm: any, v: string) => {
 //     return v in fm ? fm[v] : "";
 //   };
 //   let lma: string = get(fm, "lastModifiedAt") || get(fm, "last_modified_at");
-
+//
 //   return (
 //     <article className="lg:w-[93%] md:[99%] mx-auto mb-32">
 //       <div className="flex flex-col-1 gap-x-3">
@@ -631,7 +545,7 @@ export default async function BlogPage(props: {
 //       </div>
 //       <div className="blog-content !w-full">
 //         <Typography>{res.content}</Typography>
-
+//
 //         <div className="mt-4">
 //           <div id="blog-tail-row">
 //             <div id="blog-categories" className="inline mr-4">
@@ -670,6 +584,15 @@ export default async function BlogPage(props: {
 //     </article>
 //   );
 // }
+
+type AuthorT = {
+  username?: string;
+  name?: string;
+  avatar?: string;
+  picture?: string;
+  handle?: string;
+  handleUrl?: string;
+};
 
 function AuthorCards({ authors }: { authors: AuthorT[] }) {
   return (
@@ -738,3 +661,80 @@ export function AuthorCardItem({
     </Link>
   );
 }
+
+const calcTags = (fm: blogPageProps) => {
+  let tags: string[] = [];
+  let categories: string[] = [];
+  if ("tags" in fm)
+    tags = Array.isArray(fm.tags) ? fm.tags : safe(fm.tags).split(/[,; ]/);
+  if ("categories" in fm)
+    categories = Array.isArray(fm.categories)
+        ? fm.categories
+        : safe(fm.categories).split(/[,; ]/);
+  return { tags, categories };
+};
+
+type blogPageProps = {
+  draft: boolean;
+  title: string;
+  comment: boolean;
+  feedback: boolean;
+  tags?: string[] | undefined;
+  categories?: string | undefined;
+  description?: string | undefined;
+  icon?: string | undefined;
+  full?: boolean | undefined;
+  _openapi?: z.objectOutputType<{}, z.ZodTypeAny, "passthrough"> | undefined;
+  date?: string | Date | undefined;
+  author?:
+      | string
+      | {
+    username?: string | undefined;
+    name?: string | undefined;
+    handle?: string | undefined;
+    handleUrl?: string | undefined;
+    avatar?: string | undefined;
+  }[]
+      | undefined;
+  excerpt?: string | undefined;
+  header?:
+      | {
+    teaser?: string | undefined;
+    overlay_image?: string | undefined;
+    overlay_filter?: string | undefined;
+  }
+      | undefined;
+} & BaseCollectionEntry & { load: () => Promise<MarkdownProps> };
+
+const calcPrevNext = (
+    blog: any,
+    lang: string,
+    pageNum: number,
+    perPage: number,
+    page: Page<blogPageProps>
+) => {
+  const pages = [...blog.getPages(lang)];
+  const posts = getPosts(pages, lang, "");
+  let prev: typeof page | undefined,
+      next: typeof page | undefined,
+      last: typeof page;
+  let prevNumber: number = 1,
+      nextNumber: number = 1,
+      n: number = 1;
+  posts.map((it) => {
+    if (it.url === page.url) {
+      prev = last;
+      prevNumber = Math.floor((n + perPage - 1) / perPage);
+    } else if (last && last.url === page.url) {
+      next = it;
+      nextNumber = Math.floor((n + perPage - 1) / perPage);
+    }
+    last = it;
+    n++;
+  });
+  return { prev, next, prevNumber, nextNumber };
+};
+
+const get = (fm: any, v: string) => {
+  return v in fm ? fm[v] : "";
+};
