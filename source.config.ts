@@ -64,7 +64,7 @@ const extensions = {
 export const docs = defineDocs({
   dir: 'content/docs',
   docs: {
-    async: true,
+    // async: true,
     schema: frontmatterSchema.extend(
       {
         // preview: z.string().optional(),
@@ -105,7 +105,7 @@ const useCollection = true;
 export const blog = useCollection ? defineCollections({
   type: 'doc',
   dir: 'content/blog',
-  // async: true,
+  async: true,
   // mdxOptions: getDefaultMDXOptions({
   //   // extended mdx options
   // }),
@@ -129,7 +129,7 @@ export default defineConfig({
   // generateManifest: true,
   mdxOptions: {
     rehypeCodeOptions: {
-      lazy: true,
+      // lazy: true,
       experimentalJSEngine: true,
       langs: ['ts', 'js', 'html', 'tsx', 'mdx'],
       inline: 'tailing-curly-colon',
