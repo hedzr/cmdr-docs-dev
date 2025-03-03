@@ -105,7 +105,7 @@ const useCollection = true;
 export const blog = useCollection ? defineCollections({
   type: 'doc',
   dir: 'content/blog',
-  async: true,
+  // async: true,
   // mdxOptions: getDefaultMDXOptions({
   //   // extended mdx options
   // }),
