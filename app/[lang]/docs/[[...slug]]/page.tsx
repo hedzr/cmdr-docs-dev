@@ -1,4 +1,5 @@
 import { source } from "@/lib/source";
+import { prodMode } from "@/lib/utils";
 // import {
 //   DocsPage,
 //   DocsBody,
@@ -145,6 +146,7 @@ export default async function Page(props: {
         />
         {/*{page.data.index ? <DocsCategory page={page} from={source} /> : null}*/}
       </DocsBody>
+      {prodMode?
       <Rate
         onRateAction={async (url, feedback) => {
           "use server";
@@ -155,7 +157,7 @@ export default async function Page(props: {
         //   posthog.capture("rate_docs", feedback);
         //   // see also: https://us.posthog.com/project/130354/onboarding/web_analytics?step=install
         // }}
-      />
+      />:<></>}
       <HandlingKeyboardLeftAndRight />
     </DocsPage>
   );
