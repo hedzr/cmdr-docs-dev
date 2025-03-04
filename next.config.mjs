@@ -74,10 +74,11 @@ const config = {
   // run then command at local shell:
   //    $ export NODE_OPTIONS=--max_old_space_size=1024
   //    $ ANALYZE=true pnpm build --experimental-debug-memory-usage
-  experimental: {
-    optimizePackageImports: ["icon-library"],
-    webpackMemoryOptimizations: true,
-  },
+  // experimental: {
+  //   // optimizePackageImports: ["icon-library"],
+  //   // webpackMemoryOptimizations: true,
+  //   // ppr: 'incremental',
+  // },
   // disable static analysis
   // https://nextjs.org/docs/app/building-your-application/optimizing/memory-usage#disable-static-analysis
   eslint: {
