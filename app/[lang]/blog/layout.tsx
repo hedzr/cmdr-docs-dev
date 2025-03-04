@@ -15,6 +15,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const littleDebug =true;
+
 export default function BlogLayout({
   // params,
   // searchParams,
@@ -25,20 +27,39 @@ export default function BlogLayout({
   children: ReactNode; // PropsWithChildren;
 }) {
   const { serverRuntimeConfig } = getConfig();
-  // const cwd1 = serverRuntimeConfig.cwd();
-  const cwd2 = process.cwd();
-  console.log(`+ list '${cwd2}'`);
-  fs.readdirSync(cwd2).forEach((file) => {
-    console.log(`      file: ${file}`);
-  })
-  if (__dirname) {
-    console.log(`+ list '${__dirname}'`);
-    fs.readdirSync(__dirname).forEach((file) => {
+
+  if (littleDebug) {
+    // runtime value: /var/task
+    const cwd2 = process.cwd();
+    console.log(`+ list '${cwd2}' + 'content'`);
+    fs.readdirSync(path.join(cwd2, "content")).forEach((file) => {
       console.log(`      file: ${file}`);
     })
+    console.log(`+ list '${cwd2}' + 'content/blog'`);
+    fs.readdirSync(path.join(cwd2, "content", "blog")).forEach((file) => {
+      console.log(`      file: ${file}`);
+    })
+    if (__dirname) {
+      // runtime value: /var/task/.next/server/chunks
+      console.log(`+ list '${__dirname}'`);
+      fs.readdirSync(__dirname).forEach((file) => {
+        console.log(`      file: ${file}`);
+      })
+
+      // serverRuntimeConfig.PROJECT_ROOT: /vercel/path0
+      if (serverRuntimeConfig.PROJECT_ROOT) {
+        const root = serverRuntimeConfig.PROJECT_ROOT;
+        console.log(`+ list '${root}'`);
+        fs.readdirSync(root).forEach((file) => {
+          console.log(`      file: ${file}`);
+        })
+      }
+    }
+
+    const o = fs.existsSync(path.join(cwd2, "content/blog/file-rec.mdx"));
+    console.log(`--- [BlogLayout] cwd: ${cwd2} | 'content/blog/file-rec.mdx': ${o}, PRJ_ROOT: ${serverRuntimeConfig.PROJECT_ROOT}, serverRuntimeConfig.path: ${serverRuntimeConfig.path}`);
   }
-  const o = fs.existsSync(path.join(cwd2,"content/blog/file-rec.mdx"));
-  console.log(`--- [BlogLayout] cwd: ${cwd2} | 'content/blog/file-rec.mdx': ${o}, __dirname: ${ serverRuntimeConfig.PROJECT_ROOT }, serverRuntimeConfig.path: ${serverRuntimeConfig.path}`);
+
   return (
     <div
       className={`flex flex-col items-start justify-center pt-8 pb-10 md:w-[87%] mx-auto ${geistSans.variable} ${geistMono.variable} antialiased`}
