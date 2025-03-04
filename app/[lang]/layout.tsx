@@ -1,6 +1,6 @@
 import "../global.css";
 import { RootProvider } from "fumadocs-ui/provider";
-import { Inter } from "next/font/google";
+import { Geist } from "next/font/google";
 import type { ReactNode } from "react";
 import { I18nProvider, Translations } from "fumadocs-ui/i18n";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -12,7 +12,12 @@ import { prodMode } from "@/lib/utils";
 // import { baseUrl } from "@/lib/metadata";
 // import getConfig from "next/config";
 
-const inter = Inter({
+// const inter = Inter({
+//   subsets: ["latin"],
+// });
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
   subsets: ["latin"],
 });
 
@@ -62,7 +67,7 @@ export default async function Layout({
       // base-next-site-url={process.env.NEXT_PUBLIC_SITE_URL || "not-spec"}
       // base-next-vercel-url={process.env.NEXT_PUBLIC_VERCEL_URL || "not-spec"}
       // base-vercel-url={process.env.VERCEL_URL || "not-spec"}
-      className={inter.className}
+      className={geistSans.className}
       suppressHydrationWarning
     >
       <body className="flex flex-col min-h-screen">
