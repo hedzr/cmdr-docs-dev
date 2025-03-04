@@ -27,6 +27,16 @@ export default function BlogLayout({
   const { serverRuntimeConfig } = getConfig();
   // const cwd1 = serverRuntimeConfig.cwd();
   const cwd2 = process.cwd();
+  console.log(`+ list '${cwd2}'`);
+  fs.readdirSync(cwd2).forEach((file) => {
+    console.log(`      file: ${file}`);
+  })
+  if (__dirname) {
+    console.log(`+ list '${__dirname}'`);
+    fs.readdirSync(__dirname).forEach((file) => {
+      console.log(`      file: ${file}`);
+    })
+  }
   const o = fs.existsSync(path.join(cwd2,"content/blog/file-rec.mdx"));
   console.log(`--- [BlogLayout] cwd: ${cwd2} | 'content/blog/file-rec.mdx': ${o}, __dirname: ${ serverRuntimeConfig.PROJECT_ROOT }, serverRuntimeConfig.path: ${serverRuntimeConfig.path}`);
   return (
