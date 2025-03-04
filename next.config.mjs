@@ -26,9 +26,10 @@ const config = {
   reactStrictMode: true,
 
   serverRuntimeConfig: {
-    PROJECT_ROOT: __projectRoot,
-    RUNTIME_ROOT: __dirname,
-    // PROJECT_ROOT: process.env.pwd(),
+    __PROJECT_ROOT: __projectRoot, // = '/vercel/path0' (= process.cwd())
+    PROJECT_ROOT: path.dirname(path.dirname(path.dirname(__dirname))),
+    RUNTIME_ROOT: __dirname, // = '/var/task/.next/server/chunks'
+
     mySecret: "secret",
     secondSecret: process.env.SECOND_SECRET,
   },
@@ -42,10 +43,10 @@ const config = {
     fetches: {
       fullUrl: true,
       hmrRefreshes: true,
-      // incomingRequests: false,
-      incomingRequests: {
-        ignore: [/\api\/v1\/health/],
-      },
+      // // incomingRequests: false,
+      // incomingRequests: {
+      //   ignore: [/\api\/v1\/health/],
+      // },
     },
   },
 
