@@ -13,6 +13,7 @@ const withMDX = createMDX();
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
+const __projectRoot = process.cwd();
 
 // /** @type {import('next').NextConfig} */
 // const config = {
@@ -26,7 +27,8 @@ const config = {
   reactStrictMode: true,
 
   serverRuntimeConfig: {
-    PROJECT_ROOT: __dirname,
+    PROJECT_ROOT: __projectRoot,
+    RUNTIME_ROOT: __dirname,
     // PROJECT_ROOT: process.env.pwd(),
     mySecret: "secret",
     secondSecret: process.env.SECOND_SECRET,
