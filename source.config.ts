@@ -130,7 +130,8 @@ export default defineConfig({
   // generateManifest: true,
   mdxOptions: {
     rehypeCodeOptions: {
-      // lazy: true,
+      // `lazy` is a must-have flag. code highlight effect couldn't work properly without it.
+      lazy: true,
       experimentalJSEngine: true,
       // langs: ['ts', 'js', 'html', 'tsx', 'mdx'],
       inline: 'tailing-curly-colon',
