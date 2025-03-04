@@ -65,8 +65,8 @@ import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
 // import { Edit, Text } from "lucide-react";
 // import { I18nLabel } from "fumadocs-ui/provider";
 
-// export const dynamic = "force-static";
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
+// export const dynamic = "force-dynamic";
 
 export async function generateMetadata(props: {
   params: Promise<{ slug: string; lang: string }>;
@@ -100,9 +100,11 @@ export function generateStaticParams({
   params: { slug: string; lang: string };
 }): { slug: string }[] {
   // return source.generateParams();
-  return blog.getPages(lang).map((page) => ({
+  const ret = blog.getPages(lang).map((page) => ({
     slug: page.slugs.join("/"),
   }));
+  // console.log(`generateStaticPages(${slug}, ${lang})`, ret);
+  return ret;
 }
 
 // type PageProps = {
@@ -455,8 +457,11 @@ export default async function BlogPage(props: {
           </Toc> */}
         </div>
       </article>
-      <div id="tip-kb" className="mr-4 mb-4 disabled">
-        <div className="inline -m-1">
+      <div
+        id="tip-kb"
+        className="mr-4 mb-4 disabled m-full text-sm text-zinc-600"
+      >
+        <div className="m-auto">
           <kbd>Meta-Up Arrow</kbd> to back to list page.
           <kbd>Left/Right Arrow</kbd> to go to previous/next post.
         </div>
