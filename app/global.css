@@ -18,7 +18,10 @@
   }
 } */
 
-/* line numbers for code block */
+/* line numbers for code block
+
+   TODO https://rehype-pretty.pages.dev/#line-numbers
+*/
 
 code {
   counter-reset: step;

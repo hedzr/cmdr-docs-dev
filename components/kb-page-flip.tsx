@@ -13,6 +13,7 @@ export default function HandlingKeyboardLeftAndRight({
       if (event.shiftKey || event.ctrlKey || event.altKey) return;
 
       if (event.key === "ArrowUp" && event.metaKey) {
+        // blog only
         const q = document.body;
         const e = q.querySelector("a > span.back"); // click `back to list` button
         if (e) {
@@ -28,16 +29,18 @@ export default function HandlingKeyboardLeftAndRight({
         event.preventDefault();
         console.log("onKeyDown, right");
         const q = document.body;
-        const e = q.querySelector("a > div > svg.lucide-chevron-right");
+        const e = q.querySelector("a > div > svg.lucide-chevron-right"); // docs
         if (e) e.parentElement?.parentElement?.click();
         else {
+          // blog list
           const el = q.querySelector(
-            "ul.pagination > li.next:not(disabled) > a"
+            "ul.pagination > li.next:not(disabled) > a",
           );
           if (el) {
             // @ts-ignore
             el.click();
           } else {
+            // blog page
             const el = q.querySelector(".next.right > a");
             if (el) {
               // @ts-ignore
@@ -49,16 +52,18 @@ export default function HandlingKeyboardLeftAndRight({
         event.preventDefault();
         console.log("onKeyDown, left");
         const q = document.body;
-        const e = q.querySelector("a > div > svg.lucide-chevron-left");
+        const e = q.querySelector("a > div > svg.lucide-chevron-left"); // docs
         if (e) e.parentElement?.parentElement?.click();
         else {
+          // blog list
           const el = q.querySelector(
-            "ul.pagination > li.previous:not(disabled) > a"
+            "ul.pagination > li.previous:not(disabled) > a",
           );
           if (el) {
             // @ts-ignore
             el.click();
           } else {
+            // blog page
             const el = q.querySelector(".prev.left > a");
             if (el) {
               // @ts-ignore
