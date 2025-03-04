@@ -1,16 +1,3 @@
-// export async function BlogIndexPage({
-//   params,
-//   searchParams,
-// }: {
-//   params: Promise<{
-//     lang: string;
-//     slugs: string[];
-//   }>;
-//   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
-// }) {
-//   return <h1>Index Page</h1>;
-// }
-
 import { redirect } from "next/navigation";
 
 export default async function BlogPage(props: {
