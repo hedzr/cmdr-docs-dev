@@ -10,9 +10,9 @@ const withAnalyzer = createBundleAnalyzer({
 
 const withMDX = createMDX();
 
-const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
-const __dirname = path.dirname(__filename); // get the name of the directory
-const __projectRoot = process.cwd();
+// const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
+// const __dirname = path.dirname(__filename); // get the name of the directory
+// const __projectRoot = process.cwd();
 
 // /** @type {import('next').NextConfig} */
 // const config = {
@@ -26,9 +26,11 @@ const config = {
   reactStrictMode: true,
 
   serverRuntimeConfig: {
-    __PROJECT_ROOT: __projectRoot, // = '/vercel/path0' (= process.cwd())
-    PROJECT_ROOT: path.dirname(path.dirname(path.dirname(__dirname))),
+    __PROJECT_ROOT: process.cwd(), // = '/vercel/path0' (= process.cwd())
+    __filename: fileURLToPath(import.meta.url),
+    __dirname: path.dirname(__filename),
     RUNTIME_ROOT: __dirname, // = '/var/task/.next/server/chunks'
+    PROJECT_ROOT: path.dirname(path.dirname(path.dirname(__dirname))),
 
     mySecret: "secret",
     secondSecret: process.env.SECOND_SECRET,
