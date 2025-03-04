@@ -94,10 +94,14 @@ export async function generateMetadata(props: {
   );
 }
 
-export function generateStaticParams(): { slug: string }[] {
+export function generateStaticParams({
+  params: { slug, lang },
+}: {
+  params: { slug: string; lang: string };
+}): { slug: string }[] {
   // return source.generateParams();
-  return blog.getPages().map((page) => ({
-    slug: page.slugs[0], //.join("/"),
+  return blog.getPages(lang).map((page) => ({
+    slug: page.slugs.join("/"),
   }));
 }
 

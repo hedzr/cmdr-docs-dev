@@ -49,24 +49,24 @@ export default function BlogLayout({
     //     console.log(`      file: ${file}`);
     //   })
     // }
-    if (typeof __dirname !== "undefined") {
-      // // runtime value: /var/task/.next/server/chunks
-      // if (fs.existsSync(__dirname)) {
-      //   console.log(`+ list '${__dirname}'`);
-      //   fs.readdirSync(__dirname).forEach((file) => {
-      //     console.log(`      file: ${file}`);
-      //   })
-      // }
-
-      // serverRuntimeConfig.PROJECT_ROOT: /vercel/path0
-      if (serverRuntimeConfig.PROJECT_ROOT) {
-        const root = serverRuntimeConfig.PROJECT_ROOT;
-        console.log(`+ list '${root}'`);
-        fs.readdirSync(root).forEach((file) => {
-          console.log(`      file: ${file}`);
-        })
-      }
-    }
+    // if (typeof __dirname !== "undefined") {
+    //   // // runtime value: /var/task/.next/server/chunks
+    //   // if (fs.existsSync(__dirname)) {
+    //   //   console.log(`+ list '${__dirname}'`);
+    //   //   fs.readdirSync(__dirname).forEach((file) => {
+    //   //     console.log(`      file: ${file}`);
+    //   //   })
+    //   // }
+    //
+    //   // serverRuntimeConfig.PROJECT_ROOT: /vercel/path0
+    //   if (serverRuntimeConfig.PROJECT_ROOT) {
+    //     const root = serverRuntimeConfig.PROJECT_ROOT;
+    //     console.log(`+ list '${root}'`);
+    //     fs.readdirSync(root).forEach((file) => {
+    //       console.log(`      file: ${file}`);
+    //     })
+    //   }
+    // }
   }
 
   return (
