@@ -27,7 +27,7 @@
     ]
   },
   "include": [
-    // "content/**/*",
+    "content/**/*",
     "next-env.d.ts",
     "**/*.ts",
     "**/*.mts",
