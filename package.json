@@ -15,8 +15,11 @@
   "packageManager": "pnpm@9.1.1",
   "scripts": {
     "dev": "next dev --turbopack # https://nextjscn.org/docs/architecture/turbopack",
-    "build": "next build",
-    "build:posts": "node ./scripts/generate-posts-outline.mjs",
+    "build": "pnpm build:pre && next build && pnpm build:post",
+    "build:pre": "tsx ./scripts/pre-build.mts",
+    "build:post": "tsx ./scripts/post-build.mts",
+    "build0": "next build",
+    "build0:posts": "node ./scripts/generate-posts-outline.mjs",
     "start": "next start",
     "start:3001": "next start --port 3001",
     "build:with-mem-dbg": "next build --experimental-debug-memory-usage",
