@@ -53,6 +53,8 @@ func prepareApp(opts ...cli.Opt) (app cli.App) {
 		})
 	return
 }
+-- go.mod --
+module tiny1
 ```
 
 这个微型 app 很简单，没有集成 `Store` 存储应用程序设置, 也没有集成外部设置装载器。
@@ -68,14 +70,14 @@ jump command: (0x10140a4a0,0x140001ae6c8)
 
 ### 额外的话题
 
-为你的应用程序创建一条子命令使用的是两种序列：`app/b.Cmd("long","short",...)...Build()` 和 `app/b.Cmd("long","short",...)...With(cb)`。
+为你的应用程序创建一条子命令可以使用的有两种序列：`app/b.Cmd("long","short",...)...Build()` 和 `app/b.Cmd("long","short",...)...With(cb)`。
 
-前者使用 `Build()` 结束创建模式。
+前者使用 `Build()` 结束创建者模式。
 
-后者带有一个回调函数闭包。这样你就能在闭包中继续创建下一级子命令了。
+后者能够带有一个回调函数闭包。这样你就能在闭包中继续创建更嵌套的下一级子命令了。
 
-创建一个选项参数的方式也是类似的，`app/b.Flag("long","short",...)...Build()` 和 `app/b.Flag("long","short",...)...With(cb)`。
-其中，后者可以用于在闭包中设置 flag 的其他属性。但你依然可以使用流式调用风格，然后以 `Build()` 作为终结符完成构建模式。
+创建一个选项参数（Flag）的方式也是类似的，`app/b.Flag("long","short",...)...Build()` 和 `app/b.Flag("long","short",...)...With(cb)`。
+其中，后者可以用于在闭包中设置 flag 的其他属性。不过，既然 Flag 不存在带有子命令的可能性，所以你也无法在这个闭包中“创建”子命令，那是无意义且不被它的 FlagBuilder 所支持的。
 
 ## 下一步
 

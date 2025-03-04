@@ -7,7 +7,7 @@ description: 集成 `Store` 能够提供应用程序配置数据的管理能力
 
 通过集成 [`hedzr/store`](https://github.com/hedzr/store)[^1]，可以无缝地添加应用程序配置数据的管理功能。
 
-> 在 [tiny1](./g01-first-cli-app) 示例程序中，实际上 cmdr 也隐含地使用了一个 DymmyStore，这个空包将会忽略对配置数据的访问请求。
+> 在 [tiny1](../g01-first-cli-app) 示例程序中，实际上 cmdr 也隐含地使用了一个 DymmyStore，这个空包将会忽略对配置数据的访问请求。
 
 通过集成 [`hedzr/cmdr-loaders`](https://github.com/hedzr/cmdr-loaders) 提供的插件，可以添加符合 GNU 文件夹规范的外部配置文件自动加载。
 
@@ -224,16 +224,18 @@ func (jumpCmd) Add(app cli.App) {
   <Folder name="cmdr-loaders/" defaultOpen>
     <File name="prepare_app.go" />
   </Folder>
-  <File name="..." />
-  <Folder name="cmdr-tests/examples/common" defaultOpen>
+  ---
+  <Folder name="cmdr-tests/examples/common/" defaultOpen>
     <File name="prepare_app.go" />
   </Folder>
-  <File name="..." />
-  <Folder name="cmd" defaultOpen>
-    <File name="all.go" />
-    <File name="jump.go" />
+  ---
+  <Folder name="tiny2/" defaultOpen>
+    <Folder name="cmd/" defaultOpen>
+      <File name="all.go" />
+      <File name="jump.go" />
+    </Folder>
+    <File name="main.go" />
   </Folder>
-  <File name="main.go" />
 </Files>
 
 </Tab>
@@ -310,7 +312,22 @@ Pattern，末尾的 `Build()` 调用用于提交前面的一系列构建动作�
 类似地，在 `jump` 的 With 代码块中，可以添加它的下级子命令，当然
 也包括为其添加关联的选项。
 
-### 对 `Store` 的操作
+### OS 返回值 [#os-ret-code]
+
+`to` 命令也展示了如何设置应用程序返回值。通过 `app.SetSuggestRetCode(retCode)` 可以
+设置一个错误码，并在 main() 中利用 `os.Exit(app.SuggestRetCode())` 将其返回给操作系统。
+
+> Why so complex?
+>
+> 对于服务型应用程序来说，在退出程序之前往往需要进行占用资源清理（包括打开的文件、网络连接，
+> 以及运行中的 go routines 等等）。
+>
+> 所以在程序的中途执行 `panic()` 或者 `os.Exit(##)` 是不恰当的，这会导致资源的异常占用或者泄漏。
+>
+> 如此被推荐的最佳实践是，在需要的运行中途通过 `app.SetSuggestRetCode(retCode)` 标记一个退出码，
+> 然后逐级通过 `return err` 返回到 main() 函数，此时必要的清理代码都将正常执行，最后再调用 `os.Exit(app.SuggestRetCode())` 向操作系统返回错误码。
+
+## 对 `Store` 的操作 [#oper-to-store]
 
 在相应的 `OnAction` 处理程序中，full 选项将导致在控制台打印 Store 的内部结构。
 
@@ -365,15 +382,19 @@ $
 
 在上面打印的 app 配置数据集树结构中，`app.cmd` 包含了 tiny2 的命令行选项集合的映射，以及这些选项的最终值。
 
-除此而外，你也可以通过 `app.Store()/app.Set()` 读写你的数据。
+### `cmd.Store()` vs `cmd.Set()`
 
-检测一个选项参数在命令行中被指定过，可以使用 cmd.Store().MustXXX() 函数族。
+除此而外，你也可以通过 `app.Store()/app.Set()` 读写你的数据。
 
 `cmd.Store()` 返回一个完整 Store 的子集，也就是键值 `app.cmd.jump.to` 所下辖的子树。所以 `cmd.Store().MustBool("full")` 就可以直接取得 `--full` 的状态。
 
 `cmd.Set()` 相当于调用 `app.Set()`，它获取整个 Store 对象。此时，你需要用 `cmd.Set().MustBool("app.cmd.jump.to.full")` 来取得 `--full` 的状态。
 
-`app.Store()` 获得的是 "app.cmd" 子树，所以你也可以用 `app.Store().MustBool("jump.to.full")` 来问询。
+类似地，`app.Store()` 获得的是 "app.cmd" 子树，所以你也可以用 `app.Store().MustBool("jump.to.full")` 来问询。
+
+### `MustXXX()`
+
+检测一个选项参数在命令行中被指定过，可以使用 `cmd.Store().MustXXX()` 函数族。
 
 :::tip
 
@@ -386,20 +407,5 @@ $
 :::
 
 你也可以从外部配置文件中载入配置数据集，这将在下一节中示例。
-
-### OS 返回值 [#os-ret-code]
-
-`to` 命令也展示了如何设置应用程序返回值。通过 `app.SetSuggestRetCode(retCode)` 可以
-设置一个错误码，并在 main() 中利用 `os.Exit(app.SuggestRetCode())` 将其返回给操作系统。
-
-> Why so complex?
->
-> 对于服务型应用程序来说，在退出程序之前往往需要进行占用资源清理（包括打开的文件、网络连接，
-> 以及运行中的 go routines 等等）。
->
-> 所以在程序的中途执行 `panic()` 或者 `os.Exit(##)` 是不恰当的，这会导致资源的异常占用或者泄漏。
->
-> 如此被推荐的最佳实践是，在需要的运行中途通过 `app.SetSuggestRetCode(retCode)` 标记一个退出码，
-> 然后逐级通过 `return err` 返回到 main() 函数，此时必要的清理代码都将正常执行，最后再调用 `os.Exit(app.SuggestRetCode())` 向操作系统返回错误码。
 
 [^1]: `hedzr/store` 提供应用程序配置数据集的操作能力，以层次化的键值对方式管理数据。
