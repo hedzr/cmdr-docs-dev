@@ -39,11 +39,11 @@ export default function BlogLayout({
     fs.readdirSync(path.join(cwd2, "content")).forEach((file) => {
       console.log(`      file: ${file}`);
     })
-    console.log(`+ list '${cwd2}' + 'content/docs'`);
-    fs.readdirSync(path.join(cwd2, "content", "docs")).forEach((file) => {
-      console.log(`      file: ${file}`);
-    })
-    if(fs.existsSync(path.join(cwd2, "content", "blog"))) {
+    // console.log(`+ list '${cwd2}' + 'content/docs'`);
+    // fs.readdirSync(path.join(cwd2, "content", "docs")).forEach((file) => {
+    //   console.log(`      file: ${file}`);
+    // })
+    if (fs.existsSync(path.join(cwd2, "content", "blog"))) {
       console.log(`+ list '${cwd2}' + 'content/blog'`);
       fs.readdirSync(path.join(cwd2, "content", "blog")).forEach((file) => {
         console.log(`      file: ${file}`);
@@ -51,10 +51,12 @@ export default function BlogLayout({
     }
     if (typeof __dirname !== "undefined") {
       // runtime value: /var/task/.next/server/chunks
-      console.log(`+ list '${__dirname}'`);
-      fs.readdirSync(__dirname).forEach((file) => {
-        console.log(`      file: ${file}`);
-      })
+      if (fs.existsSync(__dirname)) {
+        console.log(`+ list '${__dirname}'`);
+        fs.readdirSync(__dirname).forEach((file) => {
+          console.log(`      file: ${file}`);
+        })
+      }
 
       // serverRuntimeConfig.PROJECT_ROOT: /vercel/path0
       if (serverRuntimeConfig.PROJECT_ROOT) {
