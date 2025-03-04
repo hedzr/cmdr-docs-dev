@@ -1,6 +1,5 @@
-import { createMDX } from "fumadocs-mdx/next";
 // import { withContentCollections } from '@content-collections/next';
-
+import { createMDX } from "fumadocs-mdx/next";
 import createBundleAnalyzer from "@next/bundle-analyzer";
 import {fileURLToPath} from "node:url";
 import path from "path";
