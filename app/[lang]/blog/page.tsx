@@ -1,13 +1,12 @@
 // import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 // import { Button } from "@/components/ui/button2";
 // // import { BlogMdxFrontmatter, getAllBlogs } from "@/lib/markdown";
-import serverPath, {
+import {
   formatDate2,
-  isFieldValid,
+  prodMode,
   safeget,
-  stringToDate,
 } from "@/lib/utils";
-import { ChevronRightIcon, CircleIcon } from "lucide-react";
+// import { ChevronRightIcon, CircleIcon } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
 import spot from "@/public/default.png";
@@ -25,7 +24,7 @@ import { LoaderOutput, MetaData, Page } from "fumadocs-core/source";
 import { BaseCollectionEntry, MarkdownProps } from "fumadocs-mdx/config";
 import { objectOutputType, ZodTypeAny } from "zod";
 import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
-import { filterPostsByPage, getPosts, prodMode } from "./util";
+import { filterPostsByPage, getPosts } from "./util";
 
 export const dynamic = "force-dynamic";
 
@@ -81,13 +80,13 @@ export default async function BlogIndexPage({
 
   const svg = `<svg viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'>
   <filter id='noiseFilter'>
-    <feTurbulence 
-      type='fractalNoise' 
-      baseFrequency='0.65' 
-      numOctaves='3' 
+    <feTurbulence
+      type='fractalNoise'
+      baseFrequency='0.65'
+      numOctaves='3'
       stitchTiles='stitch'/>
   </filter>
-  
+
   <rect width='100%' height='100%' filter='url(#noiseFilter)'/>
 </svg>`;
 

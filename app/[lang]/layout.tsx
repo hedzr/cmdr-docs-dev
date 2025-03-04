@@ -6,9 +6,10 @@ import { I18nProvider, Translations } from "fumadocs-ui/i18n";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { PostHogProvider } from "../provider";
 import { lang2display, lang2iso } from "@/lib/i18n";
-import { baseUrl } from "@/lib/metadata";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Analytics } from "@vercel/analytics/react";
+import { prodMode } from "@/lib/utils";
+// import { baseUrl } from "@/lib/metadata";
 // import getConfig from "next/config";
 
 const inter = Inter({
@@ -21,10 +22,6 @@ const cn: Partial<Translations> = {
   search: "Search", // "Translated Content",
   // other translations
 };
-
-// prodMode or dev/preview mode --------------------------------
-
-export const prodMode = process.env.NODE_ENV === "production";
 
 // Root Layout Here --------------------------------
 

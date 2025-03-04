@@ -1,9 +1,7 @@
-import { safeget, isFieldValid } from "@/lib/utils";
+import {safeget, isFieldValid, prodMode} from "@/lib/utils";
 import { LoaderOutput, MetaData } from "fumadocs-core/source";
 import { BaseCollectionEntry, MarkdownProps } from "fumadocs-mdx/config";
 import { objectOutputType, ZodTypeAny } from "zod";
-
-export const prodMode = process.env.NODE_ENV === "production";
 
 const test = (
   qry: string,
@@ -106,8 +104,8 @@ export function getPosts<T>(
 
       // console.log(v, i);
 
-      const fm = v.data;
-      const slug = v.slugs.join("-");
+      const fm = safeget(v,'data',{});
+      const slug = safeget(v,'slugs',[]).join("-");
       const log = false; // /(golang)/i.test(slug);
 
       if (log) console.log(`searching for ${slug}`);
@@ -144,8 +142,8 @@ export function getPosts<T>(
     })
     .sort(
       (a, b) =>
-        new Date(b.data.date ?? b.file.name).getTime() -
-        new Date(a.data.date ?? a.file.name).getTime()
+        new Date(safeget(safeget(b,'data',{}),'date','')).getTime() -
+        new Date(safeget(safeget(b,'data',{}),'date','')).getTime()
     );
   return posts;
 }

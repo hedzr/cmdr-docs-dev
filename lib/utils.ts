@@ -5,6 +5,12 @@
 import path from 'path'
 import getConfig from 'next/config'
 
+// prodMode or dev/preview mode ------------------------
+
+export const prodMode = process.env.NODE_ENV === "production";
+
+// -----------------------------------------------------
+
 export function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
