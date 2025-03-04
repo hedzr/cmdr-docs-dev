@@ -43,12 +43,12 @@ export default function BlogLayout({
     // fs.readdirSync(path.join(cwd2, "content", "docs")).forEach((file) => {
     //   console.log(`      file: ${file}`);
     // })
-    if (fs.existsSync(path.join(cwd2, "content", "blog"))) {
-      console.log(`+ list '${cwd2}' + 'content/blog'`);
-      fs.readdirSync(path.join(cwd2, "content", "blog")).forEach((file) => {
-        console.log(`      file: ${file}`);
-      })
-    }
+    // if (fs.existsSync(path.join(cwd2, "content", "blog"))) {
+    //   console.log(`+ list '${cwd2}' + 'content/blog'`);
+    //   fs.readdirSync(path.join(cwd2, "content", "blog")).forEach((file) => {
+    //     console.log(`      file: ${file}`);
+    //   })
+    // }
     if (typeof __dirname !== "undefined") {
       // // runtime value: /var/task/.next/server/chunks
       // if (fs.existsSync(__dirname)) {

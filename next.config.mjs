@@ -1,7 +1,7 @@
 // import { withContentCollections } from '@content-collections/next';
 import { createMDX } from "fumadocs-mdx/next";
 import createBundleAnalyzer from "@next/bundle-analyzer";
-import {fileURLToPath} from "node:url";
+import { fileURLToPath } from "node:url";
 import path from "path";
 
 const withAnalyzer = createBundleAnalyzer({
@@ -21,19 +21,19 @@ const withMDX = createMDX();
 //
 // export default withMDX(config);
 
-/** @type {import('next').NextConfig} */
+/** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
 
   serverRuntimeConfig: {
     __PROJECT_ROOT: process.cwd(), // = '/vercel/path0' (= process.cwd())
     __filename: fileURLToPath(import.meta.url),
-    __dirname: path.dirname(__filename),
-    RUNTIME_ROOT: __dirname, // = '/var/task/.next/server/chunks'
-    PROJECT_ROOT: path.dirname(path.dirname(path.dirname(__dirname))),
+    __dirname: path.dirname(fileURLToPath(import.meta.url)),
+    RUNTIME_ROOT: path.dirname(fileURLToPath(import.meta.url)), // = '/var/task/.next/server/chunks'
+    PROJECT_ROOT: process.cwd(),
 
     mySecret: "secret",
-    secondSecret: process.env.SECOND_SECRET,
+    // secondSecret: process.env.SECOND_SECRET,
   },
   publicRuntimeConfig: {
     // Will be available on both server and client
@@ -44,7 +44,7 @@ const config = {
   logging: {
     fetches: {
       fullUrl: true,
-      hmrRefreshes: true,
+      // hmrRefreshes: true,
       // // incomingRequests: false,
       // incomingRequests: {
       //   ignore: [/\api\/v1\/health/],
@@ -146,7 +146,7 @@ const config = {
   webpack: (
     config,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    { buildId, dev, isServer, defaultLoaders, nextRuntime, webpack }
+    { buildId, dev, isServer, defaultLoaders, nextRuntime, webpack },
   ) => {
     if (config.cache && !dev) {
       config.cache = Object.freeze({
@@ -189,7 +189,7 @@ export default withAnalyzer(
             //   buildActivityPosition: "bottom-right",
             // },
           }
-        : null)
+        : null),
     // )
-  )
+  ),
 );
