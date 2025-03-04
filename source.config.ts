@@ -168,9 +168,11 @@ export default defineConfig({
     remarkPlugins: [
       // [remarkCodeHike, chConfig],
       remarkMath,
-      [remarkImage, {
-          publicDir: path.join(process.cwd(), 'public'),
-      }],
+      [remarkImage,
+        // {
+        //   publicDir: path.join(process.cwd(), 'public'),
+        // }
+      ],
       remarkAdmonition,
       remarkHeading,
       remarkStructure,
