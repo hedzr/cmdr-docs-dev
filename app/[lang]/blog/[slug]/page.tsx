@@ -94,16 +94,19 @@ export async function generateMetadata(props: {
   );
 }
 
-export function generateStaticParams({
-  params: { slug, lang },
-}: {
-  params: { slug: string; lang: string };
-}): { slug: string }[] {
+export function generateStaticParams(
+  {
+    // params: { slug, lang },
+  }: {
+    // params: { slug: string; lang: string };
+  },
+): { slug: string }[] {
   // return source.generateParams();
-  const ret = blog.getPages(lang).map((page) => ({
+  const ret = blog.getPages().map((page) => ({
+    lang: page.locale,
     slug: page.slugs.join("/"),
   }));
-  // console.log(`generateStaticPages(${slug}, ${lang})`, ret);
+  console.log(`generateStaticPages()`, ret, ret.length);
   return ret;
 }
 
