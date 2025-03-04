@@ -101,13 +101,19 @@ export function generateStaticParams(
     // params: { slug: string; lang: string };
   },
 ): { slug: string }[] {
-  // return source.generateParams();
-  const ret = blog.getPages().map((page) => ({
+  // // return source.generateParams();
+  // const ret = blog.getPages().map((page) => ({
+  //   lang: page.locale,
+  //   slug: page.slugs.join("/"),
+  // }));
+  // console.log(`generateStaticPages()`, ret, ret.length);
+  // return ret;
+
+  // fixed ENOENT `/varccl/path0/content/blog/,,,`
+  return blog.getPages().map((page) => ({
     lang: page.locale,
     slug: page.slugs.join("/"),
   }));
-  console.log(`generateStaticPages()`, ret, ret.length);
-  return ret;
 }
 
 // type PageProps = {
