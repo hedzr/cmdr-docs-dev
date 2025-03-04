@@ -17,7 +17,7 @@ import {
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import { remarkMermaid } from "@theguild/remark-mermaid";
-import path from "path";
+// import path from "path";
 // import {remarkInstall} from "fumadocs-docgen";
 // import { transformerTwoslash } from 'fumadocs-twoslash';
 
