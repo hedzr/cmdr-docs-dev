@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const littleDebug =true;
+const littleDebug = true;
 
 export default function BlogLayout({
   // params,
@@ -33,12 +33,12 @@ export default function BlogLayout({
     const cwd2 = process.cwd();
 
     const o = fs.existsSync(path.join(cwd2, "content/blog/file-rec.mdx"));
-    console.log(`--- [BlogLayout] cwd: ${cwd2} | 'content/blog/file-rec.mdx': ${o}, PRJ_ROOT: ${serverRuntimeConfig.PROJECT_ROOT}, __dirname: ${__dirname}`);
+    console.log(`--- [BlogLayout] cwd: ${cwd2} | PRJ_ROOT: ${serverRuntimeConfig.PROJECT_ROOT}, __dirname: ${__dirname}`);
 
-    console.log(`+ list '${cwd2}' + 'content'`);
-    fs.readdirSync(path.join(cwd2, "content")).forEach((file) => {
-      console.log(`      file: ${file}`);
-    })
+    // console.log(`+ list '${cwd2}' + 'content'`);
+    // fs.readdirSync(path.join(cwd2, "content")).forEach((file) => {
+    //   console.log(`      file: ${file}`);
+    // })
     // console.log(`+ list '${cwd2}' + 'content/docs'`);
     // fs.readdirSync(path.join(cwd2, "content", "docs")).forEach((file) => {
     //   console.log(`      file: ${file}`);
