@@ -140,7 +140,7 @@ export function generateStaticParams(
 //   if (!val) return [];
 //   return val.map((it) => ({ slug: it }));
 // }
-
+//
 // export default function page({
 //   params,
 //   searchParams,
@@ -150,37 +150,20 @@ export function generateStaticParams(
 // }) {
 // }
 
+// const tocOptions = {
+//   style: "clerk", // normal, clerk
+// };
+
 const tocPopoverOptions = {
   style: "clerk", // normal, clerk
   single: false,
 };
 const useInlineTOC = false;
 
-// const tocOptions = {
-//   style: "clerk", // normal, clerk
-// };
-
 export default async function BlogPage(props: {
   params: Promise<{ slug: string; lang: string }>;
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  // const schema = z.union([
-  //   z.string(),
-  //   z.array(
-  //     z.object({
-  //       username: z.string().optional(),
-  //       name: z.string().optional(),
-  //       handle: z.string().optional(),
-  //       handleUrl: z.string().optional(),
-  //       avatar: z.string().optional(),
-  //     })
-  //   ),
-  // ]);
-  //
-  // console.log(1, "zod", schema.parse("uxx"));
-  // // console.log(2, "zod", schema.parse({}), "bad");
-  // console.log(3, "zod", schema.parse([{ name: "xxx" }]));
-
   const params = await props.params;
   const lang = params.lang;
 
@@ -203,7 +186,7 @@ export default async function BlogPage(props: {
 
   const page = blog.getPage([params.slug], lang);
   if (!page) {
-    console.log(`--- not found`);
+    console.log(`--- not found： ${params.slug}, ${lang}`);
     notFound();
   }
 
