@@ -4,7 +4,7 @@ import { formatDate2, isFieldValid, safe, safeget } from "@/lib/utils";
 import { createMetadata } from "@/lib/metadata";
 import { lang2iso } from "@/lib/i18n";
 import { notFound } from "next/navigation";
-import { ComponentProps, FC, type HTMLAttributes } from "react";
+import { ComponentProps, FC, type HTMLAttributes, Suspense } from "react";
 
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import Link from "next/link";
@@ -46,13 +46,15 @@ import {
 import ClerkTOCItems from "@/components/layout/toc-clerk";
 import {
   BlogBackToListButton,
-  blogPageProps,
   BlogTagButton,
   FooterNoCache,
   TocPopoverHeader,
 } from "@/page.client";
 import { buttonVariants1 } from "@/components/ui/button1";
 import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
+import { blogPageProps } from "@/lib/types";
+import { getPosts } from "../util";
+import { Page } from "fumadocs-core/source";
 
 export const dynamic = "force-static";
 // export const dynamic = "force-dynamic";
@@ -167,6 +169,10 @@ export default async function BlogPage(props: {
   let lma: string =
     lastModified || get(fm, "last_modified_at") || get(fm, "lastModifiedAt");
 
+  const perPage = 7;
+  // const { currentPage, perPage } = await getPageNumber();
+  const pageProps = calcPrevNext(blog, lang, perPage, page);
+
   // @ts-ignore
   return (
     <>
@@ -188,7 +194,9 @@ export default async function BlogPage(props: {
           {page.data.title}
         </h1>
         <p className="mb-4 text-white/80">{page.data.description}</p>
-        <BlogBackToListButton lang={lang} /> |{" "}
+        <Suspense>
+          <BlogBackToListButton lang={lang} /> |{" "}
+        </Suspense>
         <Link
           href="/"
           className={buttonVariants1({ size: "sm", variant: "secondary" })}
@@ -271,7 +279,9 @@ export default async function BlogPage(props: {
               Tab,
             }}
           />
-          <FooterNoCache lang={lang} page={page} />
+          <Suspense>
+            <FooterNoCache lang={lang} {...pageProps} />
+          </Suspense>
           {/* <div className="mt-32 w-full">
             {prev ? (
               <div className="left prev newer">
@@ -353,9 +363,11 @@ export default async function BlogPage(props: {
               </div>
               <div id="blog-tags" className="mr-4 mb-4">
                 <div className="inline -m-1">
-                  {tags.map((it) => {
-                    return <BlogTagButton tag={it} lang={lang} />;
-                  })}
+                  <Suspense>
+                    {tags.map((it) => {
+                      return <BlogTagButton tag={it} key={it} lang={lang} />;
+                    })}
+                  </Suspense>
                 </div>
               </div>
             </div>
@@ -629,6 +641,42 @@ const calcTags = (fm: blogPageProps) => {
       ? fm.categories
       : safe(fm.categories).split(/[,; ]/);
   return { tags, categories };
+};
+
+const calcPrevNext = (
+  blog: any,
+  lang: string,
+  // _pageNum: number,
+  perPage: number,
+  page: Page<blogPageProps>,
+) => {
+  const pages = [...blog.getPages(lang)];
+  const posts = getPosts(pages, lang, "");
+  let prev: typeof page | undefined,
+    next: typeof page | undefined,
+    last: typeof page;
+  let prevNumber: number = 1,
+    nextNumber: number = 1,
+    n: number = 1;
+  posts.map((it) => {
+    if (it.url === page.url) {
+      prev = last;
+      prevNumber = Math.floor((n + perPage - 1) / perPage);
+    } else if (last && last.url === page.url) {
+      next = it;
+      nextNumber = Math.floor((n + perPage - 1) / perPage);
+    }
+    last = it;
+    n++;
+  });
+  return {
+    prevUrl: prev?.url,
+    nextUrl: next?.url,
+    prevTitle: prev?.data.title,
+    nextTitle: next?.data.title,
+    prevNumber,
+    nextNumber,
+  };
 };
 
 const get = (fm: any, v: string) => {
