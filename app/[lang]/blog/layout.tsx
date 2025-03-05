@@ -32,8 +32,12 @@ export default function BlogLayout({
     // runtime value: /var/task
     const cwd2 = process.cwd();
 
-    const o = fs.existsSync(path.join(cwd2, "content/blog/file-rec.mdx"));
-    console.log(`--- [BlogLayout] cwd: ${cwd2} | PRJ_ROOT: ${serverRuntimeConfig.PROJECT_ROOT}, __dirname: ${__dirname}`);
+    // const o = fs.existsSync(path.join(cwd2, "content/blog/file-rec.mdx"));
+    // console.log(`--- [BlogLayout] cwd: ${cwd2} | PRJ_ROOT: ${serverRuntimeConfig.PROJECT_ROOT}, __dirname: ${__dirname}`);
+    // const sp = await searchParams;
+    // const p = await params;
+    // console.log(`--- [BlogLayout] cwd: ${cwd2}`, sp, p);
+    console.log(`--- [BlogLayout] cwd: ${cwd2}`);
 
     // console.log(`+ list '${cwd2}' + 'content'`);
     // fs.readdirSync(path.join(cwd2, "content")).forEach((file) => {
