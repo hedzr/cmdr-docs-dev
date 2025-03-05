@@ -44,7 +44,7 @@ const config = {
   logging: {
     fetches: {
       fullUrl: true,
-      // hmrRefreshes: true,
+      hmrRefreshes: true,
       // // incomingRequests: false,
       // incomingRequests: {
       //   ignore: [/\api\/v1\/health/],
