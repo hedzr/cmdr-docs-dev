@@ -3,6 +3,7 @@
 import {
   Fragment,
   type HTMLAttributes,
+  ReactNode,
   useEffect,
   useMemo,
   useRef,
@@ -16,7 +17,7 @@ import { useI18n } from "fumadocs-ui/provider";
 import { useTreeContext, useTreePath } from "fumadocs-ui/provider";
 import { useSidebar } from "fumadocs-ui/provider";
 import type { PageTree } from "fumadocs-core/server";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useNav } from "./components/layout/nav";
 import {
   type BreadcrumbOptions,
@@ -26,6 +27,13 @@ import { usePageStyles } from "fumadocs-ui/provider";
 import { isActive } from "./lib/is-active";
 import { TocPopover } from "./components/layout/toc";
 import { useEffectEvent } from "fumadocs-core/utils/use-effect-event";
+import { blog } from "@/lib/source";
+import { ReadonlyURLSearchParams } from "next/dist/client/components/navigation.react-server";
+import { Page } from "fumadocs-core/source";
+import { getPosts } from "@/app/[lang]/blog/util";
+import { z } from "zod";
+import { BaseCollectionEntry, MarkdownProps } from "fumadocs-mdx/config";
+import { buttonVariants1 } from "@/components/ui/button1";
 
 export function TocPopoverHeader(props: HTMLAttributes<HTMLDivElement>) {
   const ref = useRef<HTMLElement>(null);
@@ -215,8 +223,96 @@ export function Footer({ items }: FooterProps) {
   );
 }
 
-export function FooterNoCache({ items }: FooterProps) {
+export function BlogBackToListButton(_props: { lang: string }): ReactNode {
+  let sp: ReadonlyURLSearchParams & { page?: number; perpage?: number };
+  sp = useSearchParams() as typeof sp;
+  return (
+    <Link
+      href={`/blog?page=${sp?.page || ""}`}
+      className={buttonVariants1({ size: "sm", variant: "secondary" })}
+    >
+      <span className="back">Back to list</span>
+    </Link>
+  );
+}
+
+export function BlogTagButton(props: { lang: string; tag: string }): ReactNode {
+  let sp: ReadonlyURLSearchParams & {
+    page?: number | string;
+    perpage?: number | string;
+  };
+  sp = useSearchParams() as typeof sp;
+
+  const currentPage =
+    typeof sp?.page === "string"
+      ? Number(sp?.page)
+      : Array.isArray(sp?.page)
+        ? Number(sp?.page[0])
+        : 1;
+
+  return (
+    <Link
+      href={`/${props.lang}/blog/?query=%23${encodeURIComponent(props.tag)}&page=${currentPage}`}
+      className="rounded gap-2 p-2 py-1 m-1 border-1 border-zinc-400 text-sm text-zinc-900 bg-sky-500"
+      key={props.tag}
+    >
+      {props.tag}
+    </Link>
+  );
+}
+
+export function FooterNoCache(props: {
+  lang: string;
+  page: Page<blogPageProps>;
+}): ReactNode {
   const { text } = useI18n();
+
+  let sp: ReadonlyURLSearchParams & {
+    page?: number | string;
+    perpage?: number | string;
+  };
+  sp = useSearchParams() as typeof sp;
+
+  const currentPage =
+    typeof sp?.page === "string"
+      ? Number(sp?.page)
+      : Array.isArray(sp?.page)
+        ? Number(sp?.page[0])
+        : 1;
+  const perPage =
+    typeof sp?.perpage === "string"
+      ? Number(sp?.perpage)
+      : Array.isArray(sp?.perpage)
+        ? Number(sp?.perpage[0])
+        : 7;
+  const { prev, next, prevNumber, nextNumber } = calcPrevNext(
+    blog,
+    props.lang,
+    currentPage,
+    perPage,
+    props.page,
+  );
+
+  // console.log(`--- blog page ${params} 2 ----`);
+  // <Link href={bundle(prev.url, prevNumber)}>
+  // <ChevronLeft className="-ms-1 size-4 shrink-0 rtl:rotate-180" />
+  // {/* <p>{text.previousPage}</p> */} Newer:
+  // <p>{prev.data.title || ""}</p>
+
+  const o: FooterProps = {
+    items: {
+      previous: {
+        url: bundle(prev?.url, prevNumber),
+        name: prev?.data.title || "",
+      },
+      next: {
+        url: bundle(next?.url, nextNumber),
+        name: next?.data.title || "",
+      },
+    },
+  };
+  const items = o.items;
+
   return (
     <div className="not-prose grid grid-cols-2 gap-4 pb-6">
       {items?.previous ? (
@@ -243,6 +339,72 @@ export function FooterNoCache({ items }: FooterProps) {
     </div>
   );
 }
+
+const bundle = (url?: string, page?: number): string => {
+  if (page != 1) return `${url || ""}?page=${page}`;
+  return url || "";
+};
+
+const calcPrevNext = (
+  blog: any,
+  lang: string,
+  _pageNum: number,
+  perPage: number,
+  page: Page<blogPageProps>,
+) => {
+  const pages = [...blog.getPages(lang)];
+  const posts = getPosts(pages, lang, "");
+  let prev: typeof page | undefined,
+    next: typeof page | undefined,
+    last: typeof page;
+  let prevNumber: number = 1,
+    nextNumber: number = 1,
+    n: number = 1;
+  posts.map((it) => {
+    if (it.url === page.url) {
+      prev = last;
+      prevNumber = Math.floor((n + perPage - 1) / perPage);
+    } else if (last && last.url === page.url) {
+      next = it;
+      nextNumber = Math.floor((n + perPage - 1) / perPage);
+    }
+    last = it;
+    n++;
+  });
+  return { prev, next, prevNumber, nextNumber };
+};
+
+export type blogPageProps = {
+  draft: boolean;
+  title: string;
+  comment: boolean;
+  feedback: boolean;
+  tags?: string[] | undefined;
+  categories?: string | undefined;
+  description?: string | undefined;
+  icon?: string | undefined;
+  full?: boolean | undefined;
+  _openapi?: z.objectOutputType<{}, z.ZodTypeAny, "passthrough"> | undefined;
+  date?: string | Date | undefined;
+  author?:
+    | string
+    | {
+        username?: string | undefined;
+        name?: string | undefined;
+        handle?: string | undefined;
+        handleUrl?: string | undefined;
+        avatar?: string | undefined;
+      }[]
+    | undefined;
+  excerpt?: string | undefined;
+  header?:
+    | {
+        teaser?: string | undefined;
+        overlay_image?: string | undefined;
+        overlay_filter?: string | undefined;
+      }
+    | undefined;
+} & BaseCollectionEntry & { load: () => Promise<MarkdownProps> };
 
 export type BreadcrumbProps = BreadcrumbOptions;
 

@@ -1,32 +1,19 @@
 import { Metadata } from "next";
 import { blog, openapi, source } from "@/lib/source";
-import { Page } from "fumadocs-core/source";
 import { formatDate2, isFieldValid, safe, safeget } from "@/lib/utils";
-import { createMetadata, metadataImage } from "@/lib/metadata";
-import { getPosts } from "../util";
+import { createMetadata } from "@/lib/metadata";
 import { lang2iso } from "@/lib/i18n";
-import { z } from "zod";
-// import {
-//   type Author as AuthorT,
-//   BlogMdxFrontmatter,
-//   getAllBlogStaticPaths,
-//   getBlogForSlug,
-// } from "@/lib/markdown";
-// import { type Author as AuthorT } from "@/lib/markdown";
-// import { ArrowLeftIcon } from "lucide-react";
 import { notFound } from "next/navigation";
-import { type HTMLAttributes } from "react";
-import { BaseCollectionEntry, MarkdownProps } from "fumadocs-mdx/config";
+import { ComponentProps, FC, type HTMLAttributes } from "react";
 
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Control } from "./page.client";
-import { ComponentProps, FC } from "react";
 import { Callout } from "fumadocs-ui/components/callout";
 import { Card, Cards } from "fumadocs-ui/components/card";
 import { CodeBlock, Pre } from "fumadocs-ui/components/codeblock";
-import { Files, Folder, File } from "fumadocs-ui/components/files";
+import { File, Files, Folder } from "fumadocs-ui/components/files";
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
 import { TypeTable } from "fumadocs-ui/components/type-table";
@@ -40,9 +27,9 @@ import { TypeTable } from "fumadocs-ui/components/type-table";
 // import { Popup, PopupContent, PopupTrigger } from "fumadocs-twoslash/ui";
 import {
   Popover,
-  PopoverTrigger,
-  PopoverContent,
   PopoverClose,
+  PopoverContent,
+  PopoverTrigger,
 } from "@/components/ui/popover";
 import { InlineTOC } from "fumadocs-ui/components/inline-toc";
 import { Wrapper } from "@/components/preview/wrapper";
@@ -51,23 +38,23 @@ import { Step, Steps } from "fumadocs-ui/components/steps";
 import { Mermaid } from "@theguild/remark-mermaid/mermaid"; // pnpm install @theguild/remark-mermaid remark-math fumadocs-twoslash fumadocs-docgen rehype-katex
 import { DocsCategory } from "@/components/page";
 import {
-  TocPopoverTrigger,
-  TocPopoverContent,
-  TOCScrollArea,
   TOCItems,
-  // Toc,
+  TocPopoverContent,
+  TocPopoverTrigger,
+  TOCScrollArea,
 } from "@/components/layout/toc";
 import ClerkTOCItems from "@/components/layout/toc-clerk";
-import { Footer, FooterNoCache, TocPopoverHeader } from "@/page.client";
+import {
+  BlogBackToListButton,
+  blogPageProps,
+  BlogTagButton,
+  FooterNoCache,
+  TocPopoverHeader,
+} from "@/page.client";
 import { buttonVariants1 } from "@/components/ui/button1";
 import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useI18n } from "fumadocs-ui/provider";
-// import getConfig from "next/config";
-// import { Edit, Text } from "lucide-react";
-// import { I18nLabel } from "fumadocs-ui/provider";
 
-// export const dynamic = "force-static";
+export const dynamic = "force-static";
 // export const dynamic = "force-dynamic";
 
 export async function generateMetadata(props: {
@@ -96,13 +83,7 @@ export async function generateMetadata(props: {
   );
 }
 
-export function generateStaticParams(
-  {
-    // params: { slug, lang },
-  }: {
-    // params: { slug: string; lang: string };
-  },
-): { slug: string }[] {
+export function generateStaticParams(): { slug: string }[] {
   // // return source.generateParams();
   // const ret = blog.getPages().map((page) => ({
   //   lang: page.locale,
@@ -162,27 +143,10 @@ const useInlineTOC = false;
 
 export default async function BlogPage(props: {
   params: Promise<{ slug: string; lang: string }>;
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+  // searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const params = await props.params;
   const lang = params.lang;
-
-  // const { serverRuntimeConfig } = getConfig();
-  // console.log(`--- [BlogPage] cwd: ${process.cwd()} / __dirname: ${serverRuntimeConfig.PROJECT_ROOT}, params: `, params);
-
-  // if (!usingCollection) {
-  //   const page = blog.getPage([params.slug], params.lang);
-  //   if (!page) {
-  //     console.log(`--- not found`);
-  //     const pages = [...blog.getPages(lang)];
-  //     console.log(`--- pages:`, pages, blog);
-  //     notFound();
-  //   }
-  //   const Mdx = fm.body;
-  //   const toc = fm.toc;
-  //   const lastModified = fm.lastModified || page.data.last_modified_at;
-  //   return <></>;
-  // }
 
   const page = blog.getPage([params.slug], lang);
   if (!page) {
@@ -190,9 +154,9 @@ export default async function BlogPage(props: {
     notFound();
   }
 
-  const sp = await props.searchParams;
+  // const sp = await props.searchParams;
   const fm = page.data;
-  console.log(`--- blog page ${lang} / ${sp?.page} / ${params.slug} ----`);
+  console.log(`--- blog page ${lang} / ${params.slug} ----`);
   const { body: Mdx, toc, lastModified } = await fm.load();
   // const Mdx = page.data.body;
   // const toc = page.data.toc;
@@ -202,44 +166,6 @@ export default async function BlogPage(props: {
   const { tags, categories } = calcTags(fm);
   let lma: string =
     lastModified || get(fm, "last_modified_at") || get(fm, "lastModifiedAt");
-
-  const currentPage =
-    typeof sp?.page === "string"
-      ? Number(sp?.page)
-      : Array.isArray(sp?.page)
-        ? Number(sp?.page[0])
-        : 1;
-  const perPage =
-    typeof sp?.perpage === "string"
-      ? Number(sp?.perpage)
-      : Array.isArray(sp?.perpage)
-        ? Number(sp?.perpage[0])
-        : 7;
-  const { prev, next, prevNumber, nextNumber } = calcPrevNext(
-    blog,
-    lang,
-    currentPage,
-    perPage,
-    page,
-  );
-
-  // console.log(`--- blog page ${params} 2 ----`);
-  const bundle = (url?: string, page?: number): string => {
-    if (page != 1) return `${url || ""}?page=${page}`;
-    return url || "";
-  };
-  // <Link href={bundle(prev.url, prevNumber)}>
-  // <ChevronLeft className="-ms-1 size-4 shrink-0 rtl:rotate-180" />
-  // {/* <p>{text.previousPage}</p> */} Newer:
-  // <p>{prev.data.title || ""}</p>
-
-  const footer = {
-    previous: {
-      url: bundle(prev?.url, prevNumber),
-      name: prev?.data.title || "",
-    },
-    next: { url: bundle(next?.url, nextNumber), name: next?.data.title || "" },
-  };
 
   // @ts-ignore
   return (
@@ -262,13 +188,7 @@ export default async function BlogPage(props: {
           {page.data.title}
         </h1>
         <p className="mb-4 text-white/80">{page.data.description}</p>
-        <Link
-          href={`/blog?page=${sp?.page || ""}`}
-          className={buttonVariants1({ size: "sm", variant: "secondary" })}
-        >
-          <span className="back">Back to list</span>
-        </Link>{" "}
-        |{" "}
+        <BlogBackToListButton lang={lang} /> |{" "}
         <Link
           href="/"
           className={buttonVariants1({ size: "sm", variant: "secondary" })}
@@ -351,7 +271,7 @@ export default async function BlogPage(props: {
               Tab,
             }}
           />
-          <FooterNoCache items={footer} />
+          <FooterNoCache lang={lang} page={page} />
           {/* <div className="mt-32 w-full">
             {prev ? (
               <div className="left prev newer">
@@ -434,15 +354,7 @@ export default async function BlogPage(props: {
               <div id="blog-tags" className="mr-4 mb-4">
                 <div className="inline -m-1">
                   {tags.map((it) => {
-                    return (
-                      <Link
-                        href={`/${lang}/blog/?query=%23${encodeURIComponent(it)}&page=${currentPage}`}
-                        className="rounded gap-2 p-2 py-1 m-1 border-1 border-zinc-400 text-sm text-zinc-900 bg-sky-500"
-                        key={it}
-                      >
-                        {it}
-                      </Link>
-                    );
+                    return <BlogTagButton tag={it} lang={lang} />;
                   })}
                 </div>
               </div>
@@ -717,114 +629,6 @@ const calcTags = (fm: blogPageProps) => {
       ? fm.categories
       : safe(fm.categories).split(/[,; ]/);
   return { tags, categories };
-};
-
-type mdxPageProps = Omit<
-  MarkdownProps,
-  | ("title" | "draft" | "comment" | "feedback")
-  | (
-      | "author"
-      | "tags"
-      | "categories"
-      | "header"
-      | "date"
-      | "description"
-      | "icon"
-      | "full"
-      | "_openapi"
-      | "excerpt"
-    )
-> & {
-  title: string;
-  draft: boolean;
-  comment: boolean;
-  feedback: boolean;
-  author?:
-    | string
-    | {
-        username?: string | undefined;
-        name?: string | undefined;
-        handle?: string | undefined;
-        handleUrl?: string | undefined;
-        avatar?: string | undefined;
-      }[]
-    | undefined;
-  tags?: string[] | undefined;
-  categories?: string | undefined;
-  header?:
-    | {
-        teaser?: string | undefined;
-        overlay_image?: string | undefined;
-        overlay_filter?: string | undefined;
-      }
-    | undefined;
-  date?: string | Date | undefined;
-  description?: string | undefined;
-  icon?: string | undefined;
-  full?: boolean | undefined;
-  _openapi?: z.objectOutputType<{}, z.ZodTypeAny, "passthrough"> | undefined;
-  excerpt?: string | undefined;
-} & BaseCollectionEntry;
-
-type blogPageProps = {
-  draft: boolean;
-  title: string;
-  comment: boolean;
-  feedback: boolean;
-  tags?: string[] | undefined;
-  categories?: string | undefined;
-  description?: string | undefined;
-  icon?: string | undefined;
-  full?: boolean | undefined;
-  _openapi?: z.objectOutputType<{}, z.ZodTypeAny, "passthrough"> | undefined;
-  date?: string | Date | undefined;
-  author?:
-    | string
-    | {
-        username?: string | undefined;
-        name?: string | undefined;
-        handle?: string | undefined;
-        handleUrl?: string | undefined;
-        avatar?: string | undefined;
-      }[]
-    | undefined;
-  excerpt?: string | undefined;
-  header?:
-    | {
-        teaser?: string | undefined;
-        overlay_image?: string | undefined;
-        overlay_filter?: string | undefined;
-      }
-    | undefined;
-} & BaseCollectionEntry & { load: () => Promise<MarkdownProps> };
-
-const calcPrevNext = (
-  blog: any,
-  lang: string,
-  pageNum: number,
-  perPage: number,
-  page: Page<blogPageProps>,
-) => {
-  const pages = [...blog.getPages(lang)];
-  const posts = getPosts(pages, lang, "");
-  let prev: typeof page | undefined,
-    next: typeof page | undefined,
-    last: typeof page;
-  let prevNumber: number = 1,
-    nextNumber: number = 1,
-    n: number = 1;
-  posts.map((it) => {
-    if (it.url === page.url) {
-      prev = last;
-      prevNumber = Math.floor((n + perPage - 1) / perPage);
-    } else if (last && last.url === page.url) {
-      next = it;
-      nextNumber = Math.floor((n + perPage - 1) / perPage);
-    }
-    last = it;
-    n++;
-  });
-  return { prev, next, prevNumber, nextNumber };
 };
 
 const get = (fm: any, v: string) => {
