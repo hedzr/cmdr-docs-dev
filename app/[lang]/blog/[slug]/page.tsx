@@ -67,7 +67,7 @@ import { useI18n } from "fumadocs-ui/provider";
 // import { Edit, Text } from "lucide-react";
 // import { I18nLabel } from "fumadocs-ui/provider";
 
-export const dynamic = "force-static";
+// export const dynamic = "force-static";
 // export const dynamic = "force-dynamic";
 
 export async function generateMetadata(props: {
