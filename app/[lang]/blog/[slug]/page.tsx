@@ -58,9 +58,11 @@ import {
   // Toc,
 } from "@/components/layout/toc";
 import ClerkTOCItems from "@/components/layout/toc-clerk";
-import { TocPopoverHeader } from "@/page.client";
+import { Footer, FooterNoCache, TocPopoverHeader } from "@/page.client";
 import { buttonVariants1 } from "@/components/ui/button1";
 import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useI18n } from "fumadocs-ui/provider";
 // import getConfig from "next/config";
 // import { Edit, Text } from "lucide-react";
 // import { I18nLabel } from "fumadocs-ui/provider";
@@ -239,9 +241,21 @@ export default async function BlogPage(props: {
   );
 
   // console.log(`--- blog page ${params} 2 ----`);
-  const bundle = (url: string, page: number): string => {
-    if (page != 1) return `${url}?page=${page}`;
-    return url;
+  const bundle = (url?: string, page?: number): string => {
+    if (page != 1) return `${url || ""}?page=${page}`;
+    return url || "";
+  };
+  // <Link href={bundle(prev.url, prevNumber)}>
+  // <ChevronLeft className="-ms-1 size-4 shrink-0 rtl:rotate-180" />
+  // {/* <p>{text.previousPage}</p> */} Newer:
+  // <p>{prev.data.title || ""}</p>
+
+  const footer = {
+    previous: {
+      url: bundle(prev?.url, prevNumber),
+      name: prev?.data.title || "",
+    },
+    next: { url: bundle(next?.url, nextNumber), name: next?.data.title || "" },
   };
 
   // @ts-ignore
@@ -354,26 +368,31 @@ export default async function BlogPage(props: {
               Tab,
             }}
           />
-          <div className="mt-32 w-full">
+          <FooterNoCache items={footer} />
+          {/* <div className="mt-32 w-full">
             {prev ? (
-              <div className="left prev">
+              <div className="left prev newer">
                 <Link href={bundle(prev.url, prevNumber)}>
-                  Prev: {prev.data.title || ""}
+                  <ChevronLeft className="-ms-1 size-4 shrink-0 rtl:rotate-180" />
+                  Newer:
+                  <p>{prev.data.title || ""}</p>
                 </Link>
               </div>
             ) : (
               <></>
             )}
             {next ? (
-              <div className="float-right right next">
+              <div className="float-right right next older">
                 <Link href={bundle(next.url, nextNumber)}>
-                  Next: {next.data.title}
+                  <ChevronRight className="-ms-1 size-4 shrink-0 rtl:rotate-180" />
+                  Older:
+                  <p>{next.data.title || ""}</p>
                 </Link>
               </div>
             ) : (
               <></>
             )}
-          </div>
+          </div> */}
           <HandlingKeyboardLeftAndRight />
         </div>
 
