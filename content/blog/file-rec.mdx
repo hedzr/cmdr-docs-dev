@@ -2,6 +2,7 @@
 title: "Building a Recursive File System with React: A Deep Dive"
 description: "Explore how to create a recursive file system in React. This blog post provides a comprehensive guide on building a file system where folders and files can be nested, added, renamed, and deleted."
 date: 02-09-2014
+draft: true
 authors:
   - avatar: "https://ui.shadcn.com/avatars/02.png"
     handle: nisabmohd
@@ -89,7 +90,7 @@ const FileExplorer = () => {
             onRename={renameItem}
             onDelete={deleteItem}
           />
-        )
+        ),
       )}
     </div>
   );
