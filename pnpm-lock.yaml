@@ -10,7 +10,7 @@ importers:
     dependencies:
       '@fumadocs/mdx-remote':
         specifier: ^1.1.2
-        version: 1.1.2(acorn@8.14.0)(fumadocs-core@15.0.15(@types/react@19.0.10)(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
+        version: 1.1.2(acorn@8.14.0)(fumadocs-core@15.0.15(@types/react@19.0.10)(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
       '@orama/orama':
         specifier: ^3.1.1
         version: 3.1.1
@@ -61,10 +61,10 @@ importers:
         version: 0.2.0(react@19.0.0)
       '@vercel/analytics':
         specifier: ^1.5.0
-        version: 1.5.0(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
+        version: 1.5.0(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
       '@vercel/speed-insights':
         specifier: ^1.2.0
-        version: 1.2.0(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
+        version: 1.2.0(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -73,19 +73,19 @@ importers:
         version: 2.1.1
       fumadocs-core:
         specifier: 15.0.15
-        version: 15.0.15(@types/react@19.0.10)(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+        version: 15.0.15(@types/react@19.0.10)(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       fumadocs-mdx:
         specifier: 11.5.6
-        version: 11.5.6(@fumadocs/mdx-remote@1.1.2(acorn@8.14.0)(fumadocs-core@15.0.15(@types/react@19.0.10)(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0))(acorn@8.14.0)(fumadocs-core@15.0.15(@types/react@19.0.10)(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))
+        version: 11.5.6(@fumadocs/mdx-remote@1.1.2(acorn@8.14.0)(fumadocs-core@15.0.15(@types/react@19.0.10)(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0))(acorn@8.14.0)(fumadocs-core@15.0.15(@types/react@19.0.10)(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))
       fumadocs-openapi:
         specifier: ^6.3.0
-        version: 6.3.0(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(ajv@8.17.1)(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(tailwindcss@4.0.9)
+        version: 6.3.0(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(ajv@8.17.1)(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(tailwindcss@4.0.9)
       fumadocs-ui:
         specifier: 15.0.15
-        version: 15.0.15(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(fumadocs-core@15.0.15(@types/react@19.0.10)(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(tailwindcss@4.0.9)
+        version: 15.0.15(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(fumadocs-core@15.0.15(@types/react@19.0.10)(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(tailwindcss@4.0.9)
       geist:
         specifier: ^1.3.1
-        version: 1.3.1(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))
+        version: 1.3.1(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))
       hast-util-to-jsx-runtime:
         specifier: ^2.3.5
         version: 2.3.5
@@ -96,8 +96,8 @@ importers:
         specifier: ^0.477.0
         version: 0.477.0(react@19.0.0)
       next:
-        specifier: 15.2.2-canary.0
-        version: 15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+        specifier: 15.2.1
+        version: 15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       next-mdx-remote:
         specifier: ^5.0.0
         version: 5.0.0(@types/react@19.0.10)(acorn@8.14.0)(react@19.0.0)
@@ -185,7 +185,7 @@ importers:
         version: 15.2.1
       '@next/third-parties':
         specifier: ^15.2.0
-        version: 15.2.0(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
+        version: 15.2.0(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
       '@tailwindcss/postcss':
         specifier: ^4.0.9
         version: 4.0.9
@@ -626,60 +626,57 @@ packages:
   '@next/env@15.2.1':
     resolution: {integrity: sha512-JmY0qvnPuS2NCWOz2bbby3Pe0VzdAQ7XpEB6uLIHmtXNfAsAO0KLQLkuAoc42Bxbo3/jMC3dcn9cdf+piCcG2Q==, tarball: https://registry.npmmirror.com/@next/env/-/env-15.2.1.tgz}
 
-  '@next/env@15.2.2-canary.0':
-    resolution: {integrity: sha512-9NTSg/rWDJPCtae1sNH0u6q53mLRUcnL6KU79mohh/qb8FBehO7wdnbXe0yWK55b8oT5wb6gFEnpyX9UCWXO8A==, tarball: https://registry.npmmirror.com/@next/env/-/env-15.2.2-canary.0.tgz}
-
   '@next/eslint-plugin-next@15.2.1':
     resolution: {integrity: sha512-6ppeToFd02z38SllzWxayLxjjNfzvc7Wm07gQOKSLjyASvKcXjNStZrLXMHuaWkhjqxe+cnhb2uzfWXm1VEj/Q==, tarball: https://registry.npmmirror.com/@next/eslint-plugin-next/-/eslint-plugin-next-15.2.1.tgz}
 
-  '@next/swc-darwin-arm64@15.2.2-canary.0':
-    resolution: {integrity: sha512-voejMh4EMpvhFcc20LDeEStUnp87iO16dmu2gJzL6LwQZjHwHOpPNOlk6xAxpTVsqaOYx51YAMctr9PXriTV7Q==, tarball: https://registry.npmmirror.com/@next/swc-darwin-arm64/-/swc-darwin-arm64-15.2.2-canary.0.tgz}
+  '@next/swc-darwin-arm64@15.2.1':
+    resolution: {integrity: sha512-aWXT+5KEREoy3K5AKtiKwioeblmOvFFjd+F3dVleLvvLiQ/mD//jOOuUcx5hzcO9ISSw4lrqtUPntTpK32uXXQ==, tarball: https://registry.npmmirror.com/@next/swc-darwin-arm64/-/swc-darwin-arm64-15.2.1.tgz}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [darwin]
 
-  '@next/swc-darwin-x64@15.2.2-canary.0':
-    resolution: {integrity: sha512-h9Np9al0T+545FQ1lfjLdcJUAh+Mi3ieCHIU05Lu3uFiwBhs01KLaEKZuDr+Ekdfnq0vlRhEgZeod+rAtkWzug==, tarball: https://registry.npmmirror.com/@next/swc-darwin-x64/-/swc-darwin-x64-15.2.2-canary.0.tgz}
+  '@next/swc-darwin-x64@15.2.1':
+    resolution: {integrity: sha512-E/w8ervu4fcG5SkLhvn1NE/2POuDCDEy5gFbfhmnYXkyONZR68qbUlJlZwuN82o7BrBVAw+tkR8nTIjGiMW1jQ==, tarball: https://registry.npmmirror.com/@next/swc-darwin-x64/-/swc-darwin-x64-15.2.1.tgz}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [darwin]
 
-  '@next/swc-linux-arm64-gnu@15.2.2-canary.0':
-    resolution: {integrity: sha512-YI5C20BKmOt0TonWYytucBkYhsu2wQsAnYE5DVELCc2We4GV1/R0b5c0klIMVcHGlwsbCK5KaMdrWQAlednKQQ==, tarball: https://registry.npmmirror.com/@next/swc-linux-arm64-gnu/-/swc-linux-arm64-gnu-15.2.2-canary.0.tgz}
+  '@next/swc-linux-arm64-gnu@15.2.1':
+    resolution: {integrity: sha512-gXDX5lIboebbjhiMT6kFgu4svQyjoSed6dHyjx5uZsjlvTwOAnZpn13w9XDaIMFFHw7K8CpBK7HfDKw0VZvUXQ==, tarball: https://registry.npmmirror.com/@next/swc-linux-arm64-gnu/-/swc-linux-arm64-gnu-15.2.1.tgz}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
-  '@next/swc-linux-arm64-musl@15.2.2-canary.0':
-    resolution: {integrity: sha512-ISQOGO7g5mSvcUYRqjJ9/FyM1c4ie0UWUjO8G9aPOn+7xzyRhq+WnFu16Aohsr5CGdcYtuGAGM9cREanPFrsZg==, tarball: https://registry.npmmirror.com/@next/swc-linux-arm64-musl/-/swc-linux-arm64-musl-15.2.2-canary.0.tgz}
+  '@next/swc-linux-arm64-musl@15.2.1':
+    resolution: {integrity: sha512-3v0pF/adKZkBWfUffmB/ROa+QcNTrnmYG4/SS+r52HPwAK479XcWoES2I+7F7lcbqc7mTeVXrIvb4h6rR/iDKg==, tarball: https://registry.npmmirror.com/@next/swc-linux-arm64-musl/-/swc-linux-arm64-musl-15.2.1.tgz}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
     libc: [musl]
 
-  '@next/swc-linux-x64-gnu@15.2.2-canary.0':
-    resolution: {integrity: sha512-Ftf/YGC6kqw6oG5Hbv6EEUQnZCeb9mXz3NfoGbtSSCTmFWWwEiC/KQO7RjGSKMMz9qK5iyHzcIs3usXcSbrS0Q==, tarball: https://registry.npmmirror.com/@next/swc-linux-x64-gnu/-/swc-linux-x64-gnu-15.2.2-canary.0.tgz}
+  '@next/swc-linux-x64-gnu@15.2.1':
+    resolution: {integrity: sha512-RbsVq2iB6KFJRZ2cHrU67jLVLKeuOIhnQB05ygu5fCNgg8oTewxweJE8XlLV+Ii6Y6u4EHwETdUiRNXIAfpBww==, tarball: https://registry.npmmirror.com/@next/swc-linux-x64-gnu/-/swc-linux-x64-gnu-15.2.1.tgz}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
-  '@next/swc-linux-x64-musl@15.2.2-canary.0':
-    resolution: {integrity: sha512-/Om5pWRwa4nXG3iRWhuQlq1PYmEzQrFyRrbNrJVz8cI/KDEWSeKvJPq9tANmLQwtixSv70f+mssf7BQhQ3T6+A==, tarball: https://registry.npmmirror.com/@next/swc-linux-x64-musl/-/swc-linux-x64-musl-15.2.2-canary.0.tgz}
+  '@next/swc-linux-x64-musl@15.2.1':
+    resolution: {integrity: sha512-QHsMLAyAIu6/fWjHmkN/F78EFPKmhQlyX5C8pRIS2RwVA7z+t9cTb0IaYWC3EHLOTjsU7MNQW+n2xGXr11QPpg==, tarball: https://registry.npmmirror.com/@next/swc-linux-x64-musl/-/swc-linux-x64-musl-15.2.1.tgz}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
     libc: [musl]
 
-  '@next/swc-win32-arm64-msvc@15.2.2-canary.0':
-    resolution: {integrity: sha512-ZgaRoyEGTzFzioI+gJymCjMALO4GDP/4ZLx9gwOHKam0zRgdp1tZW31tObbXVdVvt7akMYlgQCOLlVhwDrsZ5w==, tarball: https://registry.npmmirror.com/@next/swc-win32-arm64-msvc/-/swc-win32-arm64-msvc-15.2.2-canary.0.tgz}
+  '@next/swc-win32-arm64-msvc@15.2.1':
+    resolution: {integrity: sha512-Gk42XZXo1cE89i3hPLa/9KZ8OuupTjkDmhLaMKFohjf9brOeZVEa3BQy1J9s9TWUqPhgAEbwv6B2+ciGfe54Vw==, tarball: https://registry.npmmirror.com/@next/swc-win32-arm64-msvc/-/swc-win32-arm64-msvc-15.2.1.tgz}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [win32]
 
-  '@next/swc-win32-x64-msvc@15.2.2-canary.0':
-    resolution: {integrity: sha512-puUeCNTt7XnN4MF5KUuHwq8Q1A49JUm2TXRzNMHfMCAobvETzXjKya22oiFu8uGBqzRnMFrryO3xp+LHN14pJQ==, tarball: https://registry.npmmirror.com/@next/swc-win32-x64-msvc/-/swc-win32-x64-msvc-15.2.2-canary.0.tgz}
+  '@next/swc-win32-x64-msvc@15.2.1':
+    resolution: {integrity: sha512-YjqXCl8QGhVlMR8uBftWk0iTmvtntr41PhG1kvzGp0sUP/5ehTM+cwx25hKE54J0CRnHYjSGjSH3gkHEaHIN9g==, tarball: https://registry.npmmirror.com/@next/swc-win32-x64-msvc/-/swc-win32-x64-msvc-15.2.1.tgz}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
@@ -2625,8 +2622,8 @@ packages:
       react: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
       react-dom: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
 
-  next@15.2.2-canary.0:
-    resolution: {integrity: sha512-L8HqSYaZolXpoQgLbFHXIIp0gs8pv4v3B55nDE3pyj0Gp76DkSF2uzskapUie56m15J1/CBpOlY/Kxb/NdUoBw==, tarball: https://registry.npmmirror.com/next/-/next-15.2.2-canary.0.tgz}
+  next@15.2.1:
+    resolution: {integrity: sha512-zxbsdQv3OqWXybK5tMkPCBKyhIz63RstJ+NvlfkaLMc/m5MwXgz2e92k+hSKcyBpyADhMk2C31RIiaDjUZae7g==, tarball: https://registry.npmmirror.com/next/-/next-15.2.1.tgz}
     engines: {node: ^18.18.0 || ^19.8.0 || >= 20.0.0}
     hasBin: true
     peerDependencies:
@@ -3465,12 +3462,12 @@ snapshots:
       picocolors: 1.1.1
       ts-morph: 25.0.1
 
-  '@fumadocs/mdx-remote@1.1.2(acorn@8.14.0)(fumadocs-core@15.0.15(@types/react@19.0.10)(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)':
+  '@fumadocs/mdx-remote@1.1.2(acorn@8.14.0)(fumadocs-core@15.0.15(@types/react@19.0.10)(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)':
     dependencies:
       '@mdx-js/mdx': 3.1.0(acorn@8.14.0)
-      fumadocs-core: 15.0.15(@types/react@19.0.10)(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      fumadocs-core: 15.0.15(@types/react@19.0.10)(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       gray-matter: 4.0.3
-      next: 15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      next: 15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       react: 19.0.0
       zod: 3.24.2
     transitivePeerDependencies:
@@ -3642,39 +3639,37 @@ snapshots:
 
   '@next/env@15.2.1': {}
 
-  '@next/env@15.2.2-canary.0': {}
-
   '@next/eslint-plugin-next@15.2.1':
     dependencies:
       fast-glob: 3.3.1
 
-  '@next/swc-darwin-arm64@15.2.2-canary.0':
+  '@next/swc-darwin-arm64@15.2.1':
     optional: true
 
-  '@next/swc-darwin-x64@15.2.2-canary.0':
+  '@next/swc-darwin-x64@15.2.1':
     optional: true
 
-  '@next/swc-linux-arm64-gnu@15.2.2-canary.0':
+  '@next/swc-linux-arm64-gnu@15.2.1':
     optional: true
 
-  '@next/swc-linux-arm64-musl@15.2.2-canary.0':
+  '@next/swc-linux-arm64-musl@15.2.1':
     optional: true
 
-  '@next/swc-linux-x64-gnu@15.2.2-canary.0':
+  '@next/swc-linux-x64-gnu@15.2.1':
     optional: true
 
-  '@next/swc-linux-x64-musl@15.2.2-canary.0':
+  '@next/swc-linux-x64-musl@15.2.1':
     optional: true
 
-  '@next/swc-win32-arm64-msvc@15.2.2-canary.0':
+  '@next/swc-win32-arm64-msvc@15.2.1':
     optional: true
 
-  '@next/swc-win32-x64-msvc@15.2.2-canary.0':
+  '@next/swc-win32-x64-msvc@15.2.1':
     optional: true
 
-  '@next/third-parties@15.2.0(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)':
+  '@next/third-parties@15.2.0(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)':
     dependencies:
-      next: 15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      next: 15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       react: 19.0.0
       third-party-capital: 1.0.20
 
@@ -4483,14 +4478,14 @@ snapshots:
 
   '@ungap/structured-clone@1.3.0': {}
 
-  '@vercel/analytics@1.5.0(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)':
+  '@vercel/analytics@1.5.0(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)':
     optionalDependencies:
-      next: 15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      next: 15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       react: 19.0.0
 
-  '@vercel/speed-insights@1.2.0(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)':
+  '@vercel/speed-insights@1.2.0(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)':
     optionalDependencies:
-      next: 15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      next: 15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       react: 19.0.0
 
   acorn-jsx@5.3.2(acorn@8.14.0):
@@ -5042,7 +5037,7 @@ snapshots:
   fsevents@2.3.3:
     optional: true
 
-  fumadocs-core@15.0.15(@types/react@19.0.10)(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
+  fumadocs-core@15.0.15(@types/react@19.0.10)(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:
       '@formatjs/intl-localematcher': 0.6.0
       '@orama/orama': 3.1.1
@@ -5060,14 +5055,14 @@ snapshots:
       shiki: 3.1.0
       unist-util-visit: 5.0.0
     optionalDependencies:
-      next: 15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      next: 15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)
     transitivePeerDependencies:
       - '@types/react'
       - supports-color
 
-  fumadocs-mdx@11.5.6(@fumadocs/mdx-remote@1.1.2(acorn@8.14.0)(fumadocs-core@15.0.15(@types/react@19.0.10)(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0))(acorn@8.14.0)(fumadocs-core@15.0.15(@types/react@19.0.10)(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)):
+  fumadocs-mdx@11.5.6(@fumadocs/mdx-remote@1.1.2(acorn@8.14.0)(fumadocs-core@15.0.15(@types/react@19.0.10)(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0))(acorn@8.14.0)(fumadocs-core@15.0.15(@types/react@19.0.10)(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)):
     dependencies:
       '@mdx-js/mdx': 3.1.0(acorn@8.14.0)
       '@standard-schema/spec': 1.0.0
@@ -5076,18 +5071,18 @@ snapshots:
       esbuild: 0.25.0
       estree-util-value-to-estree: 3.3.2
       fast-glob: 3.3.3
-      fumadocs-core: 15.0.15(@types/react@19.0.10)(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      fumadocs-core: 15.0.15(@types/react@19.0.10)(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       gray-matter: 4.0.3
-      next: 15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      next: 15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       unist-util-visit: 5.0.0
       zod: 3.24.2
     optionalDependencies:
-      '@fumadocs/mdx-remote': 1.1.2(acorn@8.14.0)(fumadocs-core@15.0.15(@types/react@19.0.10)(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
+      '@fumadocs/mdx-remote': 1.1.2(acorn@8.14.0)(fumadocs-core@15.0.15(@types/react@19.0.10)(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
     transitivePeerDependencies:
       - acorn
       - supports-color
 
-  fumadocs-openapi@6.3.0(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(ajv@8.17.1)(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(tailwindcss@4.0.9):
+  fumadocs-openapi@6.3.0(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(ajv@8.17.1)(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(tailwindcss@4.0.9):
     dependencies:
       '@fumari/json-schema-to-typescript': 1.1.2
       '@radix-ui/react-dialog': 1.1.6(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -5097,13 +5092,13 @@ snapshots:
       ajv-draft-04: 1.0.0(ajv@8.17.1)
       class-variance-authority: 0.7.1
       fast-glob: 3.3.3
-      fumadocs-core: 15.0.15(@types/react@19.0.10)(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      fumadocs-ui: 15.0.15(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(fumadocs-core@15.0.15(@types/react@19.0.10)(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(tailwindcss@4.0.9)
+      fumadocs-core: 15.0.15(@types/react@19.0.10)(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      fumadocs-ui: 15.0.15(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(fumadocs-core@15.0.15(@types/react@19.0.10)(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(tailwindcss@4.0.9)
       github-slugger: 2.0.0
       hast-util-to-jsx-runtime: 2.3.5
       js-yaml: 4.1.0
       lucide-react: 0.477.0(react@19.0.0)
-      next: 15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      next: 15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       next-themes: 0.4.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       openapi-sampler: 1.6.1
       react: 19.0.0
@@ -5122,7 +5117,7 @@ snapshots:
       - supports-color
       - tailwindcss
 
-  fumadocs-ui@15.0.15(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(fumadocs-core@15.0.15(@types/react@19.0.10)(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(tailwindcss@4.0.9):
+  fumadocs-ui@15.0.15(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(fumadocs-core@15.0.15(@types/react@19.0.10)(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(tailwindcss@4.0.9):
     dependencies:
       '@radix-ui/react-accordion': 1.2.3(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@radix-ui/react-collapsible': 1.1.3(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -5134,10 +5129,10 @@ snapshots:
       '@radix-ui/react-slot': 1.1.2(@types/react@19.0.10)(react@19.0.0)
       '@radix-ui/react-tabs': 1.1.3(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       class-variance-authority: 0.7.1
-      fumadocs-core: 15.0.15(@types/react@19.0.10)(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      fumadocs-core: 15.0.15(@types/react@19.0.10)(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       lodash.merge: 4.6.2
       lucide-react: 0.477.0(react@19.0.0)
-      next: 15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      next: 15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       next-themes: 0.4.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       postcss-selector-parser: 7.1.0
       react: 19.0.0
@@ -5150,9 +5145,9 @@ snapshots:
       - '@types/react'
       - '@types/react-dom'
 
-  geist@1.3.1(next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)):
+  geist@1.3.1(next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)):
     dependencies:
-      next: 15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      next: 15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
 
   get-nonce@1.0.1: {}
 
@@ -6042,9 +6037,9 @@ snapshots:
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)
 
-  next@15.2.2-canary.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
+  next@15.2.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:
-      '@next/env': 15.2.2-canary.0
+      '@next/env': 15.2.1
       '@swc/counter': 0.1.3
       '@swc/helpers': 0.5.15
       busboy: 1.6.0
@@ -6054,14 +6049,14 @@ snapshots:
       react-dom: 19.0.0(react@19.0.0)
       styled-jsx: 5.1.6(react@19.0.0)
     optionalDependencies:
-      '@next/swc-darwin-arm64': 15.2.2-canary.0
-      '@next/swc-darwin-x64': 15.2.2-canary.0
-      '@next/swc-linux-arm64-gnu': 15.2.2-canary.0
-      '@next/swc-linux-arm64-musl': 15.2.2-canary.0
-      '@next/swc-linux-x64-gnu': 15.2.2-canary.0
-      '@next/swc-linux-x64-musl': 15.2.2-canary.0
-      '@next/swc-win32-arm64-msvc': 15.2.2-canary.0
-      '@next/swc-win32-x64-msvc': 15.2.2-canary.0
+      '@next/swc-darwin-arm64': 15.2.1
+      '@next/swc-darwin-x64': 15.2.1
+      '@next/swc-linux-arm64-gnu': 15.2.1
+      '@next/swc-linux-arm64-musl': 15.2.1
+      '@next/swc-linux-x64-gnu': 15.2.1
+      '@next/swc-linux-x64-musl': 15.2.1
+      '@next/swc-win32-arm64-msvc': 15.2.1
+      '@next/swc-win32-x64-msvc': 15.2.1
       sharp: 0.33.5
     transitivePeerDependencies:
       - '@babel/core'
