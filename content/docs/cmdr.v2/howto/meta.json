@@ -1,4 +1,14 @@
 {
-  "defaultOpen": false,
-  "icon": "Bell"
+  "icon": "Bell",
+  "defaultOpen": true,
+  "pages": [
+    "auto-close-closers",
+    "external-tool",
+    "head-like",
+    "required",
+    "redirect-to",
+    "toggle-group",
+    "valid-args",
+    "..."
+  ]
 }
