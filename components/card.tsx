@@ -37,7 +37,7 @@ export function Card({
       {...props}
       data-card
       className={cn(
-        'block rounded-lg border bg-fd-card p-4 text-fd-card-foreground shadow-md transition-colors',
+        'not-prose block rounded-lg border bg-fd-card p-4 text-fd-card-foreground shadow-md transition-colors',
         props.href && 'hover:bg-fd-accent/80',
         props.className,
       )}
