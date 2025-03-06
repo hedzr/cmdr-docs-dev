@@ -136,7 +136,7 @@ export default async function Page(props: {
       {prodMode?
       <Rate
         onRateAction={async (url, feedback) => {
-          // "use server";
+          "use server";
         }}
         // onRateAction={async (url, feedback) => {
         //   "use server";
