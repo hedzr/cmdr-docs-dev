@@ -70,7 +70,7 @@ article h1 {
 article h2 {
   counter-reset: h3 0;
 }
-article h3 {
+article h3:not(not-prose) {
   counter-reset: h4 0;
 }
 article h4 {
@@ -116,6 +116,12 @@ article h6.nocount:before {
 }
 
 /* [data-radix-scroll-area-viewport] */
+
+/* remove the undefline of A tag in a Card */
+article h3.not-prose,
+article a[data-card]:has(h3) {
+  text-decoration: none !important;
+}
 
 /* blog pager */
 
