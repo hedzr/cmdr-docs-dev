@@ -1,12 +1,5 @@
 import { source } from "@/lib/source";
 import { prodMode } from "@/lib/utils";
-// import {
-//   DocsPage,
-//   DocsBody,
-//   DocsDescription,
-//   DocsTitle,
-//   DocsCategory,
-// } from "fumadocs-ui/page";
 import { notFound } from "next/navigation";
 import {
   DocsPage,
@@ -19,34 +12,28 @@ import {
 import { openapi } from "@/lib/source";
 import { metadataImage } from "@/lib/metadata";
 import defaultMdxComponents from "fumadocs-ui/mdx";
-import { ComponentProps, FC } from "react";
-import { Callout } from "fumadocs-ui/components/callout";
-import { Card, Cards } from "fumadocs-ui/components/card";
-import { CodeBlock, Pre } from "fumadocs-ui/components/codeblock";
-import { Files, Folder, File } from "fumadocs-ui/components/files";
-import { Tab, Tabs } from "fumadocs-ui/components/tabs";
-import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
-import { TypeTable } from "fumadocs-ui/components/type-table";
-// import { CodeWithTabs } from "@/components/markdown/code-with-tabs";
-// import { Popup, PopupContent, PopupTrigger } from "fumadocs-twoslash/ui";
+import { Callout } from "@/components/callout";
+import { Card, Cards } from "@/components/card";
+import { CodeBlock, Pre } from "@/components/codeblock";
+import { File, Files, Folder } from "@/components/files";
+import { Tab, Tabs } from "@/components/tabs";
+import { Accordion, Accordions } from "@/components/accordion";
+import { TypeTable } from "@/components/type-table";
 import {
   Popover,
-  PopoverTrigger,
-  PopoverContent,
   PopoverClose,
+  PopoverContent,
+  PopoverTrigger,
 } from "@/components/ui/popover";
-import { InlineTOC } from "fumadocs-ui/components/inline-toc";
+import { InlineTOC } from "@/components/inline-toc";
 import { Wrapper } from "@/components/preview/wrapper";
-import { ImageZoom } from "fumadocs-ui/components/image-zoom";
-import { Step, Steps } from "fumadocs-ui/components/steps";
+import { ImageZoom } from "@/components/image-zoom";
+import { Step, Steps } from "@/components/steps";
 import { Mermaid } from "@theguild/remark-mermaid/mermaid"; // pnpm install @theguild/remark-mermaid remark-math fumadocs-twoslash fumadocs-docgen rehype-katex
+import { ComponentProps, FC } from "react";
+import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
 
 import { Rate } from "@/components/rate";
-
-// import { usePostHog } from "posthog-js/react";
-// import posthog from "posthog-js";
-
-import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
 
 const get = (fm: any, v: string) => {
     return v in fm ? fm[v] : "";
@@ -149,7 +136,7 @@ export default async function Page(props: {
       {prodMode?
       <Rate
         onRateAction={async (url, feedback) => {
-          "use server";
+          // "use server";
         }}
         // onRateAction={async (url, feedback) => {
         //   "use server";
