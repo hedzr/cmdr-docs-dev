@@ -1,4 +1,5 @@
 {
   "defaultOpen": false,
-  "icon": "List"
+  "icon": "List",
+  "pages": ["..."]
 }

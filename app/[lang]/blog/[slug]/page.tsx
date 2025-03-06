@@ -5,18 +5,21 @@ import { createMetadata } from "@/lib/metadata";
 import { lang2iso } from "@/lib/i18n";
 import { notFound } from "next/navigation";
 import { ComponentProps, FC, type HTMLAttributes, Suspense } from "react";
+import { blogPageProps } from "@/lib/types";
+import { getPosts } from "../util";
+import { Page } from "fumadocs-core/source";
 
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Control } from "./page.client";
-import { Callout } from "fumadocs-ui/components/callout";
-import { Card, Cards } from "fumadocs-ui/components/card";
-import { CodeBlock, Pre } from "fumadocs-ui/components/codeblock";
-import { File, Files, Folder } from "fumadocs-ui/components/files";
-import { Tab, Tabs } from "fumadocs-ui/components/tabs";
-import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
-import { TypeTable } from "fumadocs-ui/components/type-table";
+import { Callout } from "@/components/callout";
+import { Card, Cards } from "@/components/card";
+import { CodeBlock, Pre } from "@/components/codeblock";
+import { File, Files, Folder } from "@/components/files";
+import { Tab, Tabs } from "@/components/tabs";
+import { Accordion, Accordions } from "@/components/accordion";
+import { TypeTable } from "@/components/type-table";
 // import { Typography } from "@/components/typography";
 // import { buttonVariants1 } from "@/components/ui/button1";
 // import { LoaderOutput, MetaData, Page } from "fumadocs-core/source";
@@ -31,10 +34,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { InlineTOC } from "fumadocs-ui/components/inline-toc";
+import { InlineTOC } from "@/components/inline-toc";
 import { Wrapper } from "@/components/preview/wrapper";
 import { ImageZoom } from "@/components/image-zoom";
-import { Step, Steps } from "fumadocs-ui/components/steps";
+import { Step, Steps } from "@/components/steps";
 import { Mermaid } from "@theguild/remark-mermaid/mermaid"; // pnpm install @theguild/remark-mermaid remark-math fumadocs-twoslash fumadocs-docgen rehype-katex
 import { DocsCategory } from "@/components/page";
 import {
@@ -52,9 +55,6 @@ import {
 } from "@/page.client";
 import { buttonVariants1 } from "@/components/ui/button1";
 import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
-import { blogPageProps } from "@/lib/types";
-import { getPosts } from "../util";
-import { Page } from "fumadocs-core/source";
 
 export const dynamic = "force-static";
 // export const dynamic = "force-dynamic";

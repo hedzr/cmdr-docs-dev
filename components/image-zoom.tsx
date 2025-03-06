@@ -13,7 +13,8 @@ import {
 } from "next/dist/shared/lib/get-img-props";
 
 // Define the component's props with some restrictions on ImageProps
-export interface SafeImageProps extends Omit<ImageProps, "src" | "width" | "height"> {
+export interface SafeImageProps
+  extends Omit<ImageProps, "src" | "width" | "height"> {
   src: string | StaticImport; // Primary image source
   fallbackSrc?: string; // Default image source (optional)
   alt: string; // Alt text for accessibility
@@ -49,7 +50,10 @@ export const SafeImage = ({
       }
       setValidSrc(src); // Use the absolute URL as-is
     } else {
-      setValidSrc(src.default.src || src.src || "");
+      const get = (c, p) => {
+        return c ? (p in c ? c[p] : undefined) : undefined;
+      };
+      setValidSrc(get(get(src, "default"), "src") || get(src, "src") || "");
     }
   };
   return (
@@ -103,6 +107,7 @@ export function ImageZoom({
     >
       {children ?? (
         <SafeImage
+          blurDataURL={spot.blurDataURL}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 900px"
           {...props}
         />

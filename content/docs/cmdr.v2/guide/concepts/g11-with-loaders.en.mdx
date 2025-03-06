@@ -4,9 +4,9 @@ title: With External Loaders
 
 ## tiny3 Example
 
-在本节中，通过引入 [hedzr/cmdr-loaders](https://github.com/hedzr/cmdr-loaders) 可以提供外部数据集的自动装载。
+In this section, we introduce how to enable auto-loading app settings from external souces (file) by using [hedzr/cmdr-loaders](https://github.com/hedzr/cmdr-loaders).
 
-示例程序如下，
+The sample app is,
 
 ```go title="./examples/tiny3/main.go"
 package main
@@ -152,17 +152,17 @@ func prepareApp(opts ...cli.Opt) (app cli.App) {
 }
 ```
 
-在 `hedzr/cmdr-tests` 的根目录中包含一个名为 `tiny3-app.toml` 的配置数据文件：
+There is a sample settings file named as `tiny3-app.toml` within the root folder of `hedzr/cmdr-tests` repo. It contains:
 
 ```toml
 [app.tiny3]
 foo = "bar"
 ```
 
-它将被 tiny3 在执行时装入。我们可以借助于 `--full` 打印的配置数据树观察到这个功能是正常工作的：
+The settings will be loaded in running tiny3 app. To ensure it, we could invoke `tiny3 --full` to display the whold data tree:
 
 ```bash
-$ go run ./examples/tiny3 jump to --full                                                                                                                                                                                                                                                  21:02:38 ✗ TTY:s014
+$ go run ./examples/tiny3 jump to --full
 
 ~work/godev/cmdr.v2/cmdr.tests
 
@@ -220,27 +220,26 @@ $ go run ./examples/tiny3 jump to --full                                        
 exit status 1
 ```
 
-注意到高亮行显示了 `app.tiny3.foo` 的键值被正确加载了。
+The notable point is the highlight line, which shows the value of `app.tiny3.foo` was loaded properly.
 
-### 自动搜索配置文件夹
+### Searching the settings folders
 
-[hedzr/cmdr-loaders](https://github.com/hedzr/cmdr-loaders) 提供符合 GNU Folder Spec,
-UNIX Filesystem Conventions ([wiki](https://en.wikipedia.org/wiki/Unix_filesystem#Conventional_directory_layout))
-以及 Filesystem Hierarchy Standard ([wiki](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard))。
+[hedzr/cmdr-loaders](https://github.com/hedzr/cmdr-loaders) provides a file loader to compliant with GNU Folder Spec,
+_UNIX Filesystem Conventions_ ([wiki](https://en.wikipedia.org/wiki/Unix_filesystem#Conventional_directory_layout))
+and _Filesystem Hierarchy Standard_ ([wiki](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard)).
 
-因此，cmdr and cmdr-loaders 将会自动搜索诸如
+Therefore, `cmdr` and `cmdr-loaders` will auto-search the app-settings folders from:
 
 1. Primary: `/etc/<app-name>`
 2. Secondary: `$HOME/.config/<app-name>`
 3. Alternative(s): `.` and `<exeutable-dir>`
 
-这些文件夹来查找 `<app-name>.toml` 是否存在。
+to look for whether a `<app-name>.toml` file exists or not.
 
-如果找到了（例如本例中的 `tiny3-app.toml`），那就载入其中的数据集。
-然后，如果这是 `Primary` 和 `Secondary` 配置集，那就检查该文件夹中是否有 `conf.d` 子文件夹，
-如果有，自动装载这个子文件夹中的全部配置文件。
+If it's found (such as `tiny3-app.toml` in this demo), load it into memory and merge the parsed settings into `cmdr.App`.
+Then, for `Primary` or `Secondary` setting source, check `conf.d` directory within the contains folder, and load all files as settings.
 
-`hedzr/cmdr-loaders` 识别多种文件名后缀并正确装载它们，包括：
+In loading, `hedzr/cmdr-loaders` could parse the file format by its extension name. Some suffixes are:
 
 - .toml
 - .yaml, .yml
@@ -249,12 +248,13 @@ UNIX Filesystem Conventions ([wiki](https://en.wikipedia.org/wiki/Unix_filesyste
 - .hcl
 - .nestedtext, .txt, .conf
 
-你甚至可以同时混用它们。
+It's possible to mix all them up.
 
-### 自动回写变更集合
+### Write-Back the Changeset
 
-对于 `Alternative` 配置集，我们还支持自动回写的功能：当应用程序结束时，自动将内存中的配置数据集的变更条目写入到 Alternative 配置文件中。
+For `Alternative` setting source, `Write-Back` machnism is supported: once the app terminating, the modified subset of app settings in memory will be written into `Alternative` file.
 
-默认地，仅有当前工作目录中的 `<app-name>.{toml,yaml,...}` 才属于 `Alternative` 配置集，它才支持自动回写功能。
+By default, only a `<app-name>.{toml,yaml,...}` in the current directory is `Alternative` setting source, thus it enables `Write-Back` automatically.
 
-> 注意：`<exeutable-dir>` 的 Alternative 配置文件不支持回写功能。
+> **NOTE**:  
+> The file in `<exeutable-dir>`, another `Alternative` setting source, doesn't allow write-back.
