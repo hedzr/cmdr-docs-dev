@@ -1,6 +1,6 @@
-import Link from 'fumadocs-core/link';
-import type { HTMLAttributes, ReactNode } from 'react';
-import { cn } from '../lib/cn';
+import Link from "fumadocs-core/link";
+import type { HTMLAttributes, ReactNode } from "react";
+import { cn } from "../lib/cn";
 
 export function Cards(
   props: HTMLAttributes<HTMLDivElement>,
@@ -8,7 +8,7 @@ export function Cards(
   return (
     <div
       {...props}
-      className={cn('grid grid-cols-1 gap-4 sm:grid-cols-2', props.className)}
+      className={cn("grid grid-cols-1 gap-4 sm:grid-cols-2", props.className)}
     >
       {props.children}
     </div>
@@ -30,15 +30,15 @@ export function Card({
   description,
   ...props
 }: CardProps): React.ReactElement {
-  const E = props.href ? Link : 'div';
+  const E = props.href ? Link : "div";
 
   return (
     <E
       {...props}
       data-card
       className={cn(
-        'not-prose block rounded-lg border bg-fd-card p-4 text-fd-card-foreground shadow-md transition-colors',
-        props.href && 'hover:bg-fd-accent/80',
+        "not-prose block rounded-lg border bg-fd-card p-4 text-fd-card-foreground shadow-md transition-colors",
+        props.href && "hover:bg-fd-accent/80",
         props.className,
       )}
     >
@@ -47,7 +47,7 @@ export function Card({
           {icon}
         </div>
       ) : null}
-      <h3 className="not-prose mb-1 text-sm font-medium">{title}</h3>
+      <h3 className="not-prose nocount mb-1 text-sm font-medium">{title}</h3>
       {description ? (
         <p className="my-0 text-sm text-fd-muted-foreground">{description}</p>
       ) : null}

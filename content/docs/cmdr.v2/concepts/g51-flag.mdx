@@ -1,0 +1,206 @@
+---
+title: 标志
+description: What is Flags
+---
+
+## 标志（Flags）
+
+### 什么是标志（Flag）/选项（Option）
+
+在 `cmdr` 中，`标志` 和 `选项` 这两个术语经常是混用的。但它们对于 `cmdr` 来说，确实有分别。
+
+一个标志（Flag），指的是通过 `app.Flg()`/`builder.Flg()` 等接口函数定义的实体，这个实体被用于命令行参数的解释，对应着一个特定的命令行参数选项。
+
+一个选项（Option），指的是储存在 `Option Store` 中的一个条目，例如 `“app.debug” => true`。它的 yaml 表示能够体现出层级关系：
+
+```yaml
+app:
+  debug: true
+```
+
+更多时候，当正在做实际开发时，我们可能会使用 `选项` 来表示一个与 `keyPath` 相关联的键值对条目，无论它是否一个命令行标志。
+
+### 和 `Option Store` 相集成
+
+一个选项可能和一个标志相关联，但也可能不。但一个标志一定会对应着一个选项。
+
+对于 `app.cmd.debug` 这个选项来说，由于 `app.cmd` 是内部设定的命令行标志到 Store 选项的转换前缀，故顶级的命令行标志 `--debug` 与其是关联的。
+
+而对于多级子命令的标志，例如 子命令 `cert / create` 的标志 `--cacert`，会对应着 `app.cmd.cert.create.cacert` 这个选项。
+
+#### `cmd.Store()` vs `cmd.Set()`
+
+除此而外，你也可以通过 `app.Store()/app.Set()` 读写你的数据。
+
+`cmd.Store()` 返回一个完整 Store 的子集，也就是键值 `app.cmd.jump.to` 所下辖的子树。所以 `cmd.Store().MustBool("full")` 就可以直接取得 `--full` 的状态。
+
+`cmd.Set()` 相当于调用 `app.Set()`，它获取整个 Store 对象。此时，你需要用 `cmd.Set().MustBool("app.cmd.jump.to.full")` 来取得 `--full` 的状态。
+
+类似地，`app.Store()` 获得的是 "app.cmd" 子树，所以你也可以用 `app.Store().MustBool("jump.to.full")` 来问询。
+
+当使用 `GetXXX`/`MustXXX` 来获取命令行标志所对应的选项值时，通常采用 `cmd.Store()`/`app.Store()` 以求简化调用语句。
+
+`app.cmd` 前缀是为了在序列化 Option Store 为 YAML 或者其他外部格式时而特别建立的前缀，这样能够保证 Option Store 的序列化内容能够被恰当地包含到外部配置中心里（无论是 YAML，JSON，TOML，抑或是显式的微服务外部配置中心）。
+
+对于那些不与命令行标志相挂钩的 Option Store 选项来说，它们通常被建立在 `app` 层级之下。
+
+一个 `Option Store` 在序列化为 YAML 之后能够很好地展示出其层级关系。例如下面的 Store，
+
+```yaml
+app:
+  logging:
+    file: /var/log/app/stdout.log
+  server:
+    port: 3000
+    host: 0.0.0.0
+  cmd:
+    debug: false # 对应于 `--debug`
+    verbose: false # 对应于 `--verbose`
+```
+
+它显示了你的 app 应该如何组织自己的配置设定，又如何揉合了命令行参数的选项值到 Store 之中。
+
+#### `keyPath`/`dottedPath`
+
+`keyPath`/`dottedPath`/`dottedKeyPath` 是 `Option Store` 中的专属概念，一个选项能够被通过 `前缀.子命令序列.标志长名称` 的方式被访问，这个格式就被称作 `keyPath`。
+
+例如 `app.cmd.cert.create.cacert` 中，`app.cmd` 是内置的命令行标志的选项前缀，`cert.create` 代表着 `cert` 命令及其 `create` 子命令，`cacert` 除了是标志的长格式名称之外，也表达出了从属于 `cert.create` 子命令的含义。
+
+### 长标志、短标志和别名
+
+长标志 `Long Flag` 是一个命令行标志的必选项。这是因为 cmdr 系统以长标志的名字为唯一标识。例如使用 keyPath 访问标志的对应值的时候，就会引用长标志名字作为 keyPath 的一部分。
+
+在命令行输入时，长标志用两个横线字符 `--` 引导。
+
+短标志 `Short Flag`，可以附着于一个命令行标志。在命令行输入时，以单个横线字符 `-` 引导。所以你可以将其视为长标志的快捷方式。
+
+在 `cmdr.v2` 中，进一步扩充了短标志，你可以使用 `b.Flg(longTitle, shortTitle...).ExtraShorts(...)` 来为一个标志附着更多的短标志。
+
+此外，在 POSIX 标准中短标志通常是单个字符。例如 `-v` 对应为 `--verbose` 的短标志。
+
+但在 `cmdr` 中，短标志并非只能提供单个字符，你同样可以提供多个字符。例如 `-ap` 短标志对应于 `--extra-files` 长标志，也是合法的。
+
+Golang 的命令行参数采用与 POSIX 不相合的惯例，它没有长短标志之分，而是只有短标志这种格式，所以典型的 Golang app 可能使用 `-port` 来指示端口号。
+
+> `cmdr` 提供的是符合 POSIX 规范的命令行参数处理接口，所以有区分长短标志。然而我们充分尊重 Golang 开发者的怪癖，所以我们的短标志略有扩展，允许多个字符来表示。因此你完全可以使用 `cmdr` 创建出 Golang 传统风格的 CLI app。
+
+在 `cmdr` 的构造接口中，`Flg(longTitle, shortTitle, ...)` 支持你提供更多的别名关联到一个命令行标志。这些额外的别名几乎等同于长标志，同样可以使用双重横线引导来引用它们。
+
+所以，`b.Flg("version", "V", "ver")` 定义的版本号标志，以下的命令行都是合法的：
+
+```bash
+$ app --version
+$ app -V
+$ app --ver
+```
+
+总的来说，你应该有节制地规划标志的名称。过多的别名未必对终端用户是友善的。
+
+### 短标志的组合
+
+对于布尔量的短标志来说，POSIX 要求它们能够被组合到一起。其含义是：
+
+```bash
+-azro 等价于 -a -z -r -o，或者等价于 -a -zr -o
+```
+
+### 默认值
+
+你可以在定义一个标志的时候为其指定默认值。
+
+`b.Flg("count", "c").Default(3)` 令其默认取值为 3。
+
+大多数简单值，包括整数、浮点数、虚数、字符串、布尔量，时间及周期，以及数组都可以被指定为标志的默认值。
+
+例如 `b.Flg("interval", "i").Default(3*time.Second)` 指定了一个 `3s` 的时间周期。此时，终端用户可以采用 Golang 能够转换的语法为其指定一个新值，例如：
+
+```bash
+$ app -i 8m
+```
+
+这里指定了一个 8 分钟的时间周期值，覆盖掉了程序中的预设值。
+
+> 由于布尔量标志通常带有默认值 false，所以往往无需为其显式地做默认值设定。所以，`b.Flg("verbose", "v")` 隐含着这是一个布尔量标志。
+
+### 覆盖或者叠加
+
+对于大多数默认值，如果多次在命令行中输入，那么后继的值将会覆盖更前的旧值。
+
+例如 `app -c 3 -c 4 -c 5` 中，`-c` 标志最终获得值 5。
+
+然而对于提供数组作为默认值的标志，情况有所不同。多次输入的结果是所有输入值将被叠加到一起。此外，逗号 `,` 被自动用于切分用户提供的输入值。
+
+也就是说，对于 `b.Flg("add", "a").Default([]string{"a", "b"})` 这个标志来说，`app -a z,y -a x -a u,v,w` 将会获得一个最终值为 `[]string{"z","y","x","u","v","w"}`。
+
+### 在命令行中输入值
+
+cmdr 支持模糊界限的值输入方式，下面的命令行输入都能够被有效地识别：
+
+- `--host=localhost`
+- `--hostlocalhost`
+- `--host localhost`
+- `"--hostlocalhost"`
+- `'--hostlocalhost'`
+- `--host"localhost"`
+- `--host'localhost'`
+- `--host "localhost"`
+
+等等。
+
+其中，双引号和单引号在主流的 Shell 环境中被自动去除。但是如果它们没有被 Shell 所删除，则 cmdr 遵照上面的参考格式自动在求值前删除引号。
+
+如果为标志关联了数组值作为默认值，cmdr 将会把多次输入的值合并叠加到一起形成一个最终的数组值。
+
+无论用户如何输入，cmdr 会为标志维护一个命中次数记录，以及命中时用户输入的标志名（是长还是短）。某些情况下你可以参考这些辅助信息来改变相关逻辑。
+
+作为一个范本，cmdr 的内建标志 `--verbose` 的命中次数被预设了如下逻辑：
+
+1. 用户没有输入
+
+   hidden flags/commands 不会显示于帮助屏
+
+2. 输入了一次
+   hidden flags/commands 将会显示于帮助屏
+3. 输入超过三次
+   vendor-hidden flags/commands 将会显示于帮助屏
+
+你也可以再次解释命中次数。例如 `--verbose` 的命中次数被用作一个 1-9 级的等级值，对应于提示信息的多寡。
+
+> 对于一些 cmdr 内建提供的标志，应用程序经常会使用的 verbose, quiet, debug 等等，在 `hedzr/is` 的 `Env` 中同步管理了它们的命中状态，命中次数。
+> 参考：
+>
+> - `is.VerboseModeEnabled()`, `is.GetVerboseLevel()`
+> - `is.QuietModeEnabled()`, `is.GetQuietLevel()`
+> - `is.NoColorModeEnabled()`, `is.GetNoColorLevel()`
+> - `is.DebugMode()`, `is.GetDebugLevel()`
+> - `is.TraceMode()`, `is.GetTraceLevel()`
+
+### cmdr 的更多增强 [#enhances]
+
+1. cmdr 的短标志不会被限定在单个字母。
+
+   我们支持多个字母数字符号作为短标志。
+
+   换句话说，你可以令长短标志的界限模糊，从而提供同时兼容于 golang flag 风格和 getopt 风格的标志集合。
+
+   > Golang flag 风格：命令行参数总是单短横线引导的，如：`-host abc -port 9999`
+   >
+   > getopt 风格：允许单、双短横线引导，分别代表短、长标志，通常短标志使用单个字母或数字，如：`-d -t --retry 3`。
+   >
+   > cmdr 风格：在完全兼容 getopt 风格的基础上，通过解除单字母短标志限制，使得 cmdr cli app 也能支持 `-host abc` 这样的 golang flag 风格，甚至是 `-host abc --retry 3` 这样的混合风格（wget 采用这样的混合性风格）
+
+2. 在无歧义的情况下，cmdr甚至支持你组合任何短标志。
+
+   所以，`-dr3t` 能够被解释为 `--debug --retry 3 --timeout`。
+
+   cmdr 采取特别的反向回溯算法来解决这个场景下的多级子命令的多级标志的智能匹配。
+
+### 额外的话题
+
+<Cards>
+  <Card title="Required" href="../howto/required-flag" />
+  <Card title="Toggle Group" href="../howto/toggle-group-of-flags" />
+  <Card title="Head Like" href="../howto/head-like-flag" />
+  <Card title="Valid Args" href="../howto/valid-args-flag" />
+  <Card title="External Tool" href="../howto/flag-with-external-flag" />
+</Cards>

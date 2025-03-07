@@ -6,10 +6,10 @@
   "defaultOpen": true,
   "pages": [
     "index",
-    "concepts",
 
     "---Guide---",
     "...guide",
+    "concepts",
     "howto",
 
     "---References---",

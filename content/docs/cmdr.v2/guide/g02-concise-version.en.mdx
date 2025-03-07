@@ -5,7 +5,7 @@ description: Best practise for project layout
 
 ## Small app with a better project layout
 
-In [last examples](./g01-first-cli-app), we show you how to create a tiny CLI app from scratch, by cmdr.
+In [last examples](./index), we show you how to create a tiny CLI app from scratch, by cmdr.
 
 It has a clear code ochestration step by step, including how to build a `cli.App` object, to add commands and to add flags into it, and so on.
 
@@ -161,3 +161,9 @@ All of these commands will be collected as `var Commands`, in `cmd/all.go`, then
 So we think it is a better style.
 
 Although it does not make the codes less.
+
+### With `Store`, and loading external sources
+
+This topic will be discussed at next two sections.
+
+The forecast is, by using `loaders.Create` instead of `cmdr.Create`, you will get it done.

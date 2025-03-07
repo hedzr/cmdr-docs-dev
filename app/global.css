@@ -119,7 +119,7 @@ article h6.nocount:before {
 
 /* remove the undefline of A tag in a Card */
 article h3.not-prose,
-article a[data-card]:has(h3) {
+article a[data-card]:has(h3.nocount) {
   text-decoration: none !important;
 }
 
