@@ -1,0 +1,146 @@
+---
+layout: single
+title: Linux 命令 info 全知全会
+date: 2025-01-22
+last_modified_at: 2025-01-22T09:58:00+08:00
+authors:
+  - username: hedzr
+draft: true
+preview: false
+tags: [linux, ubuntu, info, man-pages, devops]
+categories: devops linux
+comments: true
+toc: true
+header:
+  teaser: https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/image-20211226010348217.png
+  overlay_image: /assets/images/ubuntuhero.jpg
+  overlay_filter: rgba(32, 32, 0, 0.5)
+excerpt: >-
+  info 命令不完整解读 [...]
+---
+
+> **摘要**：  
+> 对 info 的各种用法做一次整理，顺便也可以当作快速参考手册。1
+
+## 引子
+
+几年前，我整理过 man 和 less 的用法，例如 [Linux 命令 man 全知全会](https://hedzr.com/devops/linux/linux-man-command/) 和 [Linux 命令 less 全知全会](https://hedzr.com/devops/linux/linux-less-command/)。和这俩命令有关系的当然是 `info` 命令了，还是不应该忽略掉的。所以本文补上这个缺失的 post。
+
+相关的不少内容如果繁琐，则本文中一律不予展开。
+
+## 使用 INFO 帮助系统
+
+`info` 是 Linux 下 info 格式的面向终端的帮助命令。它和 man 命令以及 manpages 帮助系统非常相似。它们都是面向终端的全屏帮助系统，目的是向使用者提供特定命令、syscalls、概念等的联机帮助信息。很多时候，一些关键的信息需要从这里检索和查询才能得到。而且在上世纪 90 年代时，终端中的全屏帮助系统几乎就是帮助信息、参考资料等的唯一来源。题外话，在这个基础上，中国大陆还演变出了在 DOS 下的支持中文的各种全屏阅读器、帮助页面查看系统，等等。
+
+info 帮助系统，是针对 manpages 的一个改进。
+
+在历史上，提出 info 设想的原始目的本来就是为了解决 manpages 格式过于僵化，不太适应较为通用的技术条目，并且缺乏超链接能力，使得查看、检索、定位等缺乏有效的手段。因此 info 格式在这些方面就有较多的改进设计。
+
+Linux 也曾大力推进 info 化。不过现实是这两者现在处于并存状态，info 无法完全替代掉 manpages 的作用。manpages 的遗产其惯性着实强大。
+
+info 格式不同于 manpage 格式的最大之处，就在于一份 info 源文件实际上包含多个节点，不精确地说，帮助材料被划分为一系列章节，每个章节作为一个节点是可以被锚定和可导航的。而 manpage 的源文件及其展示效果是一个单一的页面，比较平铺直叙。
+
+因此 info 帮助条目的展示显得更具有逻辑性，同时也稍微显得复杂和隐晦。这可能是 info 较难上手的原因，并且也可能因此带给用户使用和学习上的更多困难，最终导致两者并存的现状。
+
+作为个人的观点，info 条目呈现时没有一个侧边栏同步展示章节层次结构，才是它的致命缺陷。想象一下，如果这个短板补上，呈现效果如同 web 页面上的典型手册页那样结构清晰的话，想必最终结果会大有不同。
+
+### 用法
+
+```bash
+info [参数] 对象
+```
+
+#### 对象
+
+这里的对象是指具体的帮助主题。
+
+基本上你有可以尝试一下 man 的主题，例如 `info git` 或者 `info awk` 什么的。命令名就是典型的主题名，其他例如系统函数、系统调用，配置文件等等也都可能是主题名。
+
+取决于你的操作系统中的具体的相关文档包的安装情况，info 能够查看的帮助条目可能有所不同。
+
+而从总体上来看，info 条目的总的规模还是比不上 manpages 的。
+
+一般实际工作中我们都是 info 和 man 交换尝试来发掘可能的条目的主题词。
+
+#### 参数
+
+```bash
+-d #添加包含info格式帮助文档的目录
+-f #指定要读取的info格式的帮助文档
+-n #指定首先访问的info帮助文件的节点
+-o #输出被选择的节点内容到指定文件
+```
+
+在不同操作系统中，参数可能会有所出入。
+
+例如在 macOS 中 `info --help` 显示如下的结果：
+
+```bash
+# info --help
+Usage: info [OPTION]... [MENU-ITEM...]
+
+Read documentation in Info format.
+
+Frequently-used options:
+  -a, --all                    use all matching manuals
+  -k, --apropos=STRING         look up STRING in all indices of all manuals
+  -d, --directory=DIR          add DIR to INFOPATH
+  -f, --file=MANUAL            specify Info manual to visit
+  -h, --help                   display this help and exit
+      --index-search=STRING    go to node pointed by index entry STRING
+  -n, --node=NODENAME          specify nodes in first visited Info file
+  -o, --output=FILE            output selected nodes to FILE
+      --subnodes               recursively output menu items
+  -v, --variable VAR=VALUE     assign VALUE to Info variable VAR
+      --version                display version information and exit
+  -w, --where, --location      print physical location of Info file
+
+...
+```
+
+通过 `info info` 你可以学习完整的 info 帮助系统的用法。
+
+#### 示例
+
+典型地，`info ls` 可以查阅 `ls` 的帮助内容，`info info` 可以查阅 info 自己的帮助。
+
+`info -w ls` 可以显示 `ls` 的 .info 帮助文档的物理位置。
+
+### 使用 info TUI 界面
+
+运行 Shell 指令例如 `info info` 就会得到 info 帮助内容阅读器的 TUI (Terminal UI) 界面。
+
+### 参考
+
+- [info (Unix) - Wikipedia](<https://en.wikipedia.org/wiki/Info_(Unix)>)
+- [Linux info command](https://www.computerhope.com/unix/info.htm)
+
+## 建立你自己的 INFO 主题
+
+info 帮助主题实际上是一个 `.info` 文件，这个文件是从 TeXInfo 源文件编译而来。
+
+Texinfo 源文件本质上是一个 TeX 源文件，但带有 `.texi` 的后缀名、而不是传统的 `.tex`。
+
+编译 Texinfo 源文件通常会用到 `makeinfo` 命令行工具，很多情况下它是 `texi2any` 的别名。这也许意味着你可能需要安装 TeX 的某个发行版。不过在 macOS 上还可以稍微轻量一点，通过 `brew install texinfo` 即可安装 `info` 和 `makeinfo` 命令行工具集，相对规模很小。
+
+> `info makeinfo` 检索其帮助文档。
+
+Texinfo 文件的编撰，通常并不特别困难，你往往无需完整地学习 TeX 语法，可以通过学习它的一个微小的子集就能顺利地建立你自己的帮助手册。当然，更容易上手的方法是直接从某个结构良好的源模板开始，要么学习其组织方法，要么将其当作模板应用直接就地编辑和编写你自己的内容。
+
+> 由于 `.texi` 的 TeX 属性，因此除了产出 info 文档之外，也可以输出 pdf，dvi，html 等等格式，相当于你的帮助文档的手册版本或者联机网页版本。
+
+一个典型的优秀范本是 `bison.texi`，这个文件很容易找到。我在示例 repo 中也提供一份副本，不同于原始文档，我的这份副本是尽可能地进行了英文到中文的翻译，并保留了双语对照。
+
+> 如果你的 texi 包含中文字符，并且你还想输出 pdf 文档格式，那么你需要好好学习一下 TeX/LaTeX 关于生产中文 pdf 的相关内容。
+>
+> 这些方面的内容比较容易找到，良莠不齐。但是如果你具有大学生身份，那么寻求学长帮助是最容易的，理工科的毕业论文基本上都会涉及到相关的内容。
+>
+> 由于选择很多，难分优劣，所以本文也不会展开讨论。
+
+由于本文不打算教授你如何上手编撰 INFO 主题，因此仅介绍了一些关键的路线和节点。
+
+## 后记
+
+作为一个起点，本文应该足够用了。
+
+🔚
