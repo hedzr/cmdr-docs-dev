@@ -1,31 +1,99 @@
 ---
-title: Documentation
-description: About cmdr
+title: Introduction To `cmdr.v2`
+description: cmdr is a POSIX-compliant command-line argument parser and app framework, an app setting manager included.
 ---
 
 ## Documentation
 
-Welcome to the docs! You can start writing documents in `/content/docs/index.mdx`.
+Welcome to the docs! Here is a manual about cmdr, which provides command-line argument parser to help your CLI app developing.
 
-<Cards>
-  <Card title="Cmdr(-go) v2 Documentation" href="./v2.x/" />
-  <Card title="Cmdr(-go) v1 Documentation" href="./v1.x/" />
-</Cards>
+Writing a tiny CLI app with cmdr is easy. Here it is,
 
-```js
-const lorem = ipsum(dolor, sit);
-// !callout[/amet/] This is a callout
-const [amet, consectetur] = [0, 0];
-lorem.adipiscing((sed, elit) => {
-  if (sed) {
-    amet += elit;
-  }
-});
+```go title="./examples/tiny0/main.go"
+package main
+
+import (
+	"context"
+
+	"github.com/hedzr/cmdr/v2"
+	"github.com/hedzr/cmdr/v2/cli"
+)
+
+func main() {
+	app := cmdr.New().
+		Info("tiny0-app", "0.3.1").
+		Author("The Example Authors") // .Description(``).Header(``).Footer(``)
+	app.Cmd("jump").
+		Description("jump command").
+		Examples(`jump example`). // {{.AppName}}, {{.AppVersion}}, {{.DadCommands}}, {{.Commands}}, ...
+		OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+			println("jump command:", cmd)
+			if cmd.FlagBy("full").GetTriggeredTimes() > 0 {
+				// for dummy store, `if cmd.Store().MustBool("full") {}` cannot work
+				println("Dump", cmd.Set().Dump()) // nothing to display since a dummy store created
+			}
+			return
+		}).
+		With(func(b cli.CommandBuilder) {
+			b.Flg("full", "f").
+				Default(false).
+				Description("full option here").
+				Build()
+		})
+
+	ctx := context.Background() // with cancel can be passed thru in your actions
+	if err := app.Run(ctx); err != nil {
+		println("Application Error:", err)
+	}
+}
 ```
+
+Now let's run it,
+
+```bash
+$ go run ./examples/tiny0/
+
+...[help screen ignored here]
+
+$ go run ./examples/tiny0/ jump
+jump command: (0x1024be4c0,0x140000766c8)
+
+$ go run ./examples/tiny0/ jump --full
+jump command: (0x1024be4c0,0x140000766c8)
+Dump
+```
+
+The help screen looks like,
+
+![tiny0-help-screen](/cmdr/v2/guide/2025-02-16T09.14.24.png)
+
+### Deep In It
+
+In this tiny app, we do not refer to a standard `Store`, so a dummy one created internally, which discards any requests.
+
+So `cmd.Store().MustBool("full")` cannot return the right value input by end user. The replaced way is, detecting the hit times of `full` in parsing will tell us that `--full` or `-f` had been typed on command line.
+
+As a sample, when user typed `app --full -f`, the hit times would be 2.
+
+`cmd.FlagBy("full")` could locate to the right `*Flag` object by it long-title.
+Similarly, `cmd.SubCmdBy("xxx")` could be used for look up a subcommand.
+
+Both of them are searching for the child directly. But if you want the descendant children recursively, `cmd.(*cli.CmdS).FindSubCommandRecursive(ctx, longTitle, wide)` can do it. The functions include:
+
+- `FindSubCommand`
+- `FindSubCommandRecursive`
+- `FindFlag`
+- `FindFlagRecursive`
+
+As the methods of `*cli.CmdS`, they aren't exposed on `interface Cmd` currently. So it might need a `Type Assertion` before you can access them.
 
 ## Learn More
 
 <Cards>
-  <Card title="Learn more about Code Hike" href="https://codehike.org/docs" />
-  <Card title="Learn more about Fumadocs" href="https://fumadocs.vercel.app" />
+  <Card title="Cmdr(-go) v2 Documentation" href="./v2.x/" />
+  <Card title="Cmdr(-go) v1 Documentation" href="./v1.x/" />
+  <Card
+    title="Learn more about `hedzr/store`"
+    href="https://github.com/hedzr/store"
+  />
 </Cards>

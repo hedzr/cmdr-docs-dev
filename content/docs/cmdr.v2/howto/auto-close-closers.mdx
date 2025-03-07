@@ -1,0 +1,70 @@
+---
+title: Auto-close the Closers
+---
+
+## 介绍
+
+在应用程序终止时，也即当子命令的 `OnAction` 结束返回之后，cmdr 将会调用 OnPostAction 回调，然后结束 App 对象的生命周期，在最后 cmdr 也会通过依次调用所有的 `Close()` 来关闭所有 Closers。
+
+`Closers` 是一个全局的对象数组，这里登记注册了一切你想要自动关闭的资源型对象。
+
+例如一个数据库连接对象，你可以通过实现 `Peripheral` 接口 `Close()` 并将该对象登记到 `Closers` 中，然后则无需关心相关资源的回收问题了。
+
+当然，实际上回收任务将在 `Close()` 中被调用，而调用的时机就在 cmdr 快要结束运行之前。
+
+下面的代码展示了如何管理资源型对象：
+
+```go title="./examples/auto-close-closers/main.go"
+package main
+
+import (
+	"context"
+	"os"
+
+	"github.com/hedzr/cmdr/v2"
+	logz "github.com/hedzr/logg/slog"
+)
+
+type dbConn struct {
+	conn *mysql.Conn
+}
+
+func (s *dbConn) Close() {
+	// here's cleanup operations to free the conn object
+	if err := s.conn.Close(); err != nil {
+		cmdr.Recycle(err)
+	}
+}
+
+func (s *dbConn) Open(ctx context.Context) (err error) {
+	// do stuffs to open connection to database here
+	return
+}
+
+func main() {
+	app := cmdr.Create(appName, version, author, desc).WithOpts(
+		cmdr.WithPeripherals(&dbConn{}),
+	).Build()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	if err := app.Run(ctx); err != nil {
+		logz.ErrorContext(ctx, "Application Error:", "err", err) // stacktrace if in debug mode/build
+		os.Exit(app.SuggestRetCode())
+	} else if rc := app.SuggestRetCode(); rc != 0 {
+		os.Exit(rc)
+	}
+}
+
+const (
+	appName = "auto-close-closers"
+	desc    = `a sample to show u how to manage the resource objects`
+	version = cmdr.Version
+	author  = ``
+)
+```
+
+作为资源型对象的 dbConn 实例，由于它实现了 `Open(context.Context) error`，因此 `cmdr.WithPeripherals()` 完成两件事：
+
+1. 将其登记到 `is.Closers()` 之中，实现自动释放资源和关闭对象
+2. 将其登记到 pre-run 清单中（通过 `WithTasksSetupPeripherals()`），在子命令将要运行之前自动调用 `Open()`

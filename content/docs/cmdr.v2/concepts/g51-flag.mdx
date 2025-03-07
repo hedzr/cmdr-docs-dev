@@ -1,6 +1,6 @@
 ---
-title: 基本概念
-description: What is...
+title: 标志
+description: What is Flags
 ---
 
 ## 标志（Flags）
@@ -17,6 +17,8 @@ description: What is...
 app:
   debug: true
 ```
+
+更多时候，当正在做实际开发时，我们可能会使用 `选项` 来表示一个与 `keyPath` 相关联的键值对条目，无论它是否一个命令行标志。
 
 ### 和 `Option Store` 相集成
 
@@ -96,7 +98,7 @@ $ app --ver
 
 ### 短标志的组合
 
-对于布尔量的短标志来说，POSIX 要求它们能够被组合到i一起。其含义是：
+对于布尔量的短标志来说，POSIX 要求它们能够被组合到一起。其含义是：
 
 ```bash
 -azro 等价于 -a -z -r -o，或者等价于 -a -zr -o
@@ -193,99 +195,12 @@ cmdr 支持模糊界限的值输入方式，下面的命令行输入都能够被
 
    cmdr 采取特别的反向回溯算法来解决这个场景下的多级子命令的多级标志的智能匹配。
 
-## 子命令
+### 额外的话题
 
-### 没有子命令的 CLI app [#rootcmd-only]
-
-像 `wget` 这样的古典 Unix app，并不提供子命令。它可能带有大量的标志，其中一些标志带有命令性质，会请求 app 使用不同的工作逻辑。
-
-这样的非完整的 wget 复刻品，在 cmdr 支持下可以这样编写：
-
-```go
-package main
-
-import (
-	"context"
-	"os"
-
-	"github.com/hedzr/cmdr/v2"
-	"github.com/hedzr/cmdr/v2/cli"
-)
-
-func main() {
-	ctx := context.Background() // with cancel can be passed thru in your actions
-	app := prepareApp()
-	if err := app.Run(ctx); err != nil {
-		println("Application Error:", err)
-		os.Exit(app.SuggestRetCode())
-	}
-}
-
-const (
-	wgetVersion = "1.20"
-
-	cStartup          = "10.Startup"
-	cLogging          = "20.Logging and input file"
-	cDownload         = "30.Download"
-	cDirectories      = "40.Directories"
-	cHTTPOptions      = "50.HTTP Options"
-	cHTTPSOptions     = "51.HTTPS (SSL/TLS) options"
-	cHstsOptions      = "52.HSTS options"
-	cFtpOptions       = "53.FTP options"
-	cFtpsOptions      = "54.FTPS options"
-	cWarcOptions      = "55.WARC options"
-	cRecusiveDownload = "60.Recursive download"
-	cRecusiveAccept   = "61.Recursive accept/reject"
-)
-
-func prepareApp(opts ...cli.Opt) (app cli.App) {
-	app = cmdr.New(opts...).
-		Info("wget", wgetVersion).
-		Author("The Example Authors").
-		Header(`GNU Wget 1.20, a non-interactive network retriever.
-
-Usage: wget [OPTION]... [URL]...
-
-Mandatory arguments to long options are mandatory for short options too.`) // .Description(``).Header(``).Footer(``)
-
-	app.With(func(app cli.App) {
-		app.Flg("background", "b", "bg").Description(`go to background after startup`).Group(cStartup).Build()
-		app.Flg("execute", "e").Description(`execute a '.wgetrc'-style command`).Group(cStartup).Default("").PlaceHolder("COMMAND").Build()
-		app.Flg("output-file", "o").Description(`log messages to FILE`).Group(cLogging).PlaceHolder("FILE").Default("").Build()
-		app.Flg("append-output", "a").Description(`append messages to FILE`).Group(cLogging).PlaceHolder("FILE").Default("").Build()
-		app.Flg("no-verbose", "nv").Description(`turn off verboseness, without being quiet`).Group(cLogging).Default("").Build()
-		app.Flg("report-speed").Description(`output bandwidth as TYPE.  TYPE can be bits`).Group(cLogging).Default("").PlaceHolder("TYPE").Build()
-		app.Flg("input-file", "i").Description(`download URLs found in local or external FILE`).Group(cLogging).Default("").PlaceHolder("FILE").Build()
-		app.Flg("force-html", "F").Description(`treat input file as HTML`).Group(cLogging).Build()
-		app.Flg("base", "b").Description(`resolves HTML input-file links (-i -F)  relative to URL`).Default("").PlaceHolder("URL").Group(cLogging).Build()
-		app.Flg("config", "".Description(`specify config file to use`).Group(cLogging).Default("").PlaceHolder("FILE").Build()
-		app.Flg("no-config", "".Description(`do not read any config file`).Group(cLogging).Build()
-		app.Flg("rejected-log", "".Description(`log reasons for URL rejection to FILE`).Group(cLogging).Default("").PlaceHolder("FILE").Build()
-		app.Flg("conretry-connrefusedfig").Description(`retry even if connection is refused`).Group(cDownload).Build()
-	})
-
-	app.OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
-		println(`wget ran.`)
-		_, err = cmd.App().DoBuiltinAction(ctx, cli.ActionShowHelpScreen)
-		return
-	})
-	return
-}
-```
-
-注意对于仅有根命令的 app，直接在 app 对象上应用 `OnAction` 来指定命令响应回调函数。
-
-如果你已经喜欢上了 CommandBuilder/FlagBuilder 方式来构造命令和标志，在 app 对象上还有一个 RootBuilder 可以为你开启相应的回调代码块：
-
-```go
-	app.RootBuilder(func(parent cli.CommandBuilder) {
-		// parent.Cmd(...)...
-		parent.OnAction(...)
-	})
-```
-
-这和 `app.Cmd("subcmd").With(func(b cli.CommandBuilder){ ... })` 相似，只不过 `parent` 代表的是 `app.RootCommand()`，而 `b` 代表的是新建的子命令 `subcmd`。
-
-### 带有多级子命令
-
-参见 [lots-of-subcommands](./g20-lots-of-subcommands)。
+<Cards>
+  <Card title="Required" href="../howto/required-flag" />
+  <Card title="Toggle Group" href="../howto/toggle-group-of-flags" />
+  <Card title="Head Like" href="../howto/head-like-flag" />
+  <Card title="Valid Args" href="../howto/valid-args-flag" />
+  <Card title="External Tool" href="../howto/flag-with-external-flag" />
+</Cards>

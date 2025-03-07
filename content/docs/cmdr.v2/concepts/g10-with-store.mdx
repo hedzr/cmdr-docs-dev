@@ -13,7 +13,7 @@ description: 集成 `Store` 能够提供应用程序配置数据的管理能力
 
 下面的示例完成了这些任务：
 
-<Tabs items={['main.go', 'cmdr-tests/examples/common/prepare_app.go', 'cmdr-loaders/prepare_app.go', 'cmd/all.go', 'cmd/jump.go', 'project layout']} default>
+<Tabs items={['main.go', 'cmdr-tests/.../prepare_app.go', 'cmdr-loaders/prepare_app.go', 'cmdr-loaders/create.go', 'cmd/all.go', 'cmd/jump.go', 'project layout']} default>
 
 <Tab value="main.go">
 
@@ -57,9 +57,9 @@ func chain(app cli.App) cli.App {
 
 </Tab>
 
-<Tab value="cmdr-tests/examples/common/prepare_app.go">
+<Tab value="cmdr-tests/.../prepare_app.go">
 
-```go
+```go title="cmdr-tests/examples/common/prepare_app.go"
 package common
 
 import (
@@ -76,28 +76,16 @@ func PrepareApp(appName, desc string, opts ...cli.Opt) func(adders ...cli.CmdAdd
 
 <Tab value="cmdr-loaders/prepare_app.go">
 
-```go
+```go title="cmdr-loaders/prepare_app.go"
 package loaders
 
 import (
-	"github.com/hedzr/cmdr-loaders/local"
-	"github.com/hedzr/cmdr/v2"
 	"github.com/hedzr/cmdr/v2/cli"
 )
 
 func PrepareApp(appName, desc string, opts ...cli.Opt) func(adders ...cli.CmdAdder) (app cli.App) {
 	return func(adders ...cli.CmdAdder) (app cli.App) {
-		cs := cmdr.Create(appName, version, author, desc, append([]cli.Opt{
-			// import "github.com/hedzr/cmdr-loaders/local" to get in advanced external loading features
-			cmdr.WithExternalLoaders(
-				local.NewConfigFileLoader(
-					local.WithAlternateWriteBack(false), // disable write-back the modified state into alternative config file
-					local.WithAlternateDotPrefix(false), // use '<app-name>.toml' instead of '.<app-name>.toml'
-				),
-				local.NewEnvVarLoader(),
-			),
-		}, opts...)...)
-
+		cs := Create(appName, version, author, desc, opts...)
 		cs.With(func(app cli.App) {
 			// another way to disable `cmdr.WithForceDefaultAction(true)` is using
 			// env-var FORCE_RUN=1 (builtin already).
@@ -134,6 +122,34 @@ func PrepareApp(appName, desc string, opts ...cli.Opt) func(adders ...cli.CmdAdd
 
 		return
 	}
+}
+```
+
+</Tab>
+
+<Tab value="cmdr-loaders/create.go">
+
+```go title="cmdr-loaders/create.go"
+package loaders
+
+import (
+	"github.com/hedzr/cmdr-loaders/local"
+	"github.com/hedzr/cmdr/v2"
+	"github.com/hedzr/cmdr/v2/cli"
+)
+
+// Create provides a concise interface to create an cli app easily.
+func Create(appName, version, author, desc string, opts ...cli.Opt) cmdr.Creator {
+	return cmdr.Create(appName, version, author, desc, append([]cli.Opt{
+		// import "github.com/hedzr/cmdr-loaders/local" to get in advanced external loading features
+		cmdr.WithExternalLoaders(
+			local.NewConfigFileLoader(
+				local.WithAlternateWriteBack(false), // disable write-back the modified state into alternative config file
+				local.WithAlternateDotPrefix(false), // use '<app-name>.toml' instead of '.<app-name>.toml'
+			),
+			local.NewEnvVarLoader(),
+		),
+	}, opts...)...)
 }
 ```
 
@@ -190,9 +206,9 @@ func (jumpCmd) Add(app cli.App) {
 				Deprecated(`v0.1.1`).
 				OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
 					// cmd.Set() == cmdr.Store(), cmd.Store() == cmdr.Store()
-					cmd.Set().Set("app.tiny3.working", dir.GetCurrentDir())
+					cmd.Set().Set("tiny3.working", dir.GetCurrentDir())
 					println()
-					println(cmd.Set().WithPrefix("app.tiny3").MustString("working"))
+					println(cmd.Set().WithPrefix("tiny3").MustString("working"))
 
 					cs := cmdr.Store().WithPrefix("jump.to")
 					if cs.MustBool("full") {
@@ -222,6 +238,7 @@ func (jumpCmd) Add(app cli.App) {
 
 <Files>
   <Folder name="cmdr-loaders/" defaultOpen>
+    <File name="create.go" />
     <File name="prepare_app.go" />
   </Folder>
   ---
@@ -246,9 +263,11 @@ func (jumpCmd) Add(app cli.App) {
 
 :::tip
 
-[`hedzr/cmdr-loaders`](https://github.com/hedzr/cmdr-loaders) 提供了一个对 `cmdr.Create()` 更进一步的包装接口 `loaders.PrepareApp()`。
+[`hedzr/cmdr-loaders`](https://github.com/hedzr/cmdr-loaders) 提供了一个对 `cmdr.Create()` 更进一步的包装接口 `loaders.Create()`，它将会自动加载恰当位置的外部配置文件或者配置源。
 
-[`hedzr/cmdr-tests`](https://github.com/hedzr/cmdr-tests) 再一次对其包装提供一个 `common.PrepareApp()`，这是为了简化其中的 examples 示例程序们的编写。
+在此基础上，`loaders.PrepareApp()` 是进一步的包装，目的在于为示例程序提供默认的 Commands 和 Flags 定义。
+
+[`hedzr/cmdr-tests`](https://github.com/hedzr/cmdr-tests) 延续上述思路，再一次对其包装提供一个 `common.PrepareApp()`，这样就能为 examples 示例程序们的编写提供支持。
 
 它们的用途在于三点：
 
@@ -257,6 +276,10 @@ func (jumpCmd) Add(app cli.App) {
 3. 扁平化 app name，author 等基础信息。
 
 :::
+
+总的来说，对于常规开发，我们推荐你使用 `cmdr.Create()` 和 `loaders.Create()` 这两个接口。
+
+如果你愿意逐步完成初始化设定工作，那么使用 `cmdr.New()` 也是合适的。
 
 ### 手动集成 `Store` 以及 `loaders`
 
@@ -286,53 +309,40 @@ import "github.com/hedzr/cmdr-loaders/local"
 
 ### 用 `OnAction` 为命令关联处理逻辑
 
-通常来说，多级子命令的结构中，只有末级命令应该带有 `OnAction` —— 尽
-管我们允许你在中间层级也同样提供它。
+通常来说，多级子命令的结构中，只有末级命令应该带有 `OnAction` —— 尽管我们允许你在中间层级也同样提供它。
 
-如果你真的这么做了，它也并不会产生什么逻辑错误或者运行错误，只是对
-于终端用户来说稍微不那么友好，因为他可能并不会意识到 `jump` 也可
-以被 _执行_。
+如果你真的这么做了，它也并不会产生什么逻辑错误或者运行错误，只是对于终端用户来说稍微不那么友好，因为他可能并不会意识到 `jump` 也可以被 _执行_。
 
-另一个副作用是，在 Shell 执行 `app jump` 时，原本会自动显示帮助屏，
-但现在将会执行你所关联的 `OnAction` 代码了，所以你必须使用
-`app jump -h` 来查阅帮助屏。
+另一个副作用是，在 Shell 执行 `app jump` 时，原本会自动显示帮助屏，但现在将会执行你所关联的 `OnAction` 代码了，所以你必须使用`app jump -h` 来查阅帮助屏。
 
 ### `Build()` 和 `With(cb)`
 
-`app/b.Cmd("long","short",...)...Build()` 是一种 Builder
-Pattern，末尾的 `Build()` 调用用于提交前面的一系列构建动作，
-就像 tiny1 示例程序所做的那样。
-但同时，我们也提供 `app/b.Flag("long","short",...)...With(cb)`
-风格，`With(cb)` 同样起到提交作用，所以这时候就不必在结尾加上
-`.Build()` 调用了。
+`app/b.Cmd("long","short",...)...Build()` 是一种 Builder Pattern，末尾的 `Build()` 调用用于提交前面的一系列构建动作，就像 tiny1 示例程序所做的那样。
+但同时，我们也提供 `app/b.Flag("long","short",...)...With(cb)` 风格，`With(cb)` 同样起到提交作用，所以这时候就不必在结尾加上 `.Build()` 调用了。
 
 在 tiny2 中，借助于 With 回调代码块，我们为 `to` 子命令附着了 `full` 选项。
 所以终端用户可以在命令行加上 `--full` 或者 `-f` 来使能这个选项。
 
-类似地，在 `jump` 的 With 代码块中，可以添加它的下级子命令，当然
-也包括为其添加关联的选项。
+类似地，在 `jump` 的 With 代码块中，可以添加它的下级子命令，当然也包括为其添加关联的选项。
 
 ### OS 返回值 [#os-ret-code]
 
-`to` 命令也展示了如何设置应用程序返回值。通过 `app.SetSuggestRetCode(retCode)` 可以
-设置一个错误码，并在 main() 中利用 `os.Exit(app.SuggestRetCode())` 将其返回给操作系统。
+`to` 命令也展示了如何设置应用程序返回值。通过 `app.SetSuggestRetCode(retCode)` 可以设置一个错误码，并在 main() 中利用 `os.Exit(app.SuggestRetCode())` 将其返回给操作系统。
 
 > Why so complex?
 >
-> 对于服务型应用程序来说，在退出程序之前往往需要进行占用资源清理（包括打开的文件、网络连接，
-> 以及运行中的 go routines 等等）。
+> 对于服务型应用程序来说，在退出程序之前往往需要进行占用资源清理（包括打开的文件、网络连接，以及运行中的 go routines 等等）。
 >
 > 所以在程序的中途执行 `panic()` 或者 `os.Exit(##)` 是不恰当的，这会导致资源的异常占用或者泄漏。
 >
-> 如此被推荐的最佳实践是，在需要的运行中途通过 `app.SetSuggestRetCode(retCode)` 标记一个退出码，
-> 然后逐级通过 `return err` 返回到 main() 函数，此时必要的清理代码都将正常执行，最后再调用 `os.Exit(app.SuggestRetCode())` 向操作系统返回错误码。
+> 如此被推荐的最佳实践是，在需要的运行中途通过 `app.SetSuggestRetCode(retCode)` 标记一个退出码，然后逐级通过 `return err` 返回到 main() 函数，此时必要的清理代码都将正常执行，最后再调用 `os.Exit(app.SuggestRetCode())` 向操作系统返回错误码。
 
 ## 对 `Store` 的操作 [#oper-to-store]
 
 在相应的 `OnAction` 处理程序中，full 选项将导致在控制台打印 Store 的内部结构。
 
 ```bash
-$ go run ./examples/tiny2 jump to --full                                                                                                                                                                                                                                                  20:44:31 ✓ TTY:s014
+$ go run ./examples/tiny2 jump to --full
 
   app.cmd.                      <B>
     jump.to.full                <L> app.cmd.jump.to.full => true
@@ -386,11 +396,27 @@ $
 
 除此而外，你也可以通过 `app.Store()/app.Set()` 读写你的数据。
 
-`cmd.Store()` 返回一个完整 Store 的子集，也就是键值 `app.cmd.jump.to` 所下辖的子树。所以 `cmd.Store().MustBool("full")` 就可以直接取得 `--full` 的状态。
+在 `OnAction` 回调函数中，`cmd.Store()` 返回一个完整 Store 的相对于当前命令的子集。对于 `jump to` 子命令，键值 `app.cmd.jump.to` 所下辖的子树将被返回。所以 `cmd.Store().MustBool("full")` 就可以直接取得 `--full` 的状态。
 
-`cmd.Set()` 相当于调用 `app.Set()`，它获取整个 Store 对象。此时，你需要用 `cmd.Set().MustBool("app.cmd.jump.to.full")` 来取得 `--full` 的状态。
+`cmd.Set()` 相当于调用 `app.Set()`，它获取整个 Store 对象（的 `app` 子树）。此时，你需要用 `cmd.Set().MustBool("cmd.jump.to.full")` 来取得 `--full` 的状态。
 
 类似地，`app.Store()` 获得的是 "app.cmd" 子树，所以你也可以用 `app.Store().MustBool("jump.to.full")` 来问询。
+
+### `app` 子树
+
+`cmdr` 管理的 `Store` 中，`app` 子树是自动创建的。
+
+所有的命令行标志将被一一映射到 `app.cmd` 子树中，例如 `jump to` 命令的 `full` 选项，将被映射为 `app.cmd.jump.to.full` 键值。
+
+所有的外部配置文件将被解析后挂载到 `app` 子树之下。
+所以 `app.toml` 内容：
+
+```toml
+[general]
+foo = "bar"
+```
+
+将被载入后挂载为 `app.general.foo => "bar"` 的键值对。
 
 ### `MustXXX()`
 
@@ -406,6 +432,12 @@ $
 
 :::
 
-你也可以从外部配置文件中载入配置数据集，这将在下一节中示例。
+## Learn More
+
+本节中的示例程序是被推荐的编码风格，它已经集成了外部配置文件的加载能力。
+
+但是相关的内容将在下一节中予以解说。
+
+此外，下一节还提供一个较为冗长的逐步完成初始化的示例程序，用于展示使用 `cmdr.New()` 的方式自行完成集成工作。
 
 [^1]: `hedzr/store` 提供应用程序配置数据集的操作能力，以层次化的键值对方式管理数据。

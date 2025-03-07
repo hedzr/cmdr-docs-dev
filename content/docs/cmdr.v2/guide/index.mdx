@@ -5,7 +5,7 @@ description: 从这里开始
 
 ## tiny1 Example
 
-在 tiny0 示例中已经展示了极简的 cmdr-based app 的编写。但那只是玩具，接下来的几个小节我们依次介绍较为真实的用法。
+在 [tiny0 示例](../index) 中已经展示了极简的 cmdr-based app 的编写。但那只是玩具，接下来的几个小节我们依次介绍更为真实的用法。
 
 同样地，本例中不做标准的集成，简单地、但是代码结构组织得更合理一些，如下所示，
 
@@ -62,7 +62,7 @@ module tiny1
 它包含一个子命令 `jump`，相应的业务逻辑处理程序由 `OnAction` 指定。因此，运行它会得到（类似于）：
 
 ```bash
-$ go run ./examples/tiny3 jump
+$ go run ./examples/tiny1 jump
 jump command: (0x10140a4a0,0x140001ae6c8)
 ```
 

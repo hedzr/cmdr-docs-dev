@@ -4,9 +4,9 @@ title: 载入外部配置数据
 
 ## tiny3 Example
 
-在本节中，通过引入 [hedzr/cmdr-loaders](https://github.com/hedzr/cmdr-loaders) 可以提供外部数据集的自动装载。
+在本节中，通过引入 [hedzr/cmdr-loaders](https://github.com/hedzr/cmdr-loaders)，将会采用一个较为冗长的示例程序来展示如何逐步地整合配置管理并加载外部配置文件的能力。
 
-示例程序如下，
+下面的示例程序是一个较为冗长的版本，
 
 ```go title="./examples/tiny3/main.go"
 package main
@@ -95,9 +95,9 @@ func prepareApp(opts ...cli.Opt) (app cli.App) {
 				Deprecated(`v0.1.1`).
 				OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
 					// cmd.Set() == cmdr.Store(), cmd.Store() == cmdr.Store()
-					cmd.Set().Set("app.tiny3.working", dir.GetCurrentDir())
+					cmd.Set().Set("tiny3.working", dir.GetCurrentDir())
 					println()
-					println(cmd.Set().WithPrefix("app.tiny3").MustString("working"))
+					println(cmd.Set().WithPrefix("tiny3").MustString("working"))
 
 					cs := cmdr.Store().WithPrefix("jump.to")
 					if cs.MustBool("full") {
@@ -155,7 +155,7 @@ func prepareApp(opts ...cli.Opt) (app cli.App) {
 在 `hedzr/cmdr-tests` 的根目录中包含一个名为 `tiny3-app.toml` 的配置数据文件：
 
 ```toml
-[app.tiny3]
+[tiny3]
 foo = "bar"
 ```
 
