@@ -24,35 +24,35 @@ Bash 字符串操作极其强大，尽管还无法和高级语言的能力相比
 
 字符串操作和变量有密切关联性，所以先介绍变量及其表达式的使用惯例：
 
-| `${var}`          | 变量var的值, 与$var相同                                                      |
-| ----------------- | ---------------------------------------------------------------------------- |
-| `${var-DEFAULT}`  | 如果var没有被声明, 那么就以$DEFAULT作为其值；_否则其值为 $var_               |
-| `${var:-DEFAULT}` | 如果var没有被声明, 或者其值为空, 那么就以$DEFAULT作为其值；_否则其值为 $var_ |
-| `${var=DEFAULT}`  | 如果var没有被声明, 那么就以$DEFAULT作为其值；_否则其值为 $var_               |
-| `${var:=DEFAULT}` | 如果var没有被声明, 或者其值为空, 那么就以$DEFAULT作为其值；_否则其值为 $var_ |
-| `${var+OTHER}`    | 如果var声明了, 那么其值就是$OTHER；_否则就为null字符串_                      |
-| `${var:+OTHER}`   | 如果var被设置了, 那么其值就是$OTHER；_否则就为null字符串_                    |
-| `${var?ERR_MSG}`  | 如果var没被声明, 那么就打印$ERR*MSG；*否则其值为 $var\_                      |
-| `${var:?ERR_MSG}` | 如果var没被设置, 那么就打印$ERR*MSG；*否则其值为 $var\_                      |
-| `${!varprefix*}`  | 匹配之前所有以varprefix开头进行声明的变量                                    |
-| `${!varprefix@}`  | 匹配之前所有以varprefix开头进行声明的变量                                    |
+| `${var}`          | 变量var的值, 与$var相同                                                          |
+| ----------------- | -------------------------------------------------------------------------------- |
+| `${var-DEFAULT}`  | 如果var没有被声明, 那么就以`$DEFAULT`作为其值；_否则其值为 `$var_`               |
+| `${var:-DEFAULT}` | 如果var没有被声明, 或者其值为空, 那么就以`$DEFAULT`作为其值；_否则其值为 `$var_` |
+| `${var=DEFAULT}`  | 如果var没有被声明, 那么就以`$DEFAULT`作为其值；_否则其值为 `$var_`               |
+| `${var:=DEFAULT}` | 如果var没有被声明, 或者其值为空, 那么就以`$DEFAULT`作为其值；_否则其值为 `$var_` |
+| `${var+OTHER}`    | 如果var声明了, 那么其值就是`$OTHER；_`否则就为`null`字符串\_                     |
+| `${var:+OTHER}`   | 如果var被设置了, 那么其值就是`$OTHER；_`否则就为`null`字符串\_                   |
+| `${var?ERR_MSG}`  | 如果var没被声明, 那么就打印`$ERR*MSG；*`否则其值为 `$var_`                       |
+| `${var:?ERR_MSG}` | 如果var没被设置, 那么就打印`$ERR*MSG；*`否则其值为 `$var_`                       |
+| `${!varprefix*}`  | 匹配之前所有以`varprefix`开头进行声明的变量                                      |
+| `${!varprefix@}`  | 匹配之前所有以`varprefix`开头进行声明的变量                                      |
 
 ### 一系列基本操作
 
-| `${#string}`                       | $string 的长度                                                                                                                |
-| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `${string:position}`               | 在$string中, 从位置$position开始提取子串                                                                                      |
-| `${string:position:length}`        | 在$string中, 从位置$position开始提取长度为$length的子串。如果 position 带有负号（形如`${string:(-3):2}`），则抽取方向为反向。 |
-| `${string#substring}`              | 从变量$string的开头, 删除最短匹配$substring的子串                                                                             |
-| `${string##substring}`             | 从变量$string的开头, 删除最长匹配$substring的子串                                                                             |
-| `${string%substring}`              | 从变量$string的结尾, 删除最短匹配$substring的子串                                                                             |
-| `${string%%substring}`             | 从变量$string的结尾, 删除最长匹配$substring的子串                                                                             |
-| `${string/substring/replacement}`  | 使用$replacement, 来代替第一个匹配的$substring                                                                                |
-| `${string//substring/replacement}` | 使用$replacement, 代替所有匹配的$substring                                                                                    |
-| `${string/#substring/replacement}` | 如果$string的前缀匹配$substring, 那么就用$replacement来代替匹配到的$substring                                                 |
-| `${string/%substring/replacement}` | 如果$string的*后缀*匹配$substring, 那么就用$replacement来代替匹配到的$substring                                               |
+| `${#string}`                       | $string 的长度                                                                                                                      |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `${string:position}`               | 在`$string`中, 从位置`$position`开始提取子串                                                                                        |
+| `${string:position:length}`        | 在`$string`中, 从位置`$position`开始提取长度为`$length`的子串。如果 position 带有负号（形如`${string:(-3):2}`），则抽取方向为反向。 |
+| `${string#substring}`              | 从变量`$string`的开头, 删除最短匹配`$substring`的子串                                                                               |
+| `${string##substring}`             | 从变量`$string`的开头, 删除最长匹配`$substring`的子串                                                                               |
+| `${string%substring}`              | 从变量`$string`的结尾, 删除最短匹配`$substring`的子串                                                                               |
+| `${string%%substring}`             | 从变量`$string`的结尾, 删除最长匹配`$substring`的子串                                                                               |
+| `${string/substring/replacement}`  | 使用`$replacement`, 来代替第一个匹配的`$substring`                                                                                  |
+| `${string//substring/replacement}` | 使用`$replacement`, 代替所有匹配的`$substring`                                                                                      |
+| `${string/#substring/replacement}` | 如果`$string`的前缀匹配`$substring`, 那么就用`$replacement`来代替匹配到的`$substring`                                               |
+| `${string/%substring/replacement}` | 如果`$string`的`*`后缀`*`匹配`$substring`, 那么就用`$replacement`来代替匹配到的`$substring`                                         |
 
-备注：上表中所有的substring均为正则表达式。
+备注：上表中所有的`substring`均为正则表达式。
 
 下面有扼要示例：
 
