@@ -26,6 +26,12 @@ const withMDX = createMDX();
 const config = {
   reactStrictMode: true,
 
+  // time in seconds of no pages generating during static
+  // generation before timing out
+  staticPageGenerationTimeout: 6000,
+  // try to reduce the timing in building [invalid, only for next 14 and below]
+  // swcMinify: false,
+
   serverRuntimeConfig: {
     __PROJECT_ROOT: process.cwd(), // = '/vercel/path0' (= process.cwd())
     __filename: fileURLToPath(import.meta.url),
