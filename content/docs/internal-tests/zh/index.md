@@ -56,7 +56,7 @@ func buildRootCmd() (rootCmd *cmdr.RootCommand) {
 
 运行的效果是这样的：
 
-![image-20210920154132341](/cmdr/image-20210920154132341.png)
+![image-20210920154132341](/images/cmdr/image-20210920154132341.png)
 
 就是如此简单。
 

@@ -5,7 +5,7 @@ import { type ImgHTMLAttributes } from "react";
 import "./image-zoom.css";
 import Zoom, { type UncontrolledProps } from "react-medium-image-zoom";
 import { useEffect, useState } from "react";
-import spot from "@/public/spot.png";
+import spot from "@/public/images/spot.png";
 import {
   StaticImport,
   StaticRequire,
@@ -24,7 +24,7 @@ export interface SafeImageProps
 
 export const SafeImage = ({
   src, // Primary image source
-  fallbackSrc = "/spot.png", // Default fallback image
+  fallbackSrc = "/images/spot.png", // Default fallback image
   alt = "Image", // Default alt text
   width = spot.width,
   height = spot.height,

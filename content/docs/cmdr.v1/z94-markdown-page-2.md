@@ -136,8 +136,8 @@ Autoconverted link [https://github.com/nodeca/pica](https://github.com/nodeca/pi
 
 ## Images
 
-![Minion](/cmdr/minion.png)
-![Stormtroopocat](/cmdr/stormtroopocat.png) -- "The Stormtroopocat" --
+![Minion](/images/cmdr/minion.png)
+![Stormtroopocat](/images/cmdr/stormtroopocat.png) -- "The Stormtroopocat" --
 
 Like links, Images also have a footnote style syntax
 

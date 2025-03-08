@@ -93,7 +93,7 @@ $ HELP=1 app cmd1 cmd2 -a -bc
 
 [//]: # (![image-20200923093647372]&#40;/cmdr/EQXubFar3lJw8y5.png&#41;)
 
-![image-20201001205505876](/cmdr/tPyIJ6HjK9xRmbQ.png)
+![image-20201001205505876](/images/cmdr/tPyIJ6HjK9xRmbQ.png)
 
 ### 构建信息
 
@@ -103,7 +103,7 @@ $ HELP=1 app cmd1 cmd2 -a -bc
 
 [//]: # (![image-20200923094041802]&#40;/cmdr/nY8r9hpIPCBw25T.png&#41;)
 
-![image-20201001210250357](/cmdr/TXBnF1CLau2lIbN.png)
+![image-20201001210250357](/images/cmdr/TXBnF1CLau2lIbN.png)
 
 ### 版本信息
 
@@ -121,7 +121,7 @@ your_cmdr_app ver
 
 [//]: # (![image-20200923094011091]&#40;/cmdr/KRbUv6m9NyFxnlk.png&#41;)
 
-![image-20201001210402211](/cmdr/REGkj3QC9FVd4Ls.png)
+![image-20201001210402211](/images/cmdr/REGkj3QC9FVd4Ls.png)
 
 ### `SetCustomShowBuildInfo(fn func())`，`SetCustomShowVersion(fn func())`
 

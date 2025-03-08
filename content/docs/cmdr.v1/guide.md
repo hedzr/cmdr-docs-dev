@@ -85,7 +85,7 @@ excerpt: >-
   
     > 从 v1.7.21 起，主程序能够扫描扩展文件夹中的可执行的外部程序作为自己的 Extensions 子命令分组，从而允许动态扩展子命令集合、建立统一的 CLI 界面。
     >
-    > ![image-20200920174339255](/cmdr/bdvhoMjH6elENOT.png)
+    > ![image-20200920174339255](/images/cmdr/bdvhoMjH6elENOT.png)
     >
     > 可参考：[子命令 - Extentsions 子命令分组](./guide/r05-subcommand#extensions-子命令分组) 有关章节。
 
