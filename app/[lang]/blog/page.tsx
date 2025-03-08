@@ -1,15 +1,11 @@
 // import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 // import { Button } from "@/components/ui/button2";
 // // import { BlogMdxFrontmatter, getAllBlogs } from "@/lib/markdown";
-import {
-  formatDate2,
-  prodMode,
-  safeget,
-} from "@/lib/utils";
+import { formatDate2, prodMode, safeget } from "@/lib/utils";
 // import { ChevronRightIcon, CircleIcon } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
-import spot from "@/public/default.png";
+import spot from "@/public/images/spot.png";
 import Image, { type ImageProps } from "next/image";
 import { Suspense } from "react";
 import { Pagination, Search } from "@/components/blog/pager";
@@ -24,7 +20,8 @@ import { LoaderOutput, MetaData, Page } from "fumadocs-core/source";
 import { BaseCollectionEntry, MarkdownProps } from "fumadocs-mdx/config";
 import { objectOutputType, ZodTypeAny } from "zod";
 import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
-import { filterPostsByPage, getPosts } from "./util";
+import { filterPosts, extractPostsByPage, sortPages } from "./util";
+import { ImageZoom } from "fumadocs-ui/components/image-zoom";
 
 export const dynamic = "force-dynamic";
 
@@ -72,10 +69,10 @@ export default async function BlogIndexPage({
   // const ppp = pf(blog);
 
   const pages = [...blog.getPages(lang)];
-  const { posts, maxPage } = filterPostsByPage(
-    getPosts(pages, lang, query),
+  const { posts, maxPage } = extractPostsByPage(
+    filterPosts(sortPages(pages), lang, query),
     currentPage,
-    perPage
+    perPage,
   );
 
   const svg = `<svg viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'>
@@ -96,7 +93,11 @@ export default async function BlogIndexPage({
 
   let title: string = safeTitle(metadata);
 
-  console.log(`index - page: ${currentPage}, total: ${posts.length}`, sp, lang);
+  console.log(
+    `index - page: ${currentPage}, total: ${posts.length}.`,
+    sp,
+    lang,
+  );
   // console.log(blog.getLanguages());
 
   const bundle = (url: string, page: number): string => {
@@ -134,6 +135,10 @@ export default async function BlogIndexPage({
         <div>
           {posts.map((post) => {
             const draft = safeget(post.data, "draft", false);
+            const img = post.data.header?.teaser || spot.src; // safeget(post.data, "header", { teaser: "" }).teaser || spot
+            console.log(
+              `  list post ${post.data.date}: ${post.slugs}, teaser: ${img}`,
+            );
             return draft && prodMode ? (
               <></>
             ) : (
@@ -145,13 +150,10 @@ export default async function BlogIndexPage({
                   }`}
                 >
                   <div>
-                    <Image
+                    <ImageZoom
                       className="w-42 ml-2 float-right rounded-lg shadow-lg"
-                      src={
-                        safeget(post.data, "header", { teaser: "" }).teaser ||
-                        spot
-                      }
-                      alt={post.slugs.join(" ")}
+                      src={img}
+                      alt={post.slugs.join("/")}
                       width="200"
                       height="160"
                     />
