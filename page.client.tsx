@@ -279,11 +279,12 @@ export function FooterNoCache(props: {
 }
 
 export function BlogBackToListButton(_props: { lang: string }): ReactNode {
-  let sp: ReadonlyURLSearchParams & { page?: number; perpage?: number };
-  sp = useSearchParams() as typeof sp;
+  const v = useSearchParams();
+  const page = v.get("page");
+  console.log(`BlogBackToListButton: v: ${v}, page: ${page}`);
   return (
     <Link
-      href={`/blog?page=${sp?.page || ""}`}
+      href={`/blog?page=${page}`}
       className={buttonVariants1({ size: "sm", variant: "secondary" })}
     >
       <span className="back">Back to list</span>
@@ -305,23 +306,26 @@ export function BlogTagButton(props: { lang: string; tag: string }): ReactNode {
 }
 
 export function getPageNumber(): { currentPage: number; perPage: number } {
-  let sp: ReadonlyURLSearchParams & {
-    page?: number | string;
-    perpage?: number | string;
-  };
-  sp = useSearchParams() as typeof sp;
+  // let sp: ReadonlyURLSearchParams & {
+  //   page?: number | string;
+  //   perpage?: number | string;
+  // };
+  // sp = useSearchParams() as typeof sp;
+  const v = useSearchParams();
+  const page = v.get("page");
+  const perpage = v.get("perpage");
 
   const currentPage =
-    typeof sp?.page === "string"
-      ? Number(sp?.page)
-      : Array.isArray(sp?.page)
-        ? Number(sp?.page[0])
+    typeof page === "string"
+      ? Number(page)
+      : Array.isArray(page)
+        ? Number(page[0])
         : 1;
   const perPage =
-    typeof sp?.perpage === "string"
-      ? Number(sp?.perpage)
-      : Array.isArray(sp?.perpage)
-        ? Number(sp?.perpage[0])
+    typeof perpage === "string"
+      ? Number(perpage)
+      : Array.isArray(perpage)
+        ? Number(perpage[0])
         : 7;
   return { currentPage: currentPage, perPage: perPage };
 }
