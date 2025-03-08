@@ -36,7 +36,7 @@ import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
 import { Rate } from "@/components/rate";
 
 const get = (fm: any, v: string) => {
-    return v in fm ? fm[v] : "";
+  return v in fm ? fm[v] : "";
 };
 
 export default async function Page(props: {
@@ -50,12 +50,16 @@ export default async function Page(props: {
   // page.data.tags
   const MDX = page.data.body;
   const toc = page.data.toc;
-  const lastModified = page.data.lastModified || get(page.data,'last_modified_at');
+  const lastModified =
+    page.data.lastModified || get(page.data, "last_modified_at");
 
   // const path = `apps/docs/content/docs/${page.file.path}`;
   const path = `content/docs/${page.file.path}`;
   // const preview = page.data.preview;
   // const { body: MDX, toc, lastModified } = await page.data.load();
+
+  if (!prodMode)
+    console.log(`--- docs page ${params.lang} / ${params.slug} ---`);
 
   return (
     <DocsPage
@@ -133,18 +137,21 @@ export default async function Page(props: {
         />
         {/*{page.data.index ? <DocsCategory page={page} from={source} /> : null}*/}
       </DocsBody>
-      {prodMode?
-      <Rate
-        onRateAction={async (url, feedback) => {
-          "use server";
-        }}
-        // onRateAction={async (url, feedback) => {
-        //   "use server";
-        //   // const posthog = usePostHog();
-        //   posthog.capture("rate_docs", feedback);
-        //   // see also: https://us.posthog.com/project/130354/onboarding/web_analytics?step=install
-        // }}
-      />:<></>}
+      {prodMode ? (
+        <Rate
+          onRateAction={async (url, feedback) => {
+            "use server";
+          }}
+          // onRateAction={async (url, feedback) => {
+          //   "use server";
+          //   // const posthog = usePostHog();
+          //   posthog.capture("rate_docs", feedback);
+          //   // see also: https://us.posthog.com/project/130354/onboarding/web_analytics?step=install
+          // }}
+        />
+      ) : (
+        <></>
+      )}
       <HandlingKeyboardLeftAndRight />
     </DocsPage>
   );
