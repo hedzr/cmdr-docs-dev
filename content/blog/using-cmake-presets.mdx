@@ -9,8 +9,8 @@ categories: c++ algorithm
 comments: true
 toc: true
 header:
-  teaser: https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/Screenshot%202024-01-04%20at%2012.40.01.png
-  overlay_image: /assets/images/3953273590_704e3899d5_m.jpg
+  teaser: /images/blog/2024-01-05-using-cmake-presets/Screenshot-2024-01-04-at-12.40.01.png
+  overlay_image: /images/3953273590_704e3899d5_m.jpg
   overlay_filter: rgba(16, 16, 32, 0.73)
 excerpt: >-
   关于 CMakePresets.json 文件的编写方法 ...
@@ -372,7 +372,7 @@ cmake --build --preset <preset-name> --target package
 
 这里 NDEBUG 是源自 MSVC 传统定义，但分配了一个数值，以便有时候能够编写这样的 C++ 代码：
 
-```c++
+```cpp
 #if NDEBUG
 #else
 #endif
@@ -380,7 +380,7 @@ cmake --build --preset <preset-name> --target package
 
 而不是：
 
-```c++
+```cpp
 #ifdef NDEBUG
 #else
 #endif
@@ -392,7 +392,7 @@ cmake --build --preset <preset-name> --target package
 
 事实上，一个完整的跨平台的 C++ 类库可能会有类似于下面的代码来容错：
 
-```c++
+```cpp
 #if defined(NDEBUG)
 #define _NDEBUG 1
 #else
@@ -418,11 +418,11 @@ cmake --build --preset <preset-name> --target package
 
 你还可以继续添加 RelWithDebug，RelMinSize presets。这样的一套最简单的 presets，实际上就是 vscode cmake-tools 自动为你准备的默认 presets。如下图所示，一个 cmake c++ 项目在 vscode 中可以选择当前活动的配置集，此时就会弹出选择框自动向你提供 4 个标准的 presets：
 
-![image-20240104174106037](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/image-20240104174106037.png)
+![image-20240104174106037](/images/blog/2024-01-05-using-cmake-presets/image-20240104174106037.png)
 
 和
 
-![image-20240104174132645](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/image-20240104174132645.png)
+![image-20240104174132645](/images/blog/2024-01-05-using-cmake-presets/image-20240104174132645.png)
 
 我们写这么一个 “Default” 的预设集 json 文件：
 
@@ -608,11 +608,11 @@ cmake --build --preset <preset-name> --target package
 
 如例所示，我们继续定义了 use-clang, use-gcc 两个子集，然后定义了 linux-clang-debug 这个真正的配置项目，它的 inherits section 中引用了 use-clang 和 debug-build 这两个子集，这就形成了两级维度的风味矩阵。所以当我们在 vscode 中点击状态栏中的 No Configure Preset Selected （如下图）
 
-![Screenshot 2024-01-04 at 12.37.45](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/Screenshot%202024-01-04%20at%2012.37.45.png)
+![Screenshot 2024-01-04 at 12.37.45](/images/blog/2024-01-05-using-cmake-presets/Screenshot%202024-01-04%20at%2012.37.45.png)
 
 时，弹出的列表会是这样：
 
-![Screenshot 2024-01-04 at 12.40.01](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/Screenshot%202024-01-04%20at%2012.40.01.png)
+![Screenshot 2024-01-04 at 12.40.01](/images/blog/2024-01-05-using-cmake-presets/Screenshot%202024-01-04%20at%2012.40.01.png)
 
 你能看到 linux clang debug 出现在列表中。
 

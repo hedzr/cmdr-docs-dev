@@ -9,8 +9,8 @@ categories: golang nolock
 comments: true
 toc: true
 header:
-  teaser: https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/image-20231026110402900.png
-  overlay_image: /assets/images/unsplash-image-3.jpg
+  teaser: /images/blog/image-20231026110402900.png
+  overlay_image: /images/unsplash-image-3.jpg
   overlay_filter: rgba(128, 128, 0, 0.3)
 excerpt: >-
   还有一些关于加锁和避免、减轻锁定强度的思路 ...
@@ -183,7 +183,7 @@ func (s *streamBufS) clone() *streamBufS {
 
 在 C++ 中使用 swap 模式的例子可以更清晰：
 
-```c++
+```cpp
 void append(T&& el, std::function<bool precond(T&&)> cb) {
   std::list<T> cache;
   {

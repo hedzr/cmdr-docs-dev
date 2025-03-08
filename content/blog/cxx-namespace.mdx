@@ -9,8 +9,8 @@ categories: c++ namespace
 comments: true
 toc: true
 header:
-  teaser: https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/assets/images/foo-bar-identity-th.jpg
-  overlay_image: /assets/images/foo-bar-identity-th.jpg
+  teaser: /images/foo-bar-identity-th.jpg
+  overlay_image: /images/foo-bar-identity-th.jpg
   overlay_filter: rgba(16, 16, 32, 0.73)
 excerpt: >-
   回顾 C++ 中的命名空间（namespace） ...
@@ -40,7 +40,7 @@ excerpt: >-
 
 示例：
 
-```c++
+```cpp
 namespace A {
     auto a1 = 1.0f;
     namespace B {
@@ -100,7 +100,7 @@ A::a1: 1
 
 精确的辨析可以参考 [cppref](https://en.cppreference.com/w/cpp/language/namespace)。但多数情况下凭藉直觉你应可无误书写。
 
-```c++
+```cpp
 namespace Q
 {
     namespace V   // V 是 Q 的成员，且完全在 Q 内定义
@@ -147,7 +147,7 @@ namespace Q
 
 和 static 全局变量不同的是，匿名 namespace 中的符号并不处于本文件的全局符号表中。但相同则在于，两种变量都不在其他文件中可见。
 
-```c++
+```cpp
 namespace
 {
     int i; // 定义 ::(独有)::i
@@ -191,7 +191,7 @@ C++11起支持内联的命名空间。
 
 下面的示例代表着一种典型的用法：
 
-```c++
+```cpp
 namespace Contoso
 {
   namespace v_10
@@ -228,7 +228,7 @@ namespace Contoso
 
 在 C++17 之后，嵌套 namespaces 可以写作 `namespace A::B {...}`，但此时就无法解决内联 namespace 的书写问题。不过这个问题最终在 C++20 之后有了方案，可以写作：
 
-```c++
+```cpp
 namespace Contoso::inline v_20
 {
     template <typename T>
@@ -251,7 +251,7 @@ STD 标准库中也广泛地应用了内联 namespace 来支持版本迭代或�
 
 最典型的例子是 std::string_literals
 
-```c++
+```cpp
 // C++14 中，std::literals 和它的成员命名空间是内联的
 {
     using namespace std::string_literals; // 令来自 std::literals::string_literals
@@ -280,7 +280,7 @@ using 声明引入在别处定义的名称到此 using 声明出现的声明性�
 
 它同时兼具将彼处的一组名称融合到当前作用域的能力，这一能力有时帮助程序员简化代码编写，有时则难免会污染当前作用域。
 
-```c++
+```cpp
 void f();
 
 namespace A
@@ -304,7 +304,7 @@ void h()
 
 避免名字污染的方法有几种。其一是不要 using namespace，这当然是斩草除根的态度。不过还可以使用别名定义的方式来防止污染，例如
 
-```c++
+```cpp
 #include <iostream>
 
 namespace foo {
@@ -343,7 +343,7 @@ int main()
 
 有时候这个行为是一种必须品，例如在处理 hash value 时。
 
-```c++
+```cpp
 #include <iostream>
 #include <iomanip>
 #include <functional>

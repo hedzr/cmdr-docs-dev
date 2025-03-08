@@ -9,8 +9,8 @@ categories: c++ algorithm
 comments: true
 toc: true
 header:
-  teaser: https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210901010943203.png
-  overlay_image: /assets/images/3953273590_704e3899d5_m.jpg
+  teaser: /images/blog/2021-08-31-cxx-enum-class/image-20210901010943203.png
+  overlay_image: /images/3953273590_704e3899d5_m.jpg
   overlay_filter: rgba(16, 16, 32, 0.73)
 excerpt: >-
   C++ 中的枚举类型应用以及转换到字符串的增强：AWESOME_MAKE_ENUM，...
@@ -22,13 +22,13 @@ excerpt: >-
 
 ## 枚举类型
 
-![image-20210901010943203](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210901010943203.png)
+![image-20210901010943203](/images/blog/2021-08-31-cxx-enum-class/image-20210901010943203.png)
 
 ### enum
 
 在 cxx11 之前，C/C++ 通过 enum 关键字声明枚举量。
 
-```c++
+```cpp
 // 匿名全局枚举量
 enum {
   DOG,
@@ -52,7 +52,7 @@ enum 名字 : 类型 ;
 
 所以在必要时可以：
 
-```c++
+```cpp
 enum smallenum: std::int16_t {
     a,
     b,
@@ -66,7 +66,7 @@ enum smallenum: std::int16_t {
 
 从 cxx11 起，我们被推荐放弃 enum 改用有作用域的 enum class，也或者 enum struct。这时候声明枚举类型的方式如下：
 
-```c++
+```cpp
 enum class Animal {
   DOG,
   CAT = 100,
@@ -76,7 +76,7 @@ enum class Animal {
 
 同样也支持 `:类型` 的类型限定，同样地，没什么用处。
 
-```c++
+```cpp
 // altitude 可以是 altitude::high 或 altitude::low
 enum class altitude: char
 {
@@ -91,7 +91,7 @@ enum class 与 enum 的不同之处在于作用域受限以及强类型限定。
 
 作用域受限主要体现在 class/struct 中的 enum class 被其外围所限定。下面的例子可以简单地说明：
 
-```c++
+```cpp
 enum class fruit { orange, apple };
 struct S {
   using enum fruit; // OK ：引入 orange 与 apple 到 S 中
@@ -116,7 +116,7 @@ void f() {
 
 由于枚举类型现在是强类型了，所以标准库也有专用的 type check 对其进行检测：
 
-```c++
+```cpp
 #include <iostream>
 #include <type_traits>
 
@@ -143,7 +143,7 @@ false
 
 并且可以用 std::underlying_type 或 std::underlying_type_t 来抽出相应的底层类型。示例如下：
 
-```c++
+```cpp
 #include <iostream>
 #include <type_traits>
 
@@ -185,7 +185,7 @@ underlying type for 'e4' is int
 
 `using enum Xxx` 能够削减枚举类的名字空间：
 
-```c++
+```cpp
 void foo(Color c)
   using enum Color;
   switch (c) {
@@ -199,7 +199,7 @@ void foo(Color c)
 
 然而对于早期（cxx11..cxx17）的代码来说，你必须使用全限定名：
 
-```c++
+```cpp
 void foo(Color c)
   switch (c) {
     case Color::Red: ...;
@@ -232,7 +232,7 @@ void foo(Color c)
 
 简单的手撸可以这样：
 
-```c++
+```cpp
 #include <iostream>
 #include <string>
 #include <chrono>
@@ -266,7 +266,7 @@ int main(){
 
 如果你不想集成 magic_enum 那么全面的能力，而是仅仅只需要一个简单的字面量映射的话，我们在 [hicc-cxx](https://github.com/hedzr/hicc)/[cmdr-cxx](https://github.com/hedzr.cmdr-cxx) 中提供了一个宏 AWESOME_MAKE_ENUM（基于 [Debdatta Basu](https://stackoverflow.com/users/1078703/debdatta-basu) 提供的版本），用它的话你可以以很少量的代价获得枚举量的字面量表示。
 
-```c++
+```cpp
 #include <cmdr/cmdr_defs.hh>
 
 /* enum class Week {
@@ -301,7 +301,7 @@ std::cout << Animal::CAT << '\n';
 
 `AWESOME_MAKE_ENUM` 的实现是这样的：
 
-```c++
+```cpp
 #define AWESOME_MAKE_ENUM(name, ...)                                \
     enum class name { __VA_ARGS__,                                  \
                       __COUNT };                                    \

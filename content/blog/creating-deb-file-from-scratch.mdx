@@ -9,9 +9,9 @@ categories: packaging deb
 comments: true
 toc: true
 header:
-  teaser: https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20211206190604891.png
-  teaser1: https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/assets/images/unsplash-gallery-image-1-th.jpg
-  overlay_image: /assets/images/unsplash-gallery-image-1-th.jpg
+  teaser: /images/blog/2021-12-17-creating-deb-file-from-scratch/image-20211206190604891.png
+  teaser1: /blog/2021-12-17-creating-deb-file-from-scratch/unsplash-gallery-image-1-th.jpg
+  overlay_image: /images/unsplash-gallery-image-1-th.jpg
   overlay_filter: rgba(16, 16, 32, 0.73)
 excerpt: >-
   为 go-faker 命令行工具制作 deb 分发包 ...
@@ -400,7 +400,7 @@ dpkg -i package.deb
 
 这个过程图示如下：
 
-![image-20211206190604891](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20211206190604891.png)
+![image-20211206190604891](/images/blog/2021-12-17-creating-deb-file-from-scratch/image-20211206190604891.png)
 
 对于官方仓库而言，安装是通过 apt install 来进行的，本质不变。
 
@@ -414,7 +414,7 @@ dpkg -r <package-name>
 
 其流程如下：
 
-![image-20211206192724861](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20211206192724861.png)
+![image-20211206192724861](/images/blog/2021-12-17-creating-deb-file-from-scratch/image-20211206192724861.png)
 
 也可以通过 apt remove 的方式来卸载。
 
@@ -428,7 +428,7 @@ dpkg -P <package-name>
 
 其流程如下：
 
-![image-20211206193314629](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20211206193314629.png)
+![image-20211206193314629](/images/blog/2021-12-17-creating-deb-file-from-scratch/image-20211206193314629.png)
 
 也可以通过 apt purge 来达到目的。
 

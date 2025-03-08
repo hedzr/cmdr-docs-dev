@@ -9,9 +9,9 @@ categories: tech nology
 comments: true
 toc: true
 header:
-  teaser: https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/image-20230127065101719.png
-  teaser1: https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/assets/images/unsplash-gallery-image-1-th.jpg
-  overlay_image: /assets/images/unsplash-gallery-image-1-th.jpg
+  teaser: /images/blog/2023-01-27-github-actions-resource-not-accesible-by-integration/image-20230127065101719.png
+  teaser1: /blog/2023-01-27-github-actions-resource-not-accesible-by-integration/unsplash-gallery-image-1-th.jpg
+  overlay_image: /images/unsplash-gallery-image-1-th.jpg
   overlay_filter: rgba(16, 16, 32, 0.73)
 excerpt: >-
   老家伙，新问题...
@@ -21,11 +21,11 @@ excerpt: >-
 
 这次问题很简单，就是在昨天发版时 Github Action 出错，说是“Error: Resource not accessible by integration”
 
-![image-20230127065101719](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/image-20230127065101719.png)
+![image-20230127065101719](/images/blog/2023-01-27-github-actions-resource-not-accesible-by-integration/image-20230127065101719.png)
 
 这个提示模模糊糊的，本来我应该意识到点什么的，但是我 rerun failed jobs 后得到了不同的错误：
 
-![image-20230127065024455](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/image-20230127065024455.png)
+![image-20230127065024455](/images/blog/2023-01-27-github-actions-resource-not-accesible-by-integration/image-20230127065024455.png)
 
 说什么“reason: socket hang up”。
 
@@ -53,7 +53,7 @@ excerpt: >-
 
 对此，在 Repository Settings 的 Actions/General 中有相关的控制项，当我授权了 Read/Write 之后，不能发版的问题也就解决了。授权可读写的状态如下：
 
-![Screenshot 2023-01-27 at 06.45.54](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/Screenshot 2023-01-27 at 06.45.54.png)
+![Screenshot 2023-01-27 at 06.45.54](/images/blog/2023-01-27-github-actions-resource-not-accesible-by-integration/Screenshot 2023-01-27 at 06.45.54.png)
 
 我并没有搞什么花哨的玩意，在 [hedzr/progressbar](https://github.com/hedzr/progressbar) 的 Workflow 里面我和以前一样，规规矩矩地 coverage，build-release 然后 upload assets to release，没想到就这么死了一会。
 
@@ -78,7 +78,7 @@ excerpt: >-
 
 在我的旧项目里是这样子的：
 
-![image-20230127071920515](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/image-20230127071920515.png)
+![image-20230127071920515](/images/blog/2023-01-27-github-actions-resource-not-accesible-by-integration/image-20230127071920515.png)
 
 我发誓这不是我做的。
 

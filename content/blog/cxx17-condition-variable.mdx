@@ -20,8 +20,8 @@ categories: c++ algorithm
 comments: true
 toc: true
 header:
-  teaser: https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/timeline.png
-  overlay_image: /assets/images/unsplash-image-3.jpg
+  teaser: /images/blog/2021-07-22-cxx17-condition-variable/timeline.png
+  overlay_image: /images/unsplash-image-3.jpg
   overlay_filter: rgba(16, 16, 32, 0.73)
 excerpt: >-
   条件变量及其理解和改进。顺便讲了一些拉拉杂杂的，有点失控了...
@@ -47,9 +47,9 @@ excerpt: >-
 
 ## 条件变量
 
-![timeline](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/timeline.png)
+![timeline](/images/blog/2021-07-22-cxx17-condition-variable/timeline.png)
 
-> FROM: https://www.modernescpp.com/images/blog/Cpp17/Overview/timeline.png
+> FROM: /blog/2021-07-22-cxx17-condition-variable/timeline.png
 
 **条件变量**（condition variable）的存在目的是“被唤醒”。
 
@@ -63,7 +63,7 @@ excerpt: >-
 
 假设我们需要 100 个线程，并且我们想要知道这些线程都已经就绪了，这一点可以通过 condition_variable 来实现：
 
-```c++
+```cpp
 std::condition_variable cv100;
 std::mutex cv100_m;
 int count{0};
@@ -117,7 +117,7 @@ void test_cv_0() {
 
 而稍稍调整其用法，只有 m 个线程在反复不断地投食，n 个线程都使用等待语句在睡着：
 
-```c++
+```cpp
 std::condition_variable cvpc;
 std::mutex cvpc_m;
 std::deque<int> cvpc_queue;
@@ -170,7 +170,7 @@ void test_cv_1() {
 
 这是简易的示范，它忽略了提取数据时的严谨性，为了避免可能的竞争条件，你可能需要改进这两行代码的写法：
 
-```c++
+```cpp
         auto vv = cvpc_queue.front(); // 不那么费力地
         cvpc_queue.pop_front();       // 简化这两句
 ```
@@ -187,7 +187,7 @@ void test_cv_1() {
 
 所以我们可以这样做一点点封装：
 
-```c++
+```cpp
 namespace hicc::pool {
   template<typename Pred = std::function<bool()>, typename Setter = std::function<void()>>
   class conditional_wait {
@@ -231,7 +231,7 @@ namespace hicc::pool {
 
 这个包装类对条件变量的使用做了一些抽象和封装。但它还只是一个基础类，我们提供了两个进一步的封装，除了能演示 `conditional_wait` 的用法之外，也提供更简明的编码能力：
 
-```c++
+```cpp
 namespace hicc::pool {
   class conditional_wait_for_bool : public conditional_wait<> {
     bool var;
@@ -277,7 +277,7 @@ namespace hicc::pool {
 
 #### 示例
 
-```c++
+```cpp
 void test_cv() {
   {
     hicc::pool::conditional_wait_for_bool cv;
@@ -349,7 +349,7 @@ void test_cv() {
 
 这么做有何用处？你的类将能够被用来 `std::condition_variable_any` 中，或者其他要求 `BasicLockable` 的场所，例如` std::lock_guard`：
 
-```c++
+```cpp
 class L {
 public:
     L() {}

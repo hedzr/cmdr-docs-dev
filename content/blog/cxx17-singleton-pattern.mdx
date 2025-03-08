@@ -10,8 +10,8 @@ categories: c++ algorithm
 comments: true
 toc: true
 header:
-  teaser: https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210902103740865.png
-  overlay_image: /assets/images/3953273590_704e3899d5_m.jpg
+  teaser: /images/blog/image-20210902103740865.png
+  overlay_image: /images/3953273590_704e3899d5_m.jpg
   overlay_filter: rgba(16, 16, 32, 0.73)
 excerpt: >-
   回顾单件模式的各种可能的实现，尝试建立其 C++17 中的可能的最优解，...
@@ -41,7 +41,7 @@ Singleton 模式是 [Creational Patterns](https://en.wikipedia.org/wiki/Creation
 
 所以下面会介绍 C++11（包括 C++0x）以来的若干能够实际运用的 Singleton 实现方案，但略过了更早期的实现手法，以及略过了那些顾头不顾尾的示例性实现。嗯，其中一个是这样的：
 
-```c++
+```cpp
 class singleton {
   static singleton* _ptr;
   singleton() {}
@@ -66,7 +66,7 @@ class singleton {
 
 Scott Meyers 是 Effective C++系列的作者，他最早提供了简洁版本的 Singletion 模型：
 
-```c++
+```cpp
 static Singleton& instance() {
   static Singleton instance;
   return instance;
@@ -83,7 +83,7 @@ Singleton 模式已经流传了多年，有很多不同目的的实现方法，�
 
 编译器对函数中的静态变量采用了符合 [C++11 Initialization](https://en.cppreference.com/w/cpp/language/initialization#Dynamic_initialization) 特性的初始化和析构绑定，以确保该静态变量将能够在满足 thread-safe 的前提下唯一地被构造和析构。关于确保静态变量初始化和析构的线程安全被细分为多种类型，C++11 保证来有序性，而 C++17 起又支持 _Partially-ordered dynamic initialization_ 。当然这么细节的技术规范不必去抠了，就上面的 `instance()` 中的 instance 变量来说，实际上编译器为此会引入一个隐藏变量来帮助识别初始化与否：
 
-```c++
+```cpp
 static bool __guard = false;
 static char __storage[sizeof(Singleton)]; // also align it
 
@@ -140,7 +140,7 @@ singleton_t::instance():            # @singleton_t::instance()
 
 一个完整的、采用 C++11 的 Mayers' Singleton Pattern 实现是这样的：
 
-```c++
+```cpp
 #include <stdio.h>
 
 struct singleton_t {
@@ -189,7 +189,7 @@ lazyinit 有什么用呢？
 
 在 [hicc-cxx](https://link.juejin.cn/?target=https%3A%2F%2Fgithub.com%2Fhedzr%2Fhicc)/[cmdr-cxx](https://link.juejin.cn/?target=https%3A%2F%2Fgithub.com%2Fhedzr.cmdr-cxx) 中，我们提供了模板化的 `singleton<T>`，它对于省却代码有很好的帮助，也能支持线程安全的 lazyinit：
 
-```c++
+```cpp
 namespace hicc::util {
 
   template<typename T>
@@ -218,7 +218,7 @@ namespace hicc::util {
 
 这个模板类的使用一般来说必须采用派生类的方式，但需要特别的构造函数：
 
-```c++
+```cpp
 #include <hicc/hz-common.hh>
 // #include <cmdr11/cmdr_common.hh>
 
@@ -239,7 +239,7 @@ int main() {
 
 如果你的类需要构造参数，问题就稍微复杂一点，可以使用我们的 `singleton_with_optional_construction_args`，它也是 C++11 起能被直接支持的，无需 hack：
 
-```c++
+```cpp
 namespace hicc::util {
 
   template<typename C, typename... Args>
@@ -268,7 +268,7 @@ namespace hicc::util {
 
 使用方法大概像这样：
 
-```c++
+```cpp
 void test_singleton_with_optional_construction_args() {
   int &i = singleton_with_optional_construction_args<int, int>::instance(1);
   UTEST_CHECK(i == 1);

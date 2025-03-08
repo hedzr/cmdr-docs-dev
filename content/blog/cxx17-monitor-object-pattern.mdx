@@ -9,8 +9,8 @@ categories: c++ algorithm
 comments: true
 toc: true
 header:
-  teaser: https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/image-20230811092120144.png
-  overlay_image: /assets/images/3953273590_704e3899d5_m.jpg
+  teaser: /images/blog/2023-07-30-cxx17-monitor-object-pattern/image-20230811092120144.png
+  overlay_image: /images/3953273590_704e3899d5_m.jpg
   overlay_filter: rgba(16, 16, 32, 0.73)
 excerpt: >-
   以 C++17 方式实现监视器对象模式，同时讨论管程模型，也讨论 Java synchronized 关键字 ...
@@ -42,7 +42,7 @@ Monitor Object 能够保证在对象内部任意时刻只能运行一个方法�
 
 用图示来看它：
 
-![image-20230811092120144](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/image-20230811092120144.png)
+![image-20230811092120144](/images/blog/2023-07-30-cxx17-monitor-object-pattern/image-20230811092120144.png)
 
 ### 在 Java 中认识管程
 
@@ -104,7 +104,7 @@ synchronized 可以被视作为 object.lock. unlock, wait, notify 的包装后�
 
 下面是一个轻量级的仿 Java synchronized 能力的 C++ 实现，需要你提供 C++11 编译器：
 
-```c++
+```cpp
 #include <iomanip>
 #include <iostream>
 

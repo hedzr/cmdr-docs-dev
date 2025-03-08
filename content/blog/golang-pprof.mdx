@@ -9,8 +9,8 @@ categories: golang profiling
 comments: true
 toc: true
 header:
-  teaser: https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/assets/images/unsplash-image-11.jpg
-  overlay_image: /assets/images/unsplash-image-11.jpg
+  teaser: /images/unsplash-image-11.jpg
+  overlay_image: /images/unsplash-image-11.jpg
   overlay_filter: rgba(128, 128, 0, 0.3)
 excerpt: >-
   Golang 应用程序性能分析工具 pprof...
@@ -347,7 +347,7 @@ func buildRootCmd() (rootCmd *cmdr.RootCommand) {
 
 你可以如 Line 17 那样简单地集成 pprof 附加包，也可以像 Line 35 那样将其明确地附着在 root 上。它会为你提供一组命令行参数，如 `-ep` 等等：
 
-![image-20210414222955841](https://i.loli.net/2021/04/14/b749ZA5hKi6csnI.png)
+![image-20210414222955841](/images/blog/golang-pprof/b749ZA5hKi6csnI.png)
 
 对于这样的应用程序，可以简单地启用 profiling 和 pprof：
 
@@ -423,25 +423,25 @@ go tool pprof 'http://localhost:6060/debug/pprof/profile?seconds=30'
 
 显示调用结构的文字版本。
 
-![image-20210415021531303](https://i.loli.net/2021/04/15/r4W2tFUlQZ5icDR.png)
+![image-20210415021531303](/images/blog/golang-pprof/r4W2tFUlQZ5icDR.png)
 
 #### top
 
 显示耗时前几名。可以加上数字，例如 top5, top10，还可以附加参数 -cum 按照 cumulative 累积时间排序，这个参数常常很有用地帮助你展示出调用序列。
 
-![image-20210415021817794](https://i.loli.net/2021/04/15/weuFt2k9ZROVvzT.png)
+![image-20210415021817794](/images/blog/golang-pprof/weuFt2k9ZROVvzT.png)
 
 #### list
 
 List 命令显示指定的包中指定的函数的性能数据。
 
-![image-20210415022023243](https://i.loli.net/2021/04/15/GBIzK3lOyiUDjJ7.png)
+![image-20210415022023243](/images/blog/golang-pprof/GBIzK3lOyiUDjJ7.png)
 
 #### peek
 
 peek 命令和 list 相似，但你可以在这里指定一个模糊的关键字，例如：
 
-![image-20210415022218364](https://i.loli.net/2021/04/15/qZC2yvxsQ6FmgMp.png)
+![image-20210415022218364](/images/blog/golang-pprof/qZC2yvxsQ6FmgMp.png)
 
 ### 通过浏览器查看
 
@@ -449,7 +449,7 @@ peek 命令和 list 相似，但你可以在这里指定一个模糊的关键字
 
 #### top view
 
-![image-20210415000501248](https://i.loli.net/2021/04/15/TLdqtUcYZ35HzRP.png)
+![image-20210415000501248](/images/blog/golang-pprof/TLdqtUcYZ35HzRP.png)
 
 此视图较为简单，但由于 go 核心调用以及系统调用的比重较大，所以你需要耐心排除它们，然后才能找到业务逻辑的 topN。
 
@@ -457,25 +457,25 @@ peek 命令和 list 相似，但你可以在这里指定一个模糊的关键字
 
 #### Grpah 视图
 
-![image-20210415001357460](https://i.loli.net/2021/04/15/TMs1FCALmceNtDO.png)
+![image-20210415001357460](/images/blog/golang-pprof/TMs1FCALmceNtDO.png)
 
 Grpah 视图是按照 app 执行顺序排列的，几乎等价于流程图。此视图中字体越大代表着耗时越多。
 
 #### Flame Graph 视图
 
-![image-20210415001600437](https://i.loli.net/2021/04/15/ROW4DLPMlfxShpF.png)
+![image-20210415001600437](/images/blog/golang-pprof/ROW4DLPMlfxShpF.png)
 
 火焰图也是按照执行顺序从上向下排列的，其中一个函数的宽度占比代表了其耗时比例，越宽则耗时越多，所以简单看的话能看清函数签名的就是耗时多的。但是由于程序结构（例如goroutine，timerproc 等）的多样性，这样的简单判断并不确切。在大型程序中你需要仔细地排除杂音，正确地 REFINE 之后才能得到有价值的性能判定。
 
 #### Peek 视图
 
-![image-20210415002024537](https://i.loli.net/2021/04/15/lYhMaecoGrUJABp.png)
+![image-20210415002024537](/images/blog/golang-pprof/lYhMaecoGrUJABp.png)
 
 Peek 视图以文字表格的形式列出耗时统计表，你可以对其做筛选。
 
 #### Source View
 
-![image-20210415020146486](https://i.loli.net/2021/04/15/HBkw7AFLltxqeYT.png)
+![image-20210415020146486](/images/blog/golang-pprof/HBkw7AFLltxqeYT.png)
 
 Source view 可以列出函数调用的源代码。为了让此视图正确显示，你需要使用 go tool pprof 版本，命令行的 pprof 版本有可能不能呈现源码。此外，在加载视图时必须添加你的 app 的可执行文件：
 
@@ -485,7 +485,7 @@ go tool pprof -http :6060 bin/mdx-cli ref/cpu.prof
 
 #### Disassemble View
 
-![image-20210415020615493](https://i.loli.net/2021/04/15/418MLnd9ypej5Dr.png)
+![image-20210415020615493](/images/blog/golang-pprof/418MLnd9ypej5Dr.png)
 
 和 Source view 差不多，只不过显示的是汇编代码。
 

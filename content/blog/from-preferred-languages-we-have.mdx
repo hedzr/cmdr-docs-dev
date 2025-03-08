@@ -9,9 +9,9 @@ categories: tech nology
 comments: true
 toc: true
 header:
-  teaser: https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/Picsee/image-20221020223129469.png
-  teaser1: https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/assets/images/unsplash-gallery-image-1-th.jpg
-  overlay_image: /assets/images/unsplash-gallery-image-1-th.jpg
+  teaser: /images/blog/2022-09-29-from-preferref-languages-we-have/image-20221020223129469.png
+  teaser1: /blog/2022-09-29-from-preferref-languages-we-have/unsplash-gallery-image-1-th.jpg
+  overlay_image: /images/unsplash-gallery-image-1-th.jpg
   overlay_filter: rgba(16, 16, 32, 0.73)
 excerpt: >-
   短板就是不专业 ...
@@ -47,13 +47,13 @@ excerpt: >-
 
 浏览器都可以设定一个叫做“preferred languages”的选项，它可能是这样的
 
-![image-20221020223129469](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/Picsee/image-20221020223129469.png)
+![image-20221020223129469](/images/blog/2022-09-29-from-preferref-languages-we-have/image-20221020223129469.png)
 
 如果你从未修改过浏览器的这个设定，那么它总是因应于你的操作系统的“时区与语言”设定。
 
 这个设定，将会通过 HTTP 协议随附在每次 HTTP 请求中，以“accept-language”字段的方式：
 
-![image-20221020225359673](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/Picsee/image-20221020225359673.png)
+![image-20221020225359673](/images/blog/2022-09-29-from-preferref-languages-we-have/image-20221020225359673.png)
 
 一个合格的前端 webapp 框架，一定已经正确解释了这个字段并且自动将其与自己的框架相整合，例如 react-js 的文档中有相关的国际化章节。
 

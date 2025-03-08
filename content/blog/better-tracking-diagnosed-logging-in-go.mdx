@@ -9,8 +9,8 @@ categories: golang logging
 comments: true
 toc: true
 header:
-  teaser: https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/image-20220409105705674.png
-  overlay_image: /assets/images/unsplash-image-3.jpg
+  teaser: /images/blog/2022-04-09-better-tracking-diagnosed-logging-in-go/image-20220409105705674.png
+  overlay_image: /images/unsplash-image-3.jpg
   overlay_filter: rgba(128, 128, 0, 0.3)
 excerpt: >-
   埋点日志，与库作者谈研发 ...
@@ -129,7 +129,7 @@ func VDebugf(msg string, args ...interface{}) {
 
 所以我在 [hedzr/log](https://github.com/hedzr/log) 中内置了这一基础特性，并在 [hedzr/evendeep](https://github.com/hedzr/evendeep) 中正式采用这一方案。
 
-![image-20220409105705674](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/image-20220409105705674.png)
+![image-20220409105705674](/images/blog/2022-04-09-better-tracking-diagnosed-logging-in-go/image-20220409105705674.png)
 
 在 evendeep 的功能包 dbglog 中，使用了如图示的接驳方案来调用 hedzr/log 中的日志输出接口，而不是直接使用 log.VDebugf，这是为了将来能进一步剥离到 hedzr/log 的依赖。但和直接使用并无什么区别。
 

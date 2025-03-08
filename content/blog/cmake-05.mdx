@@ -9,8 +9,8 @@ categories: cmake notes
 comments: true
 toc: true
 header:
-  teaser: https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/assets/images/unsplash-image-11.jpg
-  overlay_image: /assets/images/unsplash-image-11.jpg
+  teaser: /images/unsplash-image-11.jpg
+  overlay_image: /images/unsplash-image-11.jpg
   overlay_filter: rgba(128, 128, 0, 0.3)
 excerpt: >-
   Modern CMake Tutorial 相关，Basics Part II：变量、生成式表达式、其它...
@@ -773,7 +773,7 @@ endif ()
 
 我们并不做决定，决定的策略被编写在 `./cmake/version.h.in` 文件中，并在 [configure_file](https://cmake.org/cmake/help/latest/command/configure_file.html) 指令的加持下被生成为一个源代码文件 `${CMAKE_GENERATED_DIR}/version.h`。这个文件所在的目录被加入到 include_directories 搜索路径中，所以我们可以在源代码的任何位置使用它：
 
-```c++
+```cpp
 // all.h
 #include "version.h"
 ```
@@ -811,7 +811,7 @@ configure_file(config.h.in config.h)
 
 则输出 config.h 内容为：
 
-```c++
+```cpp
 #define ENABLE_BOOST 1
 #define BOOST_STRING "foo"
 ```
@@ -822,7 +822,7 @@ configure_file(config.h.in config.h)
 
 言归正传，一个 version.h.in 的样本为：
 
-```c++
+```cpp
 #ifndef ___VERSION_H
 #define ___VERSION_H
 
@@ -850,7 +850,7 @@ configure_file(config.h.in config.h)
 
 而所生成的 version.h 可能会像这样：
 
-```c++
+```cpp
 #ifndef ___VERSION_H
 #define ___VERSION_H
 

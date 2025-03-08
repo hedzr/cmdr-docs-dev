@@ -9,8 +9,8 @@ categories: c++ algorithm
 comments: true
 toc: true
 header:
-  teaser: https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210722232648067.png
-  overlay_image: /assets/images/3953273590_704e3899d5_m.jpg
+  teaser: /images/blog/image-20210722232648067.png
+  overlay_image: /images/3953273590_704e3899d5_m.jpg
   overlay_filter: rgba(16, 16, 32, 0.73)
 excerpt: >-
   接上一篇顺便讲讲 policy pattern 及其相关，有点失控了...
@@ -44,7 +44,7 @@ policy-based programming 是一个超级大的话题。我没有准备好要开�
 
 纯虚函数基本上是 C++ 语言层面上能够支持接口的唯一方法，符合标准的：
 
-```c++
+```cpp
 class IDemo
 {
   public:
@@ -80,7 +80,7 @@ class Child : public Parent, public IDemo
 
 这里有一个例子（来自于[这里](https://stackoverflow.com/questions/872675/policy-based-design-and-best-practices-c)）但做了改进和完善：
 
-```c++
+```cpp
 struct InkPen {
     void Write() {
         this->WriteImplementation();
@@ -117,7 +117,7 @@ void test_policy_1() {
 
 但是 Policy 并不被限制于你要做一个派生类才能实施这样的约定，在成员函数或者函数中也可以：
 
-```c++
+```cpp
 template <class PenPolicy>
 class Writer {
   PenPolicy pt;
@@ -160,7 +160,7 @@ Traits 的目的在于从给定的类中抽出特定的属性，在标准库头�
 
 一个典型的 Traits 可能是这样的：
 
-```c++
+```cpp
 template< class T >
 struct is_integral
 {
@@ -173,7 +173,7 @@ struct is_integral
 
 而进一步的多值 Traits 的典范是 iterator：
 
-```c++
+```cpp
 template<T>
 struct iterator_traits<T*>
 {
@@ -195,7 +195,7 @@ Traits 只是顺便的顺便，在这里小小提一下，不再展开了。
 
 ### 小结
 
-![image-20210722232648067](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210722232648067.png)
+![image-20210722232648067](/images/blog/image-20210722232648067.png)
 
 > FROM: https://www.youtube.com/watch?v=SSsTRLyAG7Q
 

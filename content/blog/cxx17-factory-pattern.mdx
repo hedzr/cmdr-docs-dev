@@ -19,8 +19,8 @@ categories: c++ algorithm
 comments: true
 toc: true
 header:
-  teaser: https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/factory-method-en.png
-  overlay_image: /assets/images/3953273590_704e3899d5_m.jpg
+  teaser: /images/blog/2021-08-21-cxx17-factory-pattern/factory-method-en.png
+  overlay_image: /images/3953273590_704e3899d5_m.jpg
   overlay_filter: rgba(16, 16, 32, 0.73)
 excerpt: >-
   回顾工厂模式的各种可能的实现，尝试建立其 C++17 中的最优解 ...
@@ -32,7 +32,7 @@ excerpt: >-
 
 回顾下工厂模式，并考虑实现一个通用的工厂模板类以达成业务端低代码的目标。
 
-![Factory Method pattern](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/factory-method-en.png)
+![Factory Method pattern](/images/blog/2021-08-21-cxx17-factory-pattern/factory-method-en.png)
 
 > FROM: [Refactoring Guru](https://refactoring.guru/images/patterns/content/factory-method)
 
@@ -71,7 +71,7 @@ Factory 模式是 [Creational Patterns](https://en.wikipedia.org/wiki/Creational
 
 以 Point 为例，
 
-```c++
+```cpp
 namespace cmdr::dp::factory::classical {
 
     class classical_factory_method;
@@ -155,7 +155,7 @@ void test_factory_classical() {
 
 但是在现代 C++ 中，拒绝 new delete 的显式出现（甚至也拒绝*裸*指针的出现），所以上面的表述也需要微微调整一下。可能会像这样：
 
-```c++
+```cpp
 static std::unique_ptr<Ship> create_ship_2(float r_, float theta_) {
   return std::make_unique<Ship>(r_ * cos(theta_), r_ * sin(theta_));
 }
@@ -166,7 +166,7 @@ static std::unique_ptr<Trunk> create_trunk_2(float x_, float y_) {
 
 使用时也要微调，但也可以几乎没变化（因为智能指针的封装能力）：
 
-```c++
+```cpp
     auto p3 = f.create_ship_2(3.1, 4.2);
     std::cout << *p3.get() << '\n';
     p3->deliver();
@@ -188,7 +188,7 @@ static std::unique_ptr<Trunk> create_trunk_2(float x_, float y_) {
 
 在 Modern C++ 中借助于模板变参（C++17 or later）和完美转发有可能能够削减创建方法，将其糅合为一个单一的函数：
 
-```c++
+```cpp
 class classical_factory_method {
   public:
   template<typename T, typename... Args>
@@ -200,7 +200,7 @@ class classical_factory_method {
 
 使用时像这样：
 
-```c++
+```cpp
     auto p4 = f.create<Ship>(3.1, 4.2);
     std::cout << *p4.get() << '\n';
     p4->deliver();
@@ -214,7 +214,7 @@ class classical_factory_method {
 
 将工厂方法模式的实现略微调整一下，把创建新实例的方法分散到每个产品类当中，可以构成 Inner 方式的 Factory Method。一般地可能仅仅将其视为 Factory Method 的变体。
 
-```c++
+```cpp
 namespace hicc::dp::factory::inner {
 
     class Transport {
@@ -260,7 +260,7 @@ namespace hicc::dp::factory::inner {
 
 在元编程的世界里，既然所有 product 对象总是会实现 create （以及 clone 方法），那么我们可以很容易地利用 SFINAE 技术（以及 C++17 的参数包展开，模板变参，折叠表达式）来构造它的实例：
 
-```c++
+```cpp
 template<typename T, typename... Args>
 inline std::unique_ptr<T> create_transport(Args &&...args) {
   return T::create(args...);
@@ -271,7 +271,7 @@ inline std::unique_ptr<T> create_transport(Args &&...args) {
 
 使用时会是这样子：
 
-```c++
+```cpp
 void test_factory_inner() {
     using namespace hicc::dp::factory::inner;
 
@@ -287,7 +287,7 @@ void test_factory_inner() {
 
 当然也可以这样子：
 
-```c++
+```cpp
     auto p3 = Ship::create(3.1, 4.2);
     std::cout << *p3.get() << '\n';
     p3->deliver();
@@ -316,7 +316,7 @@ void test_factory_inner() {
 1. 一系列相关产品， 例如 `椅子Chair` 、 `沙发Sofa` 和 `咖啡桌Coffee­Table` 。
 2. 系列产品的不同变体。 例如， 你可以使用 `现代Modern` 、 `维多利亚Victorian` 、 `装饰风艺术Art­Deco` 等风格生成 `椅子` 、 `沙发`和 `咖啡桌` 。
 
-![生成不同风格的系列家具。](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/problem-zh.png)
+![生成不同风格的系列家具。](/images/blog/2021-08-21-cxx17-factory-pattern/problem-zh.png)
 
 所以，Abstract Factory 的特点就在于工厂可以以某种特定的风格统一地创建所有产品，而不是仅仅创建了产品就完事。这样的对于多种维度进行控制的能力，才是 Abstract Factory 的独有之处。
 
@@ -360,7 +360,7 @@ void test_factory_inner() {
 >
 > 如果不借助于 std::tuple，那么我们需要这样的片段：
 >
-> ```c++
+> ```cpp
 > template<typename product_base, typename... products>
 > struct factory {
 >   template<typename T>
@@ -382,7 +382,7 @@ void test_factory_inner() {
 
 所以我们可以有这样一个实现方案：
 
-```c++
+```cpp
 namespace hicc::util::factory {
 
   template<typename product_base, typename... products>
@@ -444,7 +444,7 @@ namespace hicc::util::factory {
 
 使用它也和往常的工厂模式的用法有一点点的不同，你需要在具现化 factory 模板类时指定产品的接口类以及所有产品类。
 
-```c++
+```cpp
 namespace fct = hicc::util::factory;
 using shape_factory = fct::factory<tmp1::Point, tmp1::Point2D, tmp1::Point3D>;
 ```
@@ -453,7 +453,7 @@ using shape_factory = fct::factory<tmp1::Point, tmp1::Point2D, tmp1::Point3D>;
 
 一个实际的例子可以是这样子：
 
-```c++
+```cpp
 namespace tmp1 {
     struct Point {
         virtual ~Point() = default;
@@ -522,7 +522,7 @@ void test_factory() {
 
 - 在需要多态能力时，应该使用基类的指针，引用参考将不能执行多态操作
 
-  ```c++
+  ```cpp
   Point* ptr = new Point3D();
   ptr->name();   // ok
   (*ptr).name(); // mostly bad
@@ -530,7 +530,7 @@ void test_factory() {
 
 - 基类指针的智能指针包装也能正确地多态：
 
-  ```c++
+  ```cpp
   std::unique_ptr<Point> ptr = std::make_unique<Point3D>();
   smt->name(); // ok
   ```

@@ -9,8 +9,8 @@ categories: golang reflect
 comments: true
 toc: true
 header:
-  teaser: https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/image-20220501131135531.png
-  overlay_image: /assets/images/unsplash-image-3.jpg
+  teaser: /images/blog/2022-04-17-deepcopy-with-go-reflect/image-20220501131135531.png
+  overlay_image: /images/unsplash-image-3.jpg
   overlay_filter: rgba(128, 128, 0, 0.3)
 excerpt: >-
   evendeep 提供 deep 系列工具: deepcopy, deepdiff 以及 deepequal ...
@@ -87,7 +87,7 @@ ret 返回值是 `interface{}`，为了在将来能够适应于 1.18+，我们�
 
 `DeepCopy` 要求第二个参数，也就 target，必须以指针方式提供，也就是说你总是应该去地址。这样从 aa 提取的值才能写入到 bb 中。通常来说，你可以自由地反复取地址，因为 evendeep 的内部会首先脱掉指针的包裹，无论它有多少层。
 
-![image-20220501131135531](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/image-20220501131135531.png)
+![image-20220501131135531](/images/blog/2022-04-17-deepcopy-with-go-reflect/image-20220501131135531.png)
 
 你可以给 `DeepCopy` 提供额外的 WithXXX 选项，这是标准的 Options 模式，好像我以前不记得在哪篇 post 中曾经单独描述过。
 

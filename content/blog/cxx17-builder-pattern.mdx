@@ -10,8 +10,8 @@ categories: c++ algorithm
 comments: true
 toc: true
 header:
-  teaser: https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210905153441992.png
-  overlay_image: /assets/images/3953273590_704e3899d5_m.jpg
+  teaser: /images/blog/2021-09-05-cxx17-builder-pattern/image-20210905153441992.png
+  overlay_image: /images/3953273590_704e3899d5_m.jpg
   overlay_filter: rgba(16, 16, 32, 0.73)
 excerpt: >-
   回顾构建者模式的各种可能的实现，在 C++17 语境中讨论，...
@@ -27,7 +27,7 @@ excerpt: >-
 
 Builder 模式就是为了分步骤构造一个对象用的，看图：
 
-![生成器设计模式](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/builder-zh.png)
+![生成器设计模式](/images/blog/2021-09-05-cxx17-builder-pattern/builder-zh.png)
 
 > FROM: [HERE](https://refactoringguru.cn/design-patterns/builder)
 
@@ -43,7 +43,7 @@ Builder 模式是 [Creational Patterns](https://en.wikipedia.org/wiki/Creational
 
 对于 Builder 模式来说，一个重要的标志，尽管这并不是规定但却往往约定俗成，就是以一个 `.build()` 调用作为结束。例如：
 
-```c++
+```cpp
 auto shape = Builder()
   .choose(Shape.Rect)   // choose a factory
   .setColor(COLOR.RED)
@@ -67,7 +67,7 @@ Builder 模式并非必须得要采用流式接口。
 
 下面是一个标准的、基本的 builder pattern 案例。这个案例通过 email 的四个组成元素的分步构造来展示 builder pattern 的典型实现方法。
 
-```c++
+```cpp
 namespace hicc::dp::builder::basic {
 
   class email_builder;
@@ -177,20 +177,20 @@ void test_builder_basic() {
 
 这一点，并不是问题，移动语义允许直接传送 u 到 s：
 
-```c++
+```cpp
 std::unique_ptr<std::string> unique = std::make_unique<std::string>("test");
 std::shared_ptr<std::string> shared = std::move(unique);
 ```
 
 甚至于：
 
-```c++
+```cpp
 std::shared_ptr<std::string> shared = std::make_unique<std::string>("test");
 ```
 
 所以在 build() 时你可以决定是否做显式的返回类型声明：
 
-```c++
+```cpp
 auto obj = builder.build(); // 得到 unique_ptr<T>
 std::shared_ptr<T> o = builder.build(); // 隐含一个移动操作
 ```
@@ -199,7 +199,7 @@ std::shared_ptr<T> o = builder.build(); // 隐含一个移动操作
 
 前面的示例中采用了分离的两个独立类的方式，这样显得类的结构以及依赖关系更清晰，但可能稍微有点污染，因为在名字空间中会有一个产品的 builder 类的额外的存在。而一个命名为 models 的 namespace 中是不应该有非 Model 的其它东西——helpers 也好，utilities 也好——的存在的。因此，特别是在 metaprogramming 中，更倾向于将 builder class 直接嵌入 product class 中：
 
-```c++
+```cpp
 namespace hicc::dp::builder::embed {
 
   class email {
@@ -257,7 +257,7 @@ void test_builder_embed() {
 
 首先给出产品类部分：
 
-```c++
+```cpp
 namespace hicc::dp::builder::complex {
 
   namespace basis {
@@ -296,7 +296,7 @@ namespace hicc::dp::builder::complex {
 
 但是它的 builder 会比较复杂，因为这里决定有两种预制的 builder（Jeep 和 Nissan）分别制作不同规格的 Car。所以我们需要一个抽象类的 builder class，以及一个构建样板类 director，实际上你也可以不必分离样板类，充分利用多态性也是可以的：
 
-```c++
+```cpp
 namespace hicc::dp::builder::complex {
 
   class builder {
@@ -340,7 +340,7 @@ namespace hicc::dp::builder::complex {
 
 接下来，是具体实现两个 builder 类了：
 
-```c++
+```cpp
 namespace hicc::dp::builder::complex {
 
   class jeep_builder : public builder {
@@ -390,7 +390,7 @@ namespace hicc::dp::builder::complex {
 
 以及，它的测试代码：
 
-```c++
+```cpp
 void test_builder_complex() {
   using namespace hicc::dp::builder::complex;
 
@@ -425,7 +425,7 @@ void test_builder_complex() {
 
 当然啰，这个示例仅仅只是示例。在真实世界里，这个示例的实现可以将 jeep_builder 和 nissan_builder 抽出一个公共的基类：
 
-```c++
+```cpp
 class managed_builder : public builder {
   public:
   basis::wheel *get_wheel() {
@@ -460,7 +460,7 @@ class managed_builder : public builder {
 
 其实也可以使用模板类的方式：
 
-```c++
+```cpp
 template<int wheel_size, int engine_horsepower, char const *const body_shape>
 class generic_builder : public builder {
   public:
@@ -503,7 +503,7 @@ class nissan_builder : public generic_builder<16, 85, hatchback_str> {
 
 如果你已经开始使用 C++20 了，那么 `std::basic_fixed_string` 能够让你获得直接传递字符串字面量的能力：
 
-```c++
+```cpp
 template<int wheel_size, int engine_horsepower, char const *const body_shape>
 class generic_builder : public builder {
   // ...
@@ -530,7 +530,7 @@ CRTP 是一种 C++ 惯用法，它比 C++11 出生的早得多。在 Visual C++ 
 
 简单地说，CRTP 的目的在于实现编译期的多态绑定，实现方法是向基类的模板参数中传入派生类类名，于是基类就能够借助 `static_cast<derived_t>(*this*)` 语法来获得派生类的“多态”的操作能力了：
 
-```c++
+```cpp
 template <typename derived_t>
 class base{
   public:

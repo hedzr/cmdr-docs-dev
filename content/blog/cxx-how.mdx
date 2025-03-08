@@ -20,8 +20,8 @@ categories: c++ exception
 comments: true
 toc: true
 header:
-  teaser: https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/assets/images/foo-bar-identity-th.jpg
-  overlay_image: /assets/images/foo-bar-identity-th.jpg
+  teaser: /images/foo-bar-identity-th.jpg
+  overlay_image: /images/foo-bar-identity-th.jpg
   overlay_filter: rgba(16, 16, 32, 0.73)
 excerpt: >-
   要想在异常时输出调用历史信息，需要一些额外的处理 ...
@@ -217,7 +217,7 @@ t1 += sub_cmd{}("dbz", "dbz", "divide-by-zero")
 
 运行它的结果部分截图是这样的：
 
-![image-20210218195833399](https://i.loli.net/2021/02/21/4JrRwygW3FEoj5p.png)
+![image-20210218195833399](/images/blog/cxx-how/4JrRwygW3FEoj5p.png)
 
 可以看到，尽管没有行号信息，但至少我们已经基本上可以定位得到故障点了。
 
@@ -313,7 +313,7 @@ t1 += sub_cmd{}("ssi", "ssi", "access-ileggal-address")
 
 同样的，Line 6 负责安装拦截器，如果有必要，你可以提供一个额外的 lambda 函数作为拦截器的响应函数，替代默认的版本。但默认版本会打印出栈帧信息，虽然不能提供足够完美的信息，但也是相当有用了：
 
-![image-20210218200735115](https://i.loli.net/2021/02/21/xXbeM2qcH3vuyAj.png)
+![image-20210218200735115](/images/blog/cxx-how/xXbeM2qcH3vuyAj.png)
 
 #### 更多
 

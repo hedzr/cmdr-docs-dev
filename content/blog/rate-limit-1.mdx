@@ -19,7 +19,7 @@ categories: golang algorithm
 comments: true
 toc: true
 header:
-  overlay_image: /assets/images/unsplash-image-10.jpg
+  overlay_image: /images/unsplash-image-10.jpg
   overlay_filter: rgba(128, 128, 0, 0.3)
 excerpt: >-
   速率限制（Rate Limit），以 Golang 视角 ...
@@ -29,7 +29,7 @@ Intro: 在 Web Server、TCP 通讯、API 交互等领域中，速率限制，Rat
 
 > Cover:
 >
-> ![Rate Limit & Throttling Graph](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/Rate-Limit-and-Throttling-Graph.jpg)
+> ![Rate Limit & Throttling Graph](/images/blog/Rate-Limit-and-Throttling-Graph.jpg)
 >
 > FROM: https://rafaelcapucho.github.io/2016/10/enhance-the-quality-of-your-api-calls-with-client-side-throttling/
 
@@ -130,7 +130,7 @@ func (s *counter) Take(count int) bool {
 
 如此，我们就得到了速率限制的水桶思维版：漏桶法。
 
-![https://cdncontribute.geeksforgeeks.org/wp-content/uploads/leakyTap-1.png](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/leakyTap-1.png)
+![/blog/leakyTap-1.png](/images/blog/leakyTap-1.png)
 
 > From: https://dev.to/swyx/networking-essentials-rate-limiting-and-traffic-shaping-43ii
 
@@ -402,7 +402,7 @@ func (r *Limiter) SimpleMiddleware() gin.HandlerFunc {
 
 按照约定俗成的标准，被抛弃的请求会得到 response header 通知：
 
-![image-20210606204438636](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210606204438636.png)
+![image-20210606204438636](/images/blog/image-20210606204438636.png)
 
 ##### Gin 中间件
 
@@ -441,7 +441,7 @@ func engine() *gin.Engine {
 
 总的来说，我们假设一个 producer 以恒定速率（每 10ms 一个）制造令牌，而一个请求被获准时则消耗一块令牌。如此一来，单位时间片中已经授权了多少请求就不再是重点，重点现在变为令牌桶中有否可用令牌的问题。
 
-![https://gateoverflow.in/?qa=blob&qa_blobid=14382465908978628560](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/14382465908978628560.jpeg)
+![https://gateoverflow.in/?qa=blob&qa_blobid=14382465908978628560](/images/blog/14382465908978628560.jpeg)
 
 > From: https://dev.to/swyx/networking-essentials-rate-limiting-and-traffic-shaping-43ii
 

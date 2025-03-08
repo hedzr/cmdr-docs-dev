@@ -22,7 +22,7 @@ categories: devops linux
 comments: true
 toc: true
 header:
-  overlay_image: /assets/images/ubuntuhero.jpg
+  overlay_image: /images/ubuntuhero.jpg
   overlay_filter: rgba(32, 32, 0, 0.5)
 excerpt: "针对 rancher 2.5.8 以及 ubuntu 20.04 的 microk8s （kubernetes 1.20）"
 ---
@@ -39,7 +39,7 @@ excerpt: "针对 rancher 2.5.8 以及 ubuntu 20.04 的 microk8s （kubernetes 1.
 
 题图：
 
-![image-20210521120242195](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210521120242195.png)
+![image-20210521120242195](/images/blog/install-rancher/image-20210521120242195.png)
 
 ## Why
 
@@ -101,7 +101,7 @@ sudo usermod -aG docker $USER
 
 因此我们采用 xca 建立一套基本链条：
 
-![image-20210521111609443](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210521111609443.png)
+![image-20210521111609443](/images/blog/install-rancher/image-20210521111609443.png)
 
 需要提及的是，对于 u20k8s.local 的 TLS-server 服务器证书来说，为了预留一定的余地，因此我们设置了这些 common names 给它：
 
@@ -220,7 +220,7 @@ docker-compose up -d && docker-compose logs -f
 
 首次登录时需要创建管理员账户：
 
-![image-20210522165748133](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210522165748133.png)
+![image-20210522165748133](/images/blog/install-rancher/image-20210522165748133.png)
 
 指定一个管理员密码之后 Continue。
 
@@ -228,7 +228,7 @@ docker-compose up -d && docker-compose logs -f
 
 然后会有下一画面：
 
-![image-20210522170042825](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210522170042825.png)
+![image-20210522170042825](/images/blog/install-rancher/image-20210522170042825.png)
 
 这里也需要确认服务器的ip地址又或者是domain名字，如果你准备采用自建的 dns 服务的话，则跟随相应的 IP 地址分配策略而采取 domain 名字，否则的话，大多数自测目的下还是使用 IP 地址。
 
@@ -238,7 +238,7 @@ docker-compose up -d && docker-compose logs -f
 
 当初始化结束后，就可以看到集群页面了。如果想要更换显示语种，请在右下方自行调整。
 
-![image-20210522170527427](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210522170527427.png)
+![image-20210522170527427](/images/blog/install-rancher/image-20210522170527427.png)
 
 那么现在可以看到，一个预建的 k3s 集群 local 已经在工作状态了。
 
@@ -503,7 +503,7 @@ eyJhbGciOiJSUzI1NiIsImtpZCI6IkthRlVHdnh6SGotc1RfOUMzYUJLNzlrNWRwQ0JZOEthXzhqWHp5
 
 由于他是在虚拟机 B 中，所以我们需要从本机上做一条 SSH Tunnel 之后，就可以愉快地打开该 10443 端口和访问 dashboard 界面了。
 
-![image-20210522181251608](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210522181251608.png)
+![image-20210522181251608](/images/blog/install-rancher/image-20210522181251608.png)
 
 #### 补充：修改 dashboard 为 NodePort
 
@@ -550,23 +550,23 @@ status:
 
 在 rancher 的 web 界面中，选择 Global：
 
-![image-20210522183011533](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210522183011533.png)
+![image-20210522183011533](/images/blog/install-rancher/image-20210522183011533.png)
 
 在 Clusters 列表的右侧点击 Add Cluster 按钮：
 
-![image-20210522183102085](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210522183102085.png)
+![image-20210522183102085](/images/blog/install-rancher/image-20210522183102085.png)
 
 选择 Other Cluster
 
-![image-20210522183138183](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210522183138183.png)
+![image-20210522183138183](/images/blog/install-rancher/image-20210522183138183.png)
 
 命名后点击 Create
 
-![image-20210522183241835](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210522183241835.png)
+![image-20210522183241835](/images/blog/install-rancher/image-20210522183241835.png)
 
 此时会显示一个说明页面：
 
-![image-20210522190403880](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210522190403880.png)
+![image-20210522190403880](/images/blog/install-rancher/image-20210522190403880.png)
 
 > 图示中的 DOMAIN 地址存在不匹配的问题，你也许需要自行纠正为 IP 地址。
 
@@ -597,11 +597,11 @@ kubectl delete -n cattle-system pods --all
 
 成功登记之后，查看 rancher 界面：
 
-![image-20210522184747150](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210522184747150.png)
+![image-20210522184747150](/images/blog/install-rancher/image-20210522184747150.png)
 
 点击进入，可以检查该集群的工作状态了：
 
-![image-20210521120242195](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210521120242195.png)
+![image-20210521120242195](/images/blog/install-rancher/image-20210521120242195.png)
 
 ## 结尾
 

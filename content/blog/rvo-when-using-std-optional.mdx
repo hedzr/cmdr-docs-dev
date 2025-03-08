@@ -20,14 +20,14 @@ categories: c++ algorithm
 comments: true
 toc: true
 header:
-  teaser: https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210716153922781.png
-  overlay_image: /assets/images/3953273590_704e3899d5_m.jpg
+  teaser: /images/blog/2021-07-16-rvo-when-using-std-optional/image-20210716153922781.png
+  overlay_image: /images/3953273590_704e3899d5_m.jpg
   overlay_filter: rgba(16, 16, 32, 0.73)
 excerpt: >-
   直觉式的写法存在着不能 RVO 的问题，所以需要一个惯用法...
 ---
 
-![image-20210716153922781](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210716153922781.png)
+![image-20210716153922781](/images/blog/2021-07-16-rvo-when-using-std-optional/image-20210716153922781.png)
 
 ## 基本问题
 
@@ -35,7 +35,7 @@ excerpt: >-
 
 在我的 message-queue 开发过程中，有这么样的代码：
 
-```c++
+```cpp
 inline std::optional<T> pop_front() {
   lock l(_m);
   _cv.wait(l, [this] { return _abort || !_data.empty(); });
@@ -53,7 +53,7 @@ inline std::optional<T> pop_front() {
 
 随即我编写了一个测试片段：
 
-```c++
+```cpp
 void test_mq() {
     hicc::pool::threaded_message_queue<hicc::debug::X> xmq;
 
@@ -70,7 +70,7 @@ void test_mq() {
 
 `hicc::debug::X` 是一个专门用来调试 RVO，In-place construction，Copy Elision 等等特性的工具类，它平平无奇，只不过是在若干位置埋点冰打印 stdout 文字而已，这可以让我们直观观察到哪些行为实际上发生了。
 
-```c++
+```cpp
 namespace hicc::debug {
 
     class X {
@@ -151,7 +151,7 @@ L3 和 L4 的 dtor，有点怪，我只能通过调试器来确认：L3 是由 `
 
 康康：
 
-```c++
+```cpp
 std::string build(){
   std::string ret;
   ret += "2";
@@ -176,7 +176,7 @@ RVO 的特性让 L2 的 ret 不必析构直接被返回给了 caller。
 
 最终能够顺利 RVO 的实现是这样的：
 
-```c++
+```cpp
 inline std::optional<T> pop_front() {
   std::optional<T> ret;
   lock l(_m);
@@ -209,7 +209,7 @@ inline std::optional<T> pop_front() {
 
 当我们采用多个变量时，编译器也有可能不能正确 RVO：
 
-```c++
+```cpp
 inline std::optional<T> pop_front_bad() {
   lock l(_m);
   _cv.wait(l, [this] { return _abort || !_data.empty(); });

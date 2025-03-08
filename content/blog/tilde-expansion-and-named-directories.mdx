@@ -9,8 +9,8 @@ categories: devops shell
 comments: true
 toc: true
 header:
-  teaser: https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/assets/images/backslashes.png
-  overlay_image: /assets/images/backslashes.png
+  teaser: /images/backslashes.png
+  overlay_image: /images/backslashes.png
   overlay_filter: rgba(0, 170, 255, 0.5)
 excerpt: >-
   自定义你的文件夹缩写词，...
@@ -145,7 +145,7 @@ unalias run-help && autoload run-help
 
 然后，你可以 `. ~/.zshrc` 立即应用变更，但我推荐你重新打开一个 Terminal，或者重新登录一次。接着就可以看看 `run-help hash` 的结果了，基本上和连线版本一摸一样，但代价就低得多了。
 
-![image-20210109205242632](https://i.loli.net/2021/01/09/6DCHgnVxXhOUwvJ.png)
+![image-20210109205242632](/images/blog/6DCHgnVxXhOUwvJ.png)
 
 有的人爱扳，告诉我说 macOS 10.15 里 run-help 已经开箱即用了。其实他是有所误解：默认时 run-help=man，而默认时 man hash 只会显示一个缩略的介绍而不是全文。对于像内建命令这样的手册条目来说，我还是很需要详细解说版本的，这就是本小节被提供的意义之所在。
 

@@ -9,9 +9,9 @@ categories: tech nology
 comments: true
 toc: true
 header:
-  teaser: https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/partition-1.png
-  teaser1: https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/assets/images/unsplash-gallery-image-1-th.jpg
-  overlay_image: /assets/images/unsplash-gallery-image-1-th.jpg
+  teaser: /images/blog/2022-09-29-hdiutil-and-sparsebundle/partition-1.png
+  teaser1: /blog/2022-09-29-hdiutil-and-sparsebundle/unsplash-gallery-image-1-th.jpg
+  overlay_image: /images/unsplash-gallery-image-1-th.jpg
   overlay_filter: rgba(16, 16, 32, 0.73)
 excerpt: >-
   hdiutil 和 sparsebundle 以及操作 ...
@@ -147,15 +147,15 @@ macOS 允许你在主分区上动态地切割出一个新的分区，无需像 W
 
 例如一台 256GB 硬盘的 MBP：
 
-![Open Disk Utility](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/partition-1.png)
+![Open Disk Utility](/images/blog/2022-09-29-hdiutil-and-sparsebundle/partition-1.png)
 
 首先点击 Partition 按钮，得到如下对话框：
 
-![Partition](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/partition-2.png)
+![Partition](/images/blog/2022-09-29-hdiutil-and-sparsebundle/partition-2.png)
 
 在分区的饼图下方点击加号按钮，给出一个分区名字 `Projects`，选择敏感分区，日志式，然后指定尺寸为 20GB：
 
-![Settings](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/partition-3.png)
+![Settings](/images/blog/2022-09-29-hdiutil-and-sparsebundle/partition-3.png)
 
 > 对于新的 macOS 操作系统来说，现在不在有 Mac OS Extended 分区类型了，取而代之的是 APFS：
 >
@@ -168,11 +168,11 @@ macOS 允许你在主分区上动态地切割出一个新的分区，无需像 W
 
 接下来，点击 Apply 按钮，确认，然后就可以得到新的大小写敏感分区了。
 
-![Done](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/partition-5.png)
+![Done](/images/blog/2022-09-29-hdiutil-and-sparsebundle/partition-5.png)
 
 它将被自动装载到 `/Volumes/Projects` 之下。
 
-![Proof](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/partition-7.png)
+![Proof](/images/blog/2022-09-29-hdiutil-and-sparsebundle/partition-7.png)
 
 这种方法最被推荐。
 

@@ -9,8 +9,8 @@ categories: packaging deb
 comments: true
 toc: true
 header:
-  teaser: https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20211206192724861.png
-  overlay_image: /assets/images/unsplash-gallery-image-1-th.jpg
+  teaser: /images/blog/publishing-and-hosting-your-own-dev-at-ppa//image-20211206192724861.png
+  overlay_image: /images/unsplash-gallery-image-1-th.jpg
   overlay_filter: rgba(16, 16, 32, 0.73)
 excerpt: >-
   发布 C/C++ 开源软件到 Launchpad，从源码构建 deb 分发包 ...
@@ -150,7 +150,7 @@ PPA 是由 launchpad.net 提供的一种软件包发行途径。所以你必须�
 
 话不多说，申请了账户之后，首先确认 email 地址有效，然后添加你的 SSH，GPG Key 到你的用户中心页面里。假设你使用用户名 hedzr 注册了账户，那么你的页面就在 [https://launchpad.net/~hedzr](https://launchpad.net/~hedzr)，在这个页面里，依次添加 SSH Key，GPG Key 到相应的条目中，然后你的页面看起来和下图比较像：
 
-![image-20211218095834885](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20211218095834885.png)
+![image-20211218095834885](/images/blog/publishing-and-hosting-your-own-dev-at-ppa//image-20211218095834885.png)
 
 其中，添加 **OpenPGP keys** 的链接为：[https://launchpad.net/~hedzr/+editpgpkeys](https://launchpad.net/~hedzr/+editpgpkeys)
 
@@ -195,7 +195,7 @@ sudo apt-add-repository ppa:hedzr/test-ppa
 
 首先是创建工作目录：
 
-```basj
+```bash
 mkdir -pv ~/deb/testpackage.work/testpackage
 cd ~/deb/testpackage.work/testpackage
 ```
@@ -289,7 +289,7 @@ rm debian/*.{ex,EX}
 
 在 dh_make 运行之后，所生成的文件都在 debian/ 之中：
 
-![image-20211218104317092](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/146779565-123e23f4-69b5-4253-9088-aae09f6ce4ab.png)
+![image-20211218104317092](/images/blog/publishing-and-hosting-your-own-dev-at-ppa//146779565-123e23f4-69b5-4253-9088-aae09f6ce4ab.png)
 
 #### 复查控制文件
 

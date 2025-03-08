@@ -9,8 +9,8 @@ categories: c++ algorithm
 comments: true
 toc: true
 header:
-  teaser: https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/image-20220728173918324.png
-  overlay_image: /assets/images/3953273590_704e3899d5_m.jpg
+  teaser: /images/blog/2022-07-27-ticker-timer-within-cxx17/image-20220728173918324.png
+  overlay_image: /images/3953273590_704e3899d5_m.jpg
   overlay_filter: rgba(16, 16, 32, 0.73)
 excerpt: >-
   介绍一个 Scheduler 类库的实现，不但支持 Timer/Ticker，也能提供行事历周期任务的支持...
@@ -87,7 +87,7 @@ Google 集成在 Gmail 中的 Task 可能是相对来说最好的一个了，因
 
 在新时代，各种不同的计算设备也都依赖同样的晶振核心以及一个定时计数也达到同样的效果。
 
-![img](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image002-20.gif)
+![img](/images/blog/2022-07-27-ticker-timer-within-cxx17/image002-20.gif)
 
 ### BIOS 中断
 
@@ -111,7 +111,7 @@ OS 按照自己的设计目标来选择接管 BIOS 中断，或者完全抛弃 B
 
 在时间轮上，尤其是多级时间轮算法思路上，从概念上来说，大抵是按照 day，hour，minute，second，millisecond 的方式建造级联的轮级：
 
-![image-20210803091625643](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210803091625643.png)
+![image-20210803091625643](/images/blog/2022-07-27-ticker-timer-within-cxx17/image-20210803091625643.png)
 
 > FROM: [Hashed and Hierarchical Timing Wheels A paper by](https://slidetodoc.com/hashed-and-hierarchical-timing-wheels-a-paper-by-2/)
 
@@ -220,7 +220,7 @@ std::chrono::system_clock 精度是受到 C++ 编译器和 OS 双方面的综合
 
 如前所述，我们首先建立了 timer 这个类，它提供 in/after，at 这两个语义。相应的实现节选如下：
 
-```c++
+```cpp
 template<typename Clock = Clock>
 class timer {
   template<typename _Callable, typename... _Args>
@@ -270,11 +270,11 @@ class timer {
 
 ##### 调用
 
-![image-20220728173918324](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/image-20220728173918324.png)
+![image-20220728173918324](/images/blog/2022-07-27-ticker-timer-within-cxx17/image-20220728173918324.png)
 
 使用的方法类似于这样：
 
-```c++
+```cpp
 void test_timer() {
   using namespace std::literals::chrono_literals;
   hicc::debug::X x_local_var;

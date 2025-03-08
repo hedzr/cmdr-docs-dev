@@ -10,8 +10,8 @@ categories: c++ algorithm
 comments: true
 toc: true
 header:
-  teaser: https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210907201203834.png
-  overlay_image: /assets/images/3953273590_704e3899d5_m.jpg
+  teaser: /images/blog/2021-09-06-cxx17-flyweight-pattern/image-20210907201203834.png
+  overlay_image: /images/3953273590_704e3899d5_m.jpg
   overlay_filter: rgba(16, 16, 32, 0.73)
 excerpt: >-
   关于享元模式的 C++17 中的较通用实现，...
@@ -51,7 +51,7 @@ excerpt: >-
 
 传统的享元模式的实现方式有这样的示例代码：
 
-```c++
+```cpp
 namespace hicc::dp::flyweight::basic {
 
   /**
@@ -234,7 +234,7 @@ Chevrolet_Camaro2018_pink
 
 一个想法是，我们认为一个尽可能通用的享元工厂可能是有利于代码书写的。所以我们尝试这样一个享元工厂模板：
 
-```c++
+```cpp
 namespace hicc::dp::flyweight::meta {
 
   template<typename shared_t = shared_state_impl, typename unique_t = unique_state_impl>
@@ -300,7 +300,7 @@ namespace hicc::dp::flyweight::meta {
 
 然后我们就可以以派生类的方式直接使用这个享元工厂了：
 
-```c++
+```cpp
 class vehicle : public flyweight_factory<shared_state_impl, unique_state_impl> {
   public:
   using flyweight_factory<shared_state_impl, unique_state_impl>::flyweight_factory;
@@ -321,7 +321,7 @@ class vehicle : public flyweight_factory<shared_state_impl, unique_state_impl> {
 
 #### 测试代码
 
-```c++
+```cpp
 void test_flyweight_meta() {
     using namespace hicc::dp::flyweight::meta;
 
@@ -354,7 +354,7 @@ void test_flyweight_meta() {
 
 我们使用了稍稍不同的基础类 `shared_state_impl` 以及 `unique_state_impl`：
 
-```c++
+```cpp
 namespace hicc::dp::flyweight::meta {
   struct shared_state_impl {
     std::string brand_;
@@ -414,7 +414,7 @@ namespace std {
 
 我们在 [hicc-cxx](https://link.juejin.cn/?target=https%3A%2F%2Fgithub.com%2Fhedzr%2Fhicc)/[cmdr-cxx](https://link.juejin.cn/?target=https%3A%2F%2Fgithub.com%2Fhedzr.cmdr-cxx) 中提供了一个源于 boost::hash_combine 的同名扩展：
 
-```c++
+```cpp
 namespace std {
   template<typename T, typename... Rest>
   inline void hash_combine(std::size_t &seed, T const &t, Rest &&...rest) {
@@ -436,7 +436,7 @@ namespace std {
 
 关于如何正确地组合一堆 hash 值，较为简单地方法是：
 
-```c++
+```cpp
 std::size_t h1 = std::hash<std::string>("hello");
 std::size_t h2 = std::hash<std::string>("world");
 std::size_t h = h1 | (h2 << 1);
@@ -444,7 +444,7 @@ std::size_t h = h1 | (h2 << 1);
 
 但仍然有更多的探讨，其中得到了公认的最佳手段（C++中）是源自于 boost::hash_combine 实现代码的一个方法：
 
-```c++
+```cpp
 seed ^= hasher(v) + 0x9e3779b9 + (seed<<6) + (seed>>2);
 ```
 
@@ -456,7 +456,7 @@ seed ^= hasher(v) + 0x9e3779b9 + (seed<<6) + (seed>>2);
 $\frac{2^{32}}{\frac{1+\sqrt{5}}{2}}$
 ```
 
-（![image-20210907202334864](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210907202334864.png))。
+（![image-20210907202334864](/images/blog/2021-09-06-cxx17-flyweight-pattern/image-20210907202334864.png))。
 
 ## Epilogue
 

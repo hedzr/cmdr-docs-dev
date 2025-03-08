@@ -9,8 +9,8 @@ categories: c++ algorithm
 comments: true
 toc: true
 header:
-  teaser: https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/assets/images/foo-bar-identity-th.jpg
-  overlay_image: /assets/images/foo-bar-identity-th.jpg
+  teaser: /images/foo-bar-identity-th.jpg
+  overlay_image: /images/foo-bar-identity-th.jpg
   overlay_filter: rgba(16, 16, 32, 0.73)
 excerpt: >-
   std::unique_ptr/shared_ptr 能够多态吗 ...
@@ -42,7 +42,7 @@ excerpt: >-
 
 也就是说：
 
-```c++
+```cpp
 class A{
   public:
   virtual void run() = 0;
@@ -68,7 +68,7 @@ sp->run(); // prints 'B'
 >
 > Line 20 是不必要的，因为我们设计为只会面对基类对象以多态方式操作，而不会直接操作派生类的某个实例。但当我们进一步完成这个类库的时候这个限制还是会取消的，目前的不必要是为了避免混淆今天谈论的主题。
 
-```c++
+```cpp
 namespace aml::res {
 
   class base {
@@ -202,7 +202,7 @@ C++ 的多态特性依赖于两个前提的同时具备：
 
 首先来讲，你必须在基类做出虚拟函数宣告。一般地，它多半是纯虚的，如同下例中的 `to_string()`：
 
-```c++
+```cpp
 class base {
   public:
   base() = default;
@@ -242,7 +242,7 @@ class base {
 
 所以一个对象容器作为对象生命周期的管理者，它理所当然地可以使用：
 
-```c++
+```cpp
 using elem_sp = std::unique_ptr<base>;
 using container_t = std::vector<elem_sp>;
 ```
@@ -275,7 +275,7 @@ using container_t = std::vector<elem_sp>;
 
 基于上文中的例子，对类体系做了充实并改善后的例子是这样的：
 
-```c++
+```cpp
 namespace aml::res {
 
   class elem : public std::enable_shared_from_this<elem> {
@@ -513,7 +513,7 @@ rect[1,2,4,3|0]
 
 下面的简单例子说明了这个效果：
 
-```c++
+```cpp
 struct A {
   virtual ~A() = default;
   virtual void run() = 0;

@@ -22,8 +22,8 @@ categories: c++ algorithm
 comments: true
 toc: true
 header:
-  teaser: https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210930084318643.png
-  overlay_image: /assets/images/3953273590_704e3899d5_m.jpg
+  teaser: /images/blog/2021-09-09-cxx17-state-pattern/image-20210930084318643.png
+  overlay_image: /images/3953273590_704e3899d5_m.jpg
   overlay_filter: rgba(16, 16, 32, 0.73)
 excerpt: >-
   关于状态模式的研究，以及状态机的 C++17 中的通用实现，介绍 fsm-cxx ...
@@ -80,7 +80,7 @@ Moore Machine 的特点是只使用进入动作，就是说输出只依赖于当
 
 例如电梯门的运行到站和超时时开闭的状态图：
 
-![image-20210908104329830](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210908104329830.png)
+![image-20210908104329830](/images/blog/2021-09-09-cxx17-state-pattern/image-20210908104329830.png)
 
 图示中，从状态 `Opened` 只能迁移到 `Closed`，当进入到 `Opened` 时其进入动作 `open door` 会导致电机启动并开门，而从状态 `Closed` 也只能迁移到 `Opened`，其进入动作 `close door` 导致电机反向启动并关门。
 
@@ -94,7 +94,7 @@ Moore Machine 的特点是只使用进入动作，就是说输出只依赖于当
 
 Mealy Machine 的状态切换依赖于输入动作以及当前状态，它比摩尔机更复杂一点，但同时也常常因此而使得其状态图更简单简约。例如电梯门被开闭的状态图：
 
-![image-20210908110017680](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210908110017680.png)
+![image-20210908110017680](/images/blog/2021-09-09-cxx17-state-pattern/image-20210908110017680.png)
 
 图示中，由于开门按钮按下（sensor opened）导致电梯门从 `closed` 状态切换到 `opened`，由于关门按钮按下（sensor closed）导致反向转换。
 
@@ -106,13 +106,13 @@ Mealy Machine 的状态切换依赖于输入动作以及当前状态，它比摩
 
 TCP 的状态跃迁图能够很好地展示状态的切换：
 
-![image-20210908080818014](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210908080818014.png)
+![image-20210908080818014](/images/blog/2021-09-09-cxx17-state-pattern/image-20210908080818014.png)
 
 > FROM: [PDF - TCP/IP State Transition Diagram (RFC793)](https://users.cs.northwestern.edu/~agupta/cs340/project2/TCPIP_State_Transition_Diagram.pdf)
 
 为了帮助不熟悉的朋友多角度观察，这里也提供另一张图可供相互佐证：
 
-![img](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/tcpfsm.png)
+![img](/images/blog/tcpfsm.png)
 
 > FROM: [The TCP/IP Guide - TCP Operational Overview and the TCP Finite State Machine (FSM)](http://tcpipguide.com/free/t_TCPOperationalOverviewandtheTCPFiniteStateMachineF-2.htm)
 
@@ -126,7 +126,7 @@ TCP 的状态跃迁图能够很好地展示状态的切换：
 
 实现状态模式最直觉的方法，是采用一系列的 if..else 或者 switch 语句，但这种方式在状态较多，转换路径复杂时将会很被动。一个简短的例子如下：
 
-```c++
+```cpp
 #include <stdio.h>
 enum states { before, inside, after };
 void step(enum states *state, int c) {
@@ -173,7 +173,7 @@ int main(void) {
 
 状态机的转换规则可以表示为一张二维的状态转移表，像这样：
 
-![image-20210908103920737](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210908103920737.png)
+![image-20210908103920737](/images/blog/2021-09-09-cxx17-state-pattern/image-20210908103920737.png)
 
 在实际场景中，这张表往往是比较稀疏的，很多交叉点是没有到下一状态的跃迁可能性的，所以这张表所映射到的二维数组通常都可以采取一定的措施以将其压缩下来，压缩的结果除了能显著降低表的存储空间之外，也有可能明显地降低扫描这张表的速度。
 
@@ -231,9 +231,9 @@ OK，在本文中，我们采用 FSM 术语来暗指 FSM 以及 NFA 以及 DFA �
 
    举个例子，计算器具有开、关状态，而开机后的计算机又有输入状态、求值状态、连续求值状态等等一系列子状态。
 
-   ![img](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/UML_state_machine_Fig2b.png)
+   ![img](/images/blog/UML_state_machine_Fig2b.png)
 
-   > https://en.wikipedia.org/wiki/UML_state_machine#/media/File:UML_state_machine_Fig2b.png
+   > From: https://en.wikipedia.org/wiki/UML_state_machine#/media/File:UML_state_machine_Fig2b.png
 
 2. 正交区域 Orthogonal regions
 

@@ -9,8 +9,8 @@ categories: c++ cp
 comments: true
 toc: true
 header:
-  teaser: https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/image-20230322212542327.png
-  overlay_image: /assets/images/3953273590_704e3899d5_m.jpg
+  teaser: /images/blog/2023-03-22-bison-xsltproc-failed-with-status-127/image-20230322212542327.png
+  overlay_image: /images/3953273590_704e3899d5_m.jpg
   overlay_filter: rgba(16, 16, 32, 0.73)
 excerpt: >-
   莫名其妙的错误，以及 gcc-12 builder in Docker ...
@@ -28,7 +28,7 @@ parser.y: error: xsltproc failed with status 127
 
 如下图
 
-![image-20230322212542327](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/image-20230322212542327.png)
+![image-20230322212542327](/images/blog/2023-03-22-bison-xsltproc-failed-with-status-127/image-20230322212542327.png)
 
 这个项目中用到了 flex 和 bison，然后构建过程中 bison 的处理失败，报错如上。
 

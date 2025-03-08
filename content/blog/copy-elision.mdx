@@ -10,8 +10,8 @@ comments: true
 toc: true
 draft: true
 header:
-  teaser: https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20210716153922781.png
-  overlay_image: /assets/images/3953273590_704e3899d5_m.jpg
+  teaser: /images/blog/copy-elision/image-20210716153922781.png
+  overlay_image: /images/3953273590_704e3899d5_m.jpg
   overlay_filter: rgba(16, 16, 32, 0.73)
 excerpt: >-
   直觉式的写法存在着不能有效复制消除的问题，所以需要一个惯用法...
@@ -21,7 +21,7 @@ excerpt: >-
 
 push_back 这么写是错的：
 
-```c++
+```cpp
 template<class T>
   class threaded_message_queue {
     public:
@@ -47,7 +47,7 @@ template<class T>
 
 正确的 push_back 应该包含左值复制和右值移动两种语义，一般来说像是这样子：
 
-```c++
+```cpp
 template<class T>
   class threaded_message_queue {
     public:
@@ -74,7 +74,7 @@ template<class T>
 
 你还可以加上一个 push_back 的移动语义：
 
-```c++
+```cpp
     void push_back(T &&t) {
       {
         lock l(_m);
@@ -92,7 +92,7 @@ template<class T>
 
 X-class 在构造函数的入参部分有相似的构造：
 
-```c++
+```cpp
 namespace hicc::debug {
 
     class X {

@@ -21,7 +21,7 @@ categories: golang testing
 comments: true
 toc: true
 header:
-  overlay_image: /assets/images/unsplash-image-11.jpg
+  overlay_image: /images/unsplash-image-11.jpg
   overlay_filter: rgba(128, 128, 0, 0.3)
 excerpt: >-
   Golang 测试补充篇，介绍一些重构的思路，介绍前文未及提及的某些内容...
@@ -163,7 +163,7 @@ func TestDiff(t *testing.T) {
 
 如果是采用 `Equal` 断言，当 `expected` 与 `actual` 确实不相等时，断言失败的输出中还将会自动打印两个结构的不同的部分，这是通过 `assert.DiffValues` 功能完成的，所以上面的测试代码中为了能让整个测试代码通过决定采用 `NotEqual` 和 `DiffValues` 配合的方式来展示不同之处，形如：
 
-![image-20201028075651364](https://i.loli.net/2020/10/28/41crkJdzwpFLU3o.png)
+![image-20201028075651364](/images/blog/41crkJdzwpFLU3o.png)
 
 请注意其中的 diff 颜色，有时候还是有点作用的。
 

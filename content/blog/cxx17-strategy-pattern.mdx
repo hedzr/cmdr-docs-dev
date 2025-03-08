@@ -9,8 +9,8 @@ categories: c++ algorithm
 comments: true
 toc: true
 header:
-  teaser: https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/dp-strategy-3221408.svg
-  overlay_image: /assets/images/3953273590_704e3899d5_m.jpg
+  teaser: /images/blog/2021-10-03-cxx17-strategy-pattern/dp-strategy-3221408.svg
+  overlay_image: /images/3953273590_704e3899d5_m.jpg
   overlay_filter: rgba(16, 16, 32, 0.73)
 excerpt: >-
   重新思考状态模式的实作可能性...
@@ -101,7 +101,7 @@ void test_strategy_basic() {
 
 除了上面的测试代码部分那样的写法之外，我们还可以援引工厂模式来创建所有 router 的实例，并且枚举全部 routers 来一次性地得到所有路径规划。这种遍历的方式也是工程上真实会采用的方案，例如地图软件中总是这么管理所有的可能的`路由器`的。
 
-![dp-strategy](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/dp-strategy-3221408.svg)
+![dp-strategy](/images/blog/2021-10-03-cxx17-strategy-pattern/dp-strategy-3221408.svg)
 
 ### 整理
 

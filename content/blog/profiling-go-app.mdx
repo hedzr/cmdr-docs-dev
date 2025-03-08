@@ -9,8 +9,8 @@ categories: golang profiling
 comments: true
 toc: true
 header:
-  teaser: https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/image-20231026110402900.png
-  overlay_image: /assets/images/unsplash-image-3.jpg
+  teaser: /images/blog/2023-10-25-profiling-go-app/image-20231026110402900.png
+  overlay_image: /images/unsplash-image-3.jpg
   overlay_filter: rgba(128, 128, 0, 0.3)
 excerpt: >-
   谈论 Golang 代码优化问题，罗列一些常见手段关于 optimizations, 调优，等等 ...
@@ -46,7 +46,7 @@ Profiling and Tune/Optimizing 是编程中例行的研究手段，用时髦的�
 
 和一般的 C++ 老手的直觉完全不同，给函数传递结构体在 C++ 里面是很傻的行为，因为这带来隐含的结构体平凡拷贝（[Trivial Copy](https://en.cppreference.com/w/cpp/named_req/TriviallyCopyable)，按位按字节复制结构体本身，对于指针成员仅复制指针本身，而不制作指针所指向的对象的副本），所以老式的 C++ 程序员会记得传递结构体的指针，而善用新风格的则更愿意使用结构体的引用，特别是 const 方式的引用。例如：
 
-```c++
+```cpp
 #include <string>
 #include <regex>
 
@@ -551,7 +551,7 @@ json 之类的东西，yaml 或者 toml 等等，全都代价昂贵。
 
 在 Goland 中 Bench with Profiling 非常容易，也很容易查看 pprof 火焰图，以及 Allocated Objects 统计表。
 
-![image-20231026110402900](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/image-20231026110402900.png)
+![image-20231026110402900](/images/blog/2023-10-25-profiling-go-app/image-20231026110402900.png)
 
 > 在一个 Test/Bench 函数的左侧边栏上直接做带有内存分配分析的 pprof，直接就可以。
 >

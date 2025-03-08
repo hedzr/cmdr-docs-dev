@@ -9,8 +9,8 @@ categories: c++ algorithm
 comments: true
 toc: true
 header:
-  teaser: https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/declval-deduce-type.png
-  overlay_image: /assets/images/3953273590_704e3899d5_m.jpg
+  teaser: /images/blog/2021-10-21-cxx-std-declval-and-decltype//declval-deduce-type.png
+  overlay_image: /images/3953273590_704e3899d5_m.jpg
   overlay_filter: rgba(16, 16, 32, 0.73)
 excerpt: >-
   理解 `std::declval` 的力量；顺带提提抽象类容器化等 tricks ...
@@ -37,7 +37,7 @@ int main() {
 
 但如此简单的一个东西，怎么就需要新增一个关键字这么大件事呢？还是元编程闹的！元编程世界里，长的怀疑人生的一串模板类声明让人崩溃，重复书写它们更是累赘。例如一条运行时调试日志输出：
 
-![image-20211018201558979](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/image-20211018201558979.png)
+![image-20211018201558979](/images/blog/2021-10-21-cxx-std-declval-and-decltype//image-20211018201558979.png)
 
 这不是我印象中最长的名称，只是最顺手就能截取的一个引用。这样的例子多的是。
 
@@ -124,7 +124,7 @@ int main() {
 
 下面的来自于某 ppt 的一页还展示了表达式不必求值仅求类型的用例：
 
-![slide 14](https://raw.githubusercontent.com/hzimg/blog-pics/master/uPic/cpp_genericity_type_deduction_14.svg)
+![slide 14](/images/blog/2021-10-21-cxx-std-declval-and-decltype//cpp_genericity_type_deduction_14.svg)
 
 > FROM: [HERE](https://hackingcpp.com/cpp/lang/type_deduction.html)
 

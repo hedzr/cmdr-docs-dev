@@ -56,7 +56,7 @@ toc: true
 
 > CPU 高速缓存以及内存的访问延迟：
 >
-> ![img](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/03.smp.assets/20200209163031.png)
+> ![img](/images/blog/images/03.smp.assets/20200209163031.png)
 
 可想而知，如果多颗 CPU 核心的 L1 们同时都有内存地址 Addr 处的数据块在它们各自的 Cache Lines 中的话，某个核心如果修改了该数据块，则其它核心的相应的 Cache Lines 都会被无效掉，然后那些核心的指令操作将会不得不重新通过总线访问内存数据。
 
@@ -66,7 +66,7 @@ toc: true
 >
 > False sharing occurs when threads on different processors modify variables that reside on the same cache line. This invalidates the cache line and forces a memory update to maintain cache coherency. Threads 0 and 1 require variables that are adjacent in memory and reside on the same cache line. The cache line is loaded into the caches of CPU 0 and CPU 1 (gray arrows). Even though the threads modify different variables (red and blue arrows), the cache line is invalidated, forcing a memory update to maintain cache coherency.
 >
-> ![img](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/03.smp.assets/x86-cache-line-false-sharing.gif)
+> ![img](/images/blog/images/03.smp.assets/x86-cache-line-false-sharing.gif)
 >
 > |     |     | 来自于[^100] |
 > | --- | --- | -----------: |

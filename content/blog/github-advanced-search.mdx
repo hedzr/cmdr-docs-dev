@@ -9,9 +9,9 @@ categories: tech nology
 comments: true
 toc: true
 header:
-  teaser: https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/Picsee/github-advanced-search/image-20220918075935077.png
-  teaser1: https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/assets/images/unsplash-gallery-image-1-th.jpg
-  overlay_image: /assets/images/unsplash-gallery-image-1-th.jpg
+  teaser: /images/blog/2022-09-23-github-advanced-search/image-20220918075935077.png
+  teaser1: /images/unsplash-gallery-image-1-th.jpg
+  overlay_image: /images/unsplash-gallery-image-1-th.jpg
   overlay_filter: rgba(16, 16, 32, 0.73)
 excerpt: >-
   搜索与hack...
@@ -27,13 +27,13 @@ GitHub 支持一套很强大到搜索语法，虽然不一定能像 Google 的�
 
 GitHub 提供一个主题入口 [GitHub Search Cheat Sheet](https://github.com/search#search_cheatsheet_pane) ，你可以从这个入口开始你的搜索之旅，而不是直接在左上角的搜索框中搜索。因为在这个主题入口中给出的帮助信息：For an [advanced search](https://github.com/search/advanced), use some of our prefixes. 其中 `prefixes` 是可以点击的，然后会得到一个页面内的弹出对话框，大概像这样子：
 
-![image-20220918075935077](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/Picsee/github-advanced-search/image-20220918075935077.png)
+![image-20220918075935077](/images/blog/2022-09-23-github-advanced-search/image-20220918075935077.png)
 
 换句话说，它有助于你从一无所知开始进行 GitHub 中的高级搜索。
 
 你可以直接使用 [advanced search](https://github.com/search/advanced) 这一入口。这一入口将高级搜索语法转变为一系列的输入框，让你可以以填空的方式进行搜索，适合于不知道高级搜索语法能力的人群，并且能够给他们充分的提示以掌握搜索语法。
 
-![image-20220918080311727](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/Picsee/github-advanced-search/image-20220918080311727.png?raw=true)
+![image-20220918080311727](/images/blog/2022-09-23-github-advanced-search/image-20220918080311727.png)
 
 对于已经掌握搜索语法的人群来说，就可以直接使用 [GitHub Search Cheat Sheet](https://github.com/search#search_cheatsheet_pane) 或者是页面左上角的搜索框来开始搜索。
 
@@ -203,7 +203,7 @@ User search finds users with an account on GitHub. You can also filter the resul
 
 可以直接搜索出大量的私钥，方法是采用关键字 `BEGIN RSA PRIVATE KEY` 来搜索纯文本内容，可能的结果类似于：
 
-![image-20220919143857845](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/Picsee/github-advanced-search/image-20220919143857845.png?raw=true)
+![image-20220919143857845](/images/blog/2022-09-23-github-advanced-search/image-20220919143857845.png)
 
 接下来就是评估工作了。
 
@@ -211,7 +211,7 @@ User search finds users with an account on GitHub. You can also filter the resul
 
 直接搜索可用的密码，这本身不怎么靠谱。但是与密码操作有关系的可以有很多内容：
 
-![image-20220919144034472](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/Picsee/github-advanced-search/image-20220919144034472.png?raw=true)
+![image-20220919144034472](/images/blog/2022-09-23-github-advanced-search/image-20220919144034472.png)
 
 很难说这些内容能够起到什么样的作用。
 
@@ -221,7 +221,7 @@ User search finds users with an account on GitHub. You can also filter the resul
 
 针对 PHP 网站的后段代码做代码审计，可以审查 `$_GET` 误用，`eval` 调用滥用等等情况，例如搜索词：`extension:php mysql_query $_GET`:
 
-![image-20220920105911944](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/Picsee/github-advanced-search/image-20220920105911944.png?raw=true)
+![image-20220920105911944](/images/blog/2022-09-23-github-advanced-search/image-20220920105911944.png)
 
 这些后端代码是否滥用误用相应的 query 参数，导致潜在的 SQL 注入漏洞，shell 反弹注入漏洞等等，可以通过上面的代码审计来作出评估。
 
@@ -229,7 +229,7 @@ User search finds users with an account on GitHub. You can also filter the resul
 
 可以试试 `extension:mysql PASSWORD`，结果可能出人意料：
 
-![image-20220920110212215](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/Picsee/github-advanced-search/image-20220920110212215.png?raw=true)
+![image-20220920110212215](/images/blog/2022-09-23-github-advanced-search/image-20220920110212215.png)
 
 尽管图例中的两个结果可能不是漏洞，但是……
 
@@ -241,7 +241,7 @@ User search finds users with an account on GitHub. You can also filter the resul
 
 可能的结果如同这样：
 
-![image-20220920105454060](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/Picsee/github-advanced-search/image-20220920105454060.png?raw=true)
+![image-20220920105454060](/images/blog/2022-09-23-github-advanced-search/image-20220920105454060.png)
 
 你需要在这个基础上进行进一步的过滤。
 
@@ -271,7 +271,7 @@ stars:>1000 forks:>100 extension:php "eval(preg_replace("
 
 它可能会返回这样的结果：
 
-![image-20220918075402094](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/Picsee/github-advanced-search/image-20220918075402094.png?raw=true)
+![image-20220918075402094](/images/blog/2022-09-23-github-advanced-search/image-20220918075402094.png)
 
 ## REFs
 

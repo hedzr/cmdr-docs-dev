@@ -9,8 +9,8 @@ categories: devops linux
 comments: true
 toc: true
 header:
-  teaser: https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/image-20220101205558999.png
-  overlay_image: /assets/images/ubuntuhero.jpg
+  teaser: /images/blog/2021-12-31-build-pxe-server-and-autoinstall-ubuntu-server/image-20220101205558999.png
+  overlay_image: /images/ubuntuhero.jpg
   overlay_filter: rgba(32, 32, 0, 0.5)
 excerpt: >-
   建立一个 PXE 服务器以便在 LAN 中提供 UbuntuServer 的自动化安装任务 / new post about building a pxe server and get unattended ubuntu server installation work. [...]
@@ -87,7 +87,7 @@ PXE 是**预启动执行环境**（**Preboot eXecution Environment**，**PXE**�
 
 所以我们需要在 LAN 中运行一台 PXE 服务器来提供 DHCP+BOOTP 服务。其中 DHCP 服务通过 UDP 协议等候裸机的网卡召唤请求一个新的 IP 地址，BOOTP 附着在 DHCP New IP Requested 报文中回应给裸机网卡，支持 BOOTP 协议的网卡就能检索对应的 BOOTP 文件并载入它进行首次启动。PXE 服务器的 DHCP+BOOP 服务通常回应的启动文件名为 pxelinux.0，这是可定制的。
 
-![img](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/290px-PXE_diagram.png)
+![img](/images/blog/2021-12-31-build-pxe-server-and-autoinstall-ubuntu-server/290px-PXE_diagram.png)
 
 客户机网卡以此文件名向 PXE 服务器的 TFTP 服务请求该文件，读取此文件到内存中特定位置，并将 CPU 执行权限交给该启动位置，进入相应的启动流程。
 
@@ -218,7 +218,7 @@ v_config() {
 
 我们将要达成的目标是建立这样的 TFTP 布局：
 
-![image-20220101132339519](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/image-20220101132339519.png)
+![image-20220101132339519](/images/blog/2021-12-31-build-pxe-server-and-autoinstall-ubuntu-server/image-20220101132339519.png)
 
 此外，还需要配置 DHCP，Web Server 等等。
 
@@ -744,11 +744,11 @@ user-data 是 cloud-init 规范的一部分，但 cloud-init 和 autoinstall 是
 
 新主机上电并获得 DHCP+BOOTP 启动参数后，运行 pxelinux.0 和自动执行 GRUB 菜单项时（图中处于 inittd 和 vmlinuz 运行状态）：
 
-![image-20220101205844882](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/image-20220101205844882.png)
+![image-20220101205844882](/images/blog/2021-12-31-build-pxe-server-and-autoinstall-ubuntu-server/image-20220101205844882.png)
 
 已经进入到无人值守系统安装流程的状态如下图：
 
-![image-20220101205558999](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/image-20220101205558999.png)
+![image-20220101205558999](/images/blog/2021-12-31-build-pxe-server-and-autoinstall-ubuntu-server/image-20220101205558999.png)
 
 我们没有解决的问题是：
 
