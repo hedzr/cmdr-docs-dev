@@ -25,10 +25,41 @@
    SFMono-Regular,
 */
 
-code, kbd, samp, pre {
-  font-family: "Martian Mono", "IBM Plex Mono", "Azeret Mono", var(--default-mono-font-family, ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace) !important;
-  font-feature-settings: var(--default-mono-font-feature-settings, normal) !important;
-  font-variation-settings: var(--default-mono-font-variation-settings, normal) !important;
+article ol {
+  list-style: decimal;
+}
+
+article a {
+  @apply text-sky-400;
+}
+article a[data-card] {
+  color: inherit !important;
+}
+
+code,
+kbd,
+samp,
+pre {
+  font-family:
+    "Martian Mono", "IBM Plex Mono", "Azeret Mono",
+    var(
+      --default-mono-font-family,
+      ui-monospace,
+      Menlo,
+      Monaco,
+      Consolas,
+      "Liberation Mono",
+      "Courier New",
+      monospace
+    ) !important;
+  font-feature-settings: var(
+    --default-mono-font-feature-settings,
+    normal
+  ) !important;
+  font-variation-settings: var(
+    --default-mono-font-variation-settings,
+    normal
+  ) !important;
   font-size: 1em !important;
 }
 
@@ -71,6 +102,7 @@ h5,
 h6 {
   /*margin: 2em 0 1.67em;*/
   line-height: 1.2;
+  @apply text-zinc-300;
 }
 
 article h1 {
