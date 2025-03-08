@@ -63,7 +63,7 @@ export default async function BlogIndexPage({
   const sp = await searchParams;
   const query = sp?.query || "";
   const currentPage = Number(sp?.page) || 1;
-  const perPage = 7;
+  const perPage = Number(sp?.perpage) || 7;
   const lang = (await params).lang;
 
   // const ppp = pf(blog);
@@ -94,9 +94,7 @@ export default async function BlogIndexPage({
   let title: string = safeTitle(metadata);
 
   console.log(
-    `index - page: ${currentPage}, total: ${posts.length}.`,
-    sp,
-    lang,
+    `--- blog.index: ${currentPage}/${perPage}/${lang}, total: ${posts.length}, sp: ${sp}`,
   );
   // console.log(blog.getLanguages());
 
@@ -136,9 +134,9 @@ export default async function BlogIndexPage({
           {posts.map((post) => {
             const draft = safeget(post.data, "draft", false);
             const img = post.data.header?.teaser || spot.src; // safeget(post.data, "header", { teaser: "" }).teaser || spot
-            console.log(
-              `  list post ${post.data.date}: ${post.slugs}, teaser: ${img}`,
-            );
+            // console.log(
+            //   `  list ${post.data.date}: ${post.slugs}, teaser: ${img}`,
+            // );
             return draft && prodMode ? (
               <></>
             ) : (
