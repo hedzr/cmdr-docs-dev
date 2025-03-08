@@ -20,13 +20,15 @@ excerpt: >-
 #      url: "https://unsplash.com"
 ---
 
-# grep 工具实用页
+## grep 工具实用页 [#top-ch]
 
 这次讲的是 bash 命令行中的外部命令 `grep` 的一些事情。
 
 > 这是以前的旧文档了，不过陆续地我会回顾和订正一下，然后全数搬移到这边来，慢慢做，有的没意思的就扔了。
 
-## 历史 [^1]
+## 历史 [#history]
+
+历史 [^1]
 
 **grep**是一个最初用于 [Unix](https://zh.wikipedia.org/wiki/Unix) 操作系统的 [命令行](https://zh.wikipedia.org/wiki/%E5%91%BD%E4%BB%A4%E8%A1%8C) 工具。在给出文件列表或 [标准输入](https://zh.wikipedia.org/wiki/%E6%A0%87%E5%87%86%E8%BE%93%E5%85%A5) 后，grep会对匹配一个或多个 [正则表达式](https://zh.wikipedia.org/wiki/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F) 的文本进行搜索，并只输出匹配（或者不匹配）的行或文本。
 
@@ -38,7 +40,7 @@ grep这个应用程序最早由 [肯·汤普逊](https://zh.wikipedia.org/wiki/%
 
 以上主要来自维基中。
 
-## 功能
+## 功能 [#function]
 
 grep 使用正则表达式搜索文本，并把匹配的行打印出来。作为输入的文本，可以来自标准输入，也可以来自（任意多个、通配符表示的）文件，新版本的 grep 也支持面向当前目录的子文件夹遍历所有文件进行正则式匹配和搜索。
 
@@ -90,7 +92,7 @@ Example: grep -i 'hello world' menu.h main.c
 
 完整的参考手册请通过命令行 `man grep` 和 `info grep` 来检索。
 
-## 基本用法 [^2]
+## 基本用法 [^2] [#basic-usages]
 
 在文件中搜索一个单词，命令会返回一个包含**“match_pattern”**的文本行：
 
@@ -283,7 +285,7 @@ b
 
 > Perl 正则式语法，又被称作 PCRE表达式，可以参考 [Wiki 的PCRE表达式全集](https://zh.wikipedia.org/wiki/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F)。
 
-## 常见的惯用法
+## 常见的惯用法 [#idioms]
 
 ### find text string recursively
 
@@ -439,7 +441,7 @@ has-group () {
 has-group staff && echo 'staff group exists' || echo 'staff group not exists'
 ```
 
-### 更多
+### 更多 [#more]
 
 下面，我们给出一些实用的例子：
 
@@ -453,13 +455,13 @@ genpasswd(){ strings /dev/urandom|grep -oP '[[:alnum:]]|[\#\%\@\&\^]'|head -n "$
 
 ```
 
-## 结束语
+## 结束语 [#conclusion]
 
 grep 和 awk，sed 是 Linux 的三大工具，很大程度上代表的 Linux 的设计哲学，即小巧、专注、组合。使用 grep 这样的工具最大的技巧就在于对目标行为进行分解：拿到源文本，筛选源文本，构造结果输出。
 
 本文也只是讲解到了基本的用法部分，打开思路还是要看你自己的聪明才智。
 
-## 参考
+## 参考 [#ref]
 
 [^1]: https://zh.wikipedia.org/wiki/Grep
 

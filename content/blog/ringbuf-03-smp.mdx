@@ -12,9 +12,9 @@ toc: true
 > **摘要**：  
 > 本文针对并发编程、尤其是 SMP 下的并发择其要点简要进行叙述。
 
-### 并发和多核编程概要
+## 并发和多核编程概要
 
-#### 内存屏障
+### 内存屏障
 
 内存屏障是一个大型的话题。下面我们浓缩一些要点。
 
@@ -24,13 +24,13 @@ toc: true
 
 这当然是物理电路上实现的，但也是通过诸如 lfense/sfence/mfense 机器指令来触发的（对于 x86 来说）。通过总线锁定，CPU 多个核心的写入动作能够依据例如 sfense 的宣告来顺次提交到内存地址 M 上，并且能够通过总线解锁的信号来通知到 CPU 的每个核心能够将相应的高速缓存条目无效化，无效化的后果就是当核心 N 执行下一指令访问 M 的数据时，新鲜的数据版本能够被重新载入到核心 N 的高速缓存，这就解决了过时的脏数据问题，保证了数据的一致性。
 
-#### 内存模型和内存顺序
+### 内存模型和内存顺序
 
 略
 
-#### 数据一致性
+### 数据一致性
 
-##### Gcc
+#### Gcc
 
 在 Linux 中，gcc 提供编译器屏障 barrier() 和 ACESS_ONCE()，此外还有CPU内存屏障：
 
@@ -40,7 +40,7 @@ toc: true
 
 此外，使用 gcc [内建的原子操作](https://gcc.gnu.org/onlinedocs/gcc-4.4.5/gcc/Atomic-Builtins.html) ，包括 对 int32，int64 的 `cmpxchg` 等特性，也都对数据一致性提供了相应的支持。注意 C++11 可以使用标准的 [atomic库](http://en.cppreference.com/w/cpp/atomic) 来达到同样的效果。
 
-##### Golang 中的数据一致性
+#### Golang 中的数据一致性
 
 在 Golang 中，内存屏障、内存顺序等技术点是被隐含在 Go 语言编码约定中的。这些约定大体上体现在 包初始化顺序，Goroutine创建、销毁、以及共享变量在主线程以及 Goroutines 之间的同步，Channel通讯，锁（sync包）等方面[^4]。
 
@@ -48,7 +48,7 @@ toc: true
 
 全面讨论 多核、并发编程，已经是一整本书的问题，因此这里只能择其概要进行简述。总而言之，我们现在就要综合上述的各种知识点来具体实现一个无锁的环形队列，这个队列是有界的，你可以选择在抵达边界时的行为是锁定还是覆盖。下面我们具体来研究细节。
 
-#### false sharing
+### false sharing
 
 假共享 false sharing 是一种在 SMP 上特有的性能问题。
 
@@ -110,12 +110,12 @@ Intel 为了解决这些缓存间的同步问题，在 cache 上实现了 [MESIF
 
 一致性原语在支持并行的语言里都有支持，golang 也不例外。golang 官方已经提供给我们不少资料来描述这个问题，首先就是 github 上的 [LearnConcurrency](https://github.com/golang/go/wiki/LearnConcurrency)，里面详细介绍了一致性原语的设计、使用中的细节。其中最推荐看的是这篇 [The Go Memory Model](https://golang.org/ref/mem)，不仅列举了不少一致性原语的正确打开方式，更是引入了[Happens Before](https://golang.org/ref/mem#tmp_2) 这一重要概念。
 
-#### Golang 一致性原语及内存模型
+### Golang 一致性原语及内存模型
 
 略
 
-#### Go 和 乱序执行
+### Go 和 乱序执行
 
-##### atomic 包
+#### atomic 包
 
 所有 `Store` 内存的操作，实际上都带了 `LOCK` 前缀，也就是说都有 Happens Before 的语义。而 golang 在分配内存的时候，是实现了内存对齐的，所以单纯地 `Load` 内存的操作，也可以保证操作原子性，但不保证 Happens Before 的语义。这也刚好解释了为何在 [The Go Memory Model](https://golang.org/ref/mem) 只字不提 atomic 和 Happens Before 的关系。

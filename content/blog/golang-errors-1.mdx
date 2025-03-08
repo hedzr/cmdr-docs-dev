@@ -20,7 +20,7 @@ excerpt: >-
 #      url: "https://unsplash.com"
 ---
 
-## Golang errors 最佳实践 Part I
+> Golang errors 最佳实践 Part I
 
 > 这个系列的文章有一定的摘抄，来自于原文，也包括译文等等。
 >
@@ -295,7 +295,9 @@ func (ew *errWriter) Flush() error {
 
 从而将多个步骤的 Write 产生的错误累积到了 Flush() 返回时再进行处理。
 
-### 测试其行为而不是测试其类型[^1]
+### 测试其行为而不是测试其类型
+
+测试其行为而不是测试其类型 [^1]。
 
 以前我们可能习惯于这样子测试一个错误类型：
 

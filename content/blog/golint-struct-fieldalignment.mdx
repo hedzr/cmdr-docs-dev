@@ -9,7 +9,7 @@ categories: golang lint
 comments: true
 toc: true
 header:
-  teaser: /images/blog/image-20231026110402900.png
+  teaser: /images/blog/2023-10-25-profiling-go-app/image-20231026110402900.png
   overlay_image: /images/unsplash-image-3.jpg
   overlay_filter: rgba(128, 128, 0, 0.3)
 excerpt: >-
@@ -30,12 +30,11 @@ type MyStruct struct { //nolint:govet //can be reordered
 	required string
 	note     *string
 }
-
 ```
 
 这个结构体（去掉 nolint 宣告后）会得到 golangci-lint govet filedalignment 的报告：
 
-```
+```plain
 fieldalignment: struct with 32 pointer bytes could be 16 (govet)
 ```
 
@@ -109,8 +108,9 @@ type MyStruct struct {
 6. int8/byte 次之
 7. bool 最后
 8. 特别案例
+
    1. 空结构 `struct{}` 在语言规范层面被设计为 0 字节占用，而不是像结构那样被当作隐式指针。它需要被置于结构体最前端。
-   1. 其后才是 map，pointer
+   2. 其后才是 map，pointer
 
 总的来说，字段摆放和 C++ 惯例上的字长对齐是一点关系也没有的。而且所谓的不合格的顺序，其实和对齐之后节约空间也是一点关系都木有。
 
