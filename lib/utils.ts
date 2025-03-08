@@ -118,6 +118,24 @@ export function stringToDate(date: string) {
   return new Date(year, month - 1, day);
 }
 
+export function stringToDatetime(date: string | Date) {
+  if (date instanceof Date) return date;
+  if (!date) return new Date(1973, 3, 13);
+  try {
+    const d = new Date(date);
+    return d;
+  } catch (e) {
+    const dta = date.split(/[ T]/);
+    const [day, month, year] = dta[0].split("-").map(Number);
+    const [h, m, s] = dta.length > 1 ? dta[1].split(":").map(Number) : [0, 0, 0];
+    if (day > 1970) {
+      const y = day, m = month, d = year;
+      return new Date(y, m - 1, d, h, m, s);
+    }
+    return new Date(year, month - 1, day, h, m, s);
+  }
+}
+
 export function safe(s: any, defval: string = ''): string {
   if (!s) return defval;
   if (typeof s === 'string') return s;
