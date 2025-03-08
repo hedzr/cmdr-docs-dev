@@ -1,7 +1,9 @@
-import {safeget, isFieldValid, prodMode} from "@/lib/utils";
-import { LoaderOutput, MetaData } from "fumadocs-core/source";
+import { safeget, isFieldValid, prodMode } from "@/lib/utils";
+import {LoaderOutput, MetaData, Page} from "fumadocs-core/source";
 import { BaseCollectionEntry, MarkdownProps } from "fumadocs-mdx/config";
+import { cache } from "react";
 import { objectOutputType, ZodTypeAny } from "zod";
+import {blogPageProps} from "@/lib/types";
 
 const test = (
   qry: string,
@@ -93,62 +95,77 @@ const test = (
   return false;
 };
 
-export function getPosts<T>(
+export const sortPages = cache((pages: Page<blogPageProps>[]): Page<blogPageProps>[] => {
+  return pages.sort(
+    (a: any, b: any) =>
+      new Date(safeget(safeget(b, "data", {}), "date", "")).getTime() -
+      new Date(safeget(safeget(b, "data", {}), "date", "")).getTime()
+  );
+});
+
+/**
+ * filtering and sorting all posts and return new subset.
+ * @param pages T[], unsorted, unfiltered posts
+ * @param lang
+ * @param query
+ * @returns T[]
+ */
+export function filterPosts<T>(
   pages: T[],
   lang: string,
   query: string | string[]
-) {
-  const posts = pages
-    .filter((v, i, a) => {
-      if (!v) return false;
+): T[] {
+  const posts = pages.filter((v, i, a) => {
+    if (!v) return false;
 
-      // console.log(v, i);
+    // console.log(v, i);
 
-      const fm = safeget(v,'data',{});
-      const slug = safeget(v,'slugs',[]).join("-");
-      const log = false; // /(golang)/i.test(slug);
+    const fm = safeget(v, "data", {});
+    const slug = safeget(v, "slugs", []).join("-");
+    const log = false; // /(golang)/i.test(slug);
 
-      if (log) console.log(`searching for ${slug}`);
-      if (typeof query !== "string") {
-        for (const key in query) {
-          if (key !== "") {
-            if (test(key, fm, slug, log)) {
-              const draft = safeget(fm, "draft", false);
-              if (log)
-                console.log(
-                  `search test q[] - '${key}' ok, and [draft test == ${!draft || !prodMode}]: ${slug}`
-                );
-              return !draft || !prodMode;
-            }
+    if (log) console.log(`searching for ${slug}`);
+    if (typeof query !== "string") {
+      for (const key in query) {
+        if (key !== "") {
+          if (test(key, fm, slug, log)) {
+            const draft = safeget(fm, "draft", false);
+            if (log)
+              console.log(
+                `search test q[] - '${key}' ok, and [draft test == ${
+                  !draft || !prodMode
+                }]: ${slug}`
+              );
+            return !draft || !prodMode;
           }
         }
-        return false;
-      } else if (query !== "") {
-        if (!test(query, fm, slug, log)) return false;
-        const draft = safeget(fm, "draft", false);
-        if (log)
-          console.log(
-            `search test q - '${query}' ok, and [draft test == ${!draft || !prodMode}]: ${slug}`
-          );
-        return !draft || !prodMode;
       }
-
+      return false;
+    } else if (query !== "") {
+      if (!test(query, fm, slug, log)) return false;
       const draft = safeget(fm, "draft", false);
       if (log)
         console.log(
-          `search final test '${query}' [draft test == ${!draft || !prodMode}]: ${slug}`
+          `search test q - '${query}' ok, and [draft test == ${
+            !draft || !prodMode
+          }]: ${slug}`
         );
       return !draft || !prodMode;
-    })
-    .sort(
-      (a, b) =>
-        new Date(safeget(safeget(b,'data',{}),'date','')).getTime() -
-        new Date(safeget(safeget(b,'data',{}),'date','')).getTime()
-    );
+    }
+
+    const draft = safeget(fm, "draft", false);
+    if (log)
+      console.log(
+        `search final test '${query}' [draft test == ${
+          !draft || !prodMode
+        }]: ${slug}`
+      );
+    return !draft || !prodMode;
+  });
   return posts;
 }
 
-export function filterPostsByPage<T>(
+export function extractPostsByPage<T>(
   posts: T[],
   page: number,
   perpage: number
