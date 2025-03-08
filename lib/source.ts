@@ -1,5 +1,5 @@
 import { docs, blog as blogPosts } from '@/.source';
-import { InferMetaType, InferPageType, loader } from 'fumadocs-core/source';
+import { InferMetaType, InferPageType, loader, LoadOptions} from 'fumadocs-core/source';
 import { i18n } from "./i18n";
 // import { createOpenAPI } from "fumadocs-openapi/server";
 // import { docs, blog as blogPosts } from "@/.source"
@@ -24,13 +24,19 @@ export const source = loader({
 
 export const openapi = createOpenAPI();
 
-export const usingCollection = true;
+// export const usingCollection = true;
+
+const sortTransformer = (_context: { storage: any; options: LoadOptions; }) => {
+  // console.log(`options: ${JSON.stringify(_context.options)}, storage:`, _context.storage);
+  return;
+};
 
 export const blog = loader({
   baseUrl: '/blog',
   source: createMDXSource(blogPosts),
   // source: createMDXSource(docs.docs, docs.meta),
   i18n: i18n,
+  transformers: [sortTransformer]
 });
 
 // ' : loader({
