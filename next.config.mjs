@@ -6,6 +6,7 @@ import path from "path";
 
 const withAnalyzer = createBundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
+  openAnalyzer: false, // for .next/analyze/
 });
 
 const withMDX = createMDX();
@@ -79,6 +80,7 @@ const config = {
   //   // webpackMemoryOptimizations: true,
   //   // ppr: 'incremental',
   // },
+
   // disable static analysis
   // https://nextjs.org/docs/app/building-your-application/optimizing/memory-usage#disable-static-analysis
   eslint: {
