@@ -18,8 +18,8 @@ export interface SafeImageProps
   src: string | StaticImport; // Primary image source
   fallbackSrc?: string; // Default image source (optional)
   alt: string; // Alt text for accessibility
-  width?: number; // Optional width for the image
-  height?: number; // Optional height for the image
+  width?: number | `${number}`; // Optional width for the image
+  height?: number | `${number}`; // Optional height for the image
 }
 
 export const SafeImage = ({
@@ -43,19 +43,15 @@ export const SafeImage = ({
      Accepts HTTPS/HTTP links as-is.
    */
   const checkImage = (src: string | StaticImport) => {
-    if (typeof src === "string") {
-      if (!src.startsWith("https") && !src.startsWith("http")) {
-        setValidSrc(src.startsWith("/") ? src : "/" + src); // Ensure valid relative path
-        return;
-      }
-      setValidSrc(src); // Use the absolute URL as-is
-    } else {
-      const get = (c, p) => {
-        return c ? (p in c ? c[p] : undefined) : undefined;
-      };
-      setValidSrc(get(get(src, "default"), "src") || get(src, "src") || "");
+    const uri = getImageSrc(src);
+    // console.log("checkImage: src", src, "uri", uri);
+    if (!uri.startsWith("https") && !uri.startsWith("http")) {
+      setValidSrc(uri.startsWith("/") ? uri : "/" + uri); // Ensure valid relative path
+      return;
     }
+    setValidSrc(uri); // Use the absolute URL as-is
   };
+  // console.log(`SafeImage validSrc: ${validSrc}`);
   return (
     <Image
       src={validSrc} // The current valid source
@@ -94,6 +90,7 @@ export function ImageZoom({
   ...props
 }: ImageZoomProps) {
   const src = getImageSrc(props.src);
+  // console.log(`ImageZoom: ${src} | props:`, props);
   return (
     <Zoom
       zoomMargin={20}
