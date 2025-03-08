@@ -55,6 +55,7 @@ import {
 } from "@/page.client";
 import { buttonVariants1 } from "@/components/ui/button1";
 import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
+import { ArrowUp } from "lucide-react";
 
 export const dynamic = "force-static";
 // export const dynamic = "force-dynamic";
@@ -215,7 +216,7 @@ export default async function BlogPage(props: {
         className={`container blog flex flex-col px-0 py-8 lg:flex-row lg:px-4min-w-0 prose-zinc1 dark:prose-invert md:prose-md lg:prose-lg prose-headings:a:underline:none w-[85vw] sm:w-full sm:mx-auto prose-code:text-sm prose-code:leading-6 prose-headings:scroll-m-20 prose-code:font-code prose-code:p-1 prose-code:rounded-md prose-pre:border pt-2 prose-code:before:content-none prose-code:after:content-none !min-w-full prose-img:rounded-md prose-img:border`}
         // prose md:prose-md lg:prose-lg prose-${base} dark:prose-invert dark:prose-code:bg-${ref}-900 dark:prose-pre:bg-${ref}-900 prose-code:bg-${ref}-100 prose-pre:bg-${ref}-100 dark:prose-code:text-${base}-300 prose-code:text-${ref}-700
       >
-        <div className="min-w-0  flex-1 p-4">
+        <div id={"top-of-page"} className="min-w-0  flex-1 p-4">
           {useInlineTOC ? (
             <InlineTOC items={toc} />
           ) : (
@@ -362,7 +363,14 @@ export default async function BlogPage(props: {
 
           <Control url={page.url} />
         </div>
+
+        <div className="fixed bottom-4 right-8 lg:right-[250px] shrink-0 overflow-hidden rounded-full items-center justify-center">
+          <Link href="#top-of-page" className="">
+            <ArrowUp className="w-10 h-10" />
+          </Link>
+        </div>
       </article>
+
       <div
         id="tip-kb"
         className="mr-4 mb-4 disabled m-full text-sm text-zinc-600"
