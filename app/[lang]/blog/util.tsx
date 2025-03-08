@@ -1,9 +1,8 @@
 import { safeget, isFieldValid, prodMode, stringToDatetime } from "@/lib/utils";
-import { LoaderOutput, MetaData, Page } from "fumadocs-core/source";
-import { BaseCollectionEntry, MarkdownProps } from "fumadocs-mdx/config";
-import { cache } from "react";
-import { objectOutputType, ZodTypeAny } from "zod";
+import { Page } from "fumadocs-core/source";
 import { blogPageProps } from "@/lib/types";
+import { blog } from "@/lib/source";
+import { cache } from "react";
 
 const test = (
   qry: string,
@@ -95,23 +94,28 @@ const test = (
   return false;
 };
 
-export const sortPages = cache(
+export const getPages = cache((lang: string) => {
+  // const pages = [...blog.getPages(lang)];
+  const pages = blog.getPages(lang);
+  const ret = sortPages(pages);
+  return ret;
+});
+
+export const sortPages = // cache(
   (pages: Page<blogPageProps>[]): Page<blogPageProps>[] => {
     return pages.sort(
       (a: Page<blogPageProps>, b: Page<blogPageProps>) =>
         stringToDatetime(
-          b.data.date || "",
-          // safeget(safeget(b, "data", {}), "date", ""),
+          b.data.date || "", // safeget(safeget(b, "data", {}), "date", ""),
         ).getTime() -
         stringToDatetime(
-          a.data.date || "",
-          // safeget(safeget(a, "data", {}), "date", ""),
+          a.data.date || "", // safeget(safeget(a, "data", {}), "date", ""),
         ).getTime(),
       // new Date(safeget(safeget(b, "date", {}), "date", "")).getTime() -
-      // new Date(safeget(safeget(b, "date", {}), "date", "")).getTime(),
+      // new Date(safeget(safeget(a, "date", {}), "date", "")).getTime(),
     );
-  },
-);
+  };
+// )
 
 /**
  * filtering and sorting all posts and return new subset.

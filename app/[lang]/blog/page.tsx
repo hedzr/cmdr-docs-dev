@@ -6,7 +6,6 @@ import { formatDate2, prodMode, safeget } from "@/lib/utils";
 import { Metadata } from "next";
 import Link from "next/link";
 import spot from "@/public/assets/spot.png";
-import Image, { type ImageProps } from "next/image";
 import { Suspense } from "react";
 import { Pagination, Search } from "@/components/blog/pager";
 // import { TemplateString } from "next/dist/lib/metadata/types/metadata-types";
@@ -15,13 +14,11 @@ import { Pagination, Search } from "@/components/blog/pager";
 // import Footer from "@/components/layout/footer";
 // import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
 
-import { blog } from "@/lib/source";
-import { LoaderOutput, MetaData, Page } from "fumadocs-core/source";
-import { BaseCollectionEntry, MarkdownProps } from "fumadocs-mdx/config";
-import { objectOutputType, ZodTypeAny } from "zod";
+import { Page } from "fumadocs-core/source";
 import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
-import { filterPosts, extractPostsByPage, sortPages } from "./util";
+import {filterPosts, extractPostsByPage, getPages} from "./util";
 import { ImageZoom } from "fumadocs-ui/components/image-zoom";
+import {blogPageProps} from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -39,16 +36,16 @@ export const metadata: Metadata = {
   description: SITE_SLOGAN,
 };
 
-function safeTitle(md: Metadata): string {
-  let title: string = "The Latest Posts";
-  if (md.title) {
-    if (typeof md.title === "string") title = md.title.toString();
-    else if (typeof md.title === "object") {
-      if ("default" in md.title) title = md.title["default"].toString();
-    }
-  }
-  return title;
-}
+// function safeTitle(md: Metadata): string {
+//   let title: string = "The Latest Posts";
+//   if (md.title) {
+//     if (typeof md.title === "string") title = md.title.toString();
+//     else if (typeof md.title === "object") {
+//       if ("default" in md.title) title = md.title["default"].toString();
+//     }
+//   }
+//   return title;
+// }
 
 export default async function BlogIndexPage({
   params,
@@ -58,7 +55,7 @@ export default async function BlogIndexPage({
     lang: string;
     query?: string;
   }>;
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams?: Promise<{ [_key: string]: string | string[] | undefined }>;
 }) {
   const sp = await searchParams;
   const query = sp?.query || "";
@@ -68,9 +65,8 @@ export default async function BlogIndexPage({
 
   // const ppp = pf(blog);
 
-  const pages = [...blog.getPages(lang)];
-  const { posts, maxPage } = extractPostsByPage(
-    filterPosts(sortPages(pages), lang, query),
+  const pages: Page<blogPageProps>[] = getPages(lang);
+  const { posts, maxPage } = extractPostsByPage(filterPosts(pages, lang, query),
     currentPage,
     perPage,
   );
@@ -91,11 +87,12 @@ export default async function BlogIndexPage({
   // const length = Math.min(blogs.items.length, blogs.maxpage);
   // console.log("lang:", lang, "| count:", blogs.items.length);
 
-  let title: string = safeTitle(metadata);
+  // let title: string = safeTitle(metadata);
 
-  console.log(
-    `--- blog.index: ${currentPage}/${perPage}/${lang}, total: ${posts.length}, sp: ${sp}`,
-  );
+  if (!prodMode)
+    console.log(
+      `--- blog.index: ${currentPage}/${perPage}/${lang}, total: ${posts.length}, sp: ${sp}`,
+    );
   // console.log(blog.getLanguages());
 
   const bundle = (url: string, page: number): string => {
@@ -104,7 +101,7 @@ export default async function BlogIndexPage({
   };
 
   return (
-    <main className="container max-sm:px-0 md:py-12">
+    <main className="container max-sm:px-0 md:py-2">
       <div
         className="h-[113px] p-8 md:h-[213px] md:p-12"
         style={{
@@ -234,9 +231,9 @@ export default async function BlogIndexPage({
 //   );
 // }
 
-function BlogTable(query: string, currentPage: number) {
-  return <>empty</>;
-}
+// function BlogTable(_query: string, _currentPage: number) {
+//   return <>empty</>;
+// }
 
 function BlogTableSkeleton() {
   return <>empty</>;

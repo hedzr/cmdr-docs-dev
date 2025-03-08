@@ -1,18 +1,24 @@
 import { Metadata } from "next";
 import { blog, openapi, source } from "@/lib/source";
-import { formatDate2, isFieldValid, safe, safeget } from "@/lib/utils";
+import {
+  formatDate2,
+  isFieldValid,
+  prodMode,
+  safe,
+  safeget,
+} from "@/lib/utils";
 import { createMetadata } from "@/lib/metadata";
 import { lang2iso } from "@/lib/i18n";
 import { notFound } from "next/navigation";
 import { ComponentProps, FC, type HTMLAttributes, Suspense } from "react";
 import { blogPageProps } from "@/lib/types";
-import { filterPosts, sortPages } from "../util";
+import {filterPosts, getPages, sortPages} from "../util";
 import { Page } from "fumadocs-core/source";
 
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Control } from "./page.client";
+import { A, Control } from "./page.client";
 import { Callout } from "@/components/callout";
 import { Card, Cards } from "@/components/card";
 import { CodeBlock, Pre } from "@/components/codeblock";
@@ -51,8 +57,8 @@ import {
   BlogBackToListButton,
   BlogTagButton,
   FooterNoCache,
-  TocPopoverHeader,
-} from "@/page.client";
+} from "./page.client";
+import { TocPopoverHeader } from "@/page.client";
 import { buttonVariants1 } from "@/components/ui/button1";
 import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
 import { ArrowUp } from "lucide-react";
@@ -161,7 +167,7 @@ export default async function BlogPage(props: {
 
   // const sp = await props.searchParams;
   const fm = page.data;
-  console.log(`--- blog page ${lang} / ${params.slug} ----`);
+  if (!prodMode) console.log(`--- blog page ${lang} / ${params.slug} ----`);
   const { body: Mdx, toc, lastModified } = await fm.load();
   // const Mdx = page.data.body;
   // const toc = page.data.toc;
@@ -175,8 +181,9 @@ export default async function BlogPage(props: {
   let pageProps: prevNextProps = { prevNumber: 1, nextNumber: 1 };
   if (calcPrevAndNextPost) {
     const perPage = 7;
+    const query = '';
     // const { currentPage, perPage } = await getPageNumber();
-    pageProps = calcPrevNext(blog, lang, perPage, page);
+    pageProps = calcPrevNext(lang, perPage, page, query);
   }
 
   // @ts-ignore
@@ -216,7 +223,7 @@ export default async function BlogPage(props: {
         className={`container blog flex flex-col px-0 py-8 lg:flex-row lg:px-4min-w-0 prose-zinc1 dark:prose-invert md:prose-md lg:prose-lg prose-headings:a:underline:none w-[85vw] sm:w-full sm:mx-auto prose-code:text-sm prose-code:leading-6 prose-headings:scroll-m-20 prose-code:font-code prose-code:p-1 prose-code:rounded-md prose-pre:border pt-2 prose-code:before:content-none prose-code:after:content-none !min-w-full prose-img:rounded-md prose-img:border`}
         // prose md:prose-md lg:prose-lg prose-${base} dark:prose-invert dark:prose-code:bg-${ref}-900 dark:prose-pre:bg-${ref}-900 prose-code:bg-${ref}-100 prose-pre:bg-${ref}-100 dark:prose-code:text-${base}-300 prose-code:text-${ref}-700
       >
-        <div id={"top-of-page"} className="min-w-0  flex-1 p-4">
+        <div className="min-w-0 flex-1 p-4">
           {useInlineTOC ? (
             <InlineTOC items={toc} />
           ) : (
@@ -235,6 +242,7 @@ export default async function BlogPage(props: {
               </TocPopoverContent>
             </TocPopoverHeader>
           )}
+          <A name={"top-of-page"} />
           <Mdx
             components={{
               ...defaultMdxComponents,
@@ -365,6 +373,7 @@ export default async function BlogPage(props: {
         </div>
 
         <div className="fixed bottom-4 right-8 lg:right-[250px] shrink-0 overflow-hidden rounded-full items-center justify-center">
+          {/*  <!--suppress HtmlUnknownAnchorTarget --> */}
           <Link href="#top-of-page" className="">
             <ArrowUp className="w-10 h-10" />
           </Link>
@@ -487,14 +496,14 @@ interface prevNextProps {
 }
 
 const calcPrevNext = (
-  blog: any,
   lang: string,
   // _pageNum: number,
   perPage: number,
-  page: Page<blogPageProps>,
+  currPost: Page<blogPageProps>,
+  query: string = '',
 ): prevNextProps => {
-  const pages: Page<blogPageProps>[] = [...blog.getPages(lang)];
-  const posts = filterPosts(sortPages(pages), lang, "");
+  const pages: Page<blogPageProps>[] = getPages(lang);
+  const posts: Page<blogPageProps>[] = filterPosts(pages, lang, query);
   let prev: Page<blogPageProps> | undefined,
     next: Page<blogPageProps> | undefined,
     last: Page<blogPageProps>;
@@ -502,10 +511,10 @@ const calcPrevNext = (
     nextNumber: number = 1,
     n: number = 1;
   posts.map((it) => {
-    if (it.url === page.url) {
+    if (it.url === currPost.url) {
       prev = last;
       prevNumber = Math.floor((n + perPage - 1) / perPage);
-    } else if (last && last.url === page.url) {
+    } else if (last && last.url === currPost.url) {
       next = it;
       nextNumber = Math.floor((n + perPage - 1) / perPage);
     }
