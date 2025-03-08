@@ -21,7 +21,16 @@
 /* line numbers for code block
 
    TODO https://rehype-pretty.pages.dev/#line-numbers
+
+   SFMono-Regular,
 */
+
+code, kbd, samp, pre {
+  font-family: "Martian Mono", "IBM Plex Mono", "Azeret Mono", var(--default-mono-font-family, ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace) !important;
+  font-feature-settings: var(--default-mono-font-feature-settings, normal) !important;
+  font-variation-settings: var(--default-mono-font-variation-settings, normal) !important;
+  font-size: 1em !important;
+}
 
 code {
   counter-reset: step;
