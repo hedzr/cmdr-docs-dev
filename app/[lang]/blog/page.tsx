@@ -5,7 +5,7 @@ import { formatDate2, prodMode, safeget } from "@/lib/utils";
 // import { ChevronRightIcon, CircleIcon } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
-import spot from "@/public/images/spot.png";
+import spot from "@/public/assets/spot.png";
 import Image, { type ImageProps } from "next/image";
 import { Suspense } from "react";
 import { Pagination, Search } from "@/components/blog/pager";
