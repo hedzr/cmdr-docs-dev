@@ -1,15 +1,15 @@
-import { safeget, isFieldValid, prodMode } from "@/lib/utils";
-import {LoaderOutput, MetaData, Page} from "fumadocs-core/source";
+import { safeget, isFieldValid, prodMode, stringToDatetime } from "@/lib/utils";
+import { LoaderOutput, MetaData, Page } from "fumadocs-core/source";
 import { BaseCollectionEntry, MarkdownProps } from "fumadocs-mdx/config";
 import { cache } from "react";
 import { objectOutputType, ZodTypeAny } from "zod";
-import {blogPageProps} from "@/lib/types";
+import { blogPageProps } from "@/lib/types";
 
 const test = (
   qry: string,
   fm: any,
   slug: string,
-  log: boolean = false
+  log: boolean = false,
 ): boolean => {
   const qq = qry.replace(/[+-\[\]*\/\\{}()?^$]/g, (v) => {
     return "\\" + v;
@@ -34,7 +34,7 @@ const test = (
       if (q.test(t)) {
         if (log)
           console.log(
-            `searched ok (q=${q.toString()}) [category(${t})]: ${slug}`
+            `searched ok (q=${q.toString()}) [category(${t})]: ${slug}`,
           );
         return true;
       }
@@ -95,13 +95,23 @@ const test = (
   return false;
 };
 
-export const sortPages = cache((pages: Page<blogPageProps>[]): Page<blogPageProps>[] => {
-  return pages.sort(
-    (a: any, b: any) =>
-      new Date(safeget(safeget(b, "data", {}), "date", "")).getTime() -
-      new Date(safeget(safeget(b, "data", {}), "date", "")).getTime()
-  );
-});
+export const sortPages = cache(
+  (pages: Page<blogPageProps>[]): Page<blogPageProps>[] => {
+    return pages.sort(
+      (a: Page<blogPageProps>, b: Page<blogPageProps>) =>
+        stringToDatetime(
+          b.data.date || "",
+          // safeget(safeget(b, "data", {}), "date", ""),
+        ).getTime() -
+        stringToDatetime(
+          a.data.date || "",
+          // safeget(safeget(a, "data", {}), "date", ""),
+        ).getTime(),
+      // new Date(safeget(safeget(b, "date", {}), "date", "")).getTime() -
+      // new Date(safeget(safeget(b, "date", {}), "date", "")).getTime(),
+    );
+  },
+);
 
 /**
  * filtering and sorting all posts and return new subset.
@@ -113,7 +123,7 @@ export const sortPages = cache((pages: Page<blogPageProps>[]): Page<blogPageProp
 export function filterPosts<T>(
   pages: T[],
   lang: string,
-  query: string | string[]
+  query: string | string[],
 ): T[] {
   const posts = pages.filter((v, i, a) => {
     if (!v) return false;
@@ -134,7 +144,7 @@ export function filterPosts<T>(
               console.log(
                 `search test q[] - '${key}' ok, and [draft test == ${
                   !draft || !prodMode
-                }]: ${slug}`
+                }]: ${slug}`,
               );
             return !draft || !prodMode;
           }
@@ -148,7 +158,7 @@ export function filterPosts<T>(
         console.log(
           `search test q - '${query}' ok, and [draft test == ${
             !draft || !prodMode
-          }]: ${slug}`
+          }]: ${slug}`,
         );
       return !draft || !prodMode;
     }
@@ -158,7 +168,7 @@ export function filterPosts<T>(
       console.log(
         `search final test '${query}' [draft test == ${
           !draft || !prodMode
-        }]: ${slug}`
+        }]: ${slug}`,
       );
     return !draft || !prodMode;
   });
@@ -168,7 +178,7 @@ export function filterPosts<T>(
 export function extractPostsByPage<T>(
   posts: T[],
   page: number,
-  perpage: number
+  perpage: number,
 ): { posts: T[]; maxPage: number } {
   const start = (page - 1) * perpage,
     stop = page * perpage;
