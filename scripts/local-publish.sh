@@ -8,6 +8,9 @@ which vercel >/dev/null || {
 }
 [ -d .vercel ] || {
   vercel pull --yes --environment=production
+  # vercel pull --yes --environment=development
+  # vercel build --target development
+  # vercel deploy --prebuilt --target development --archive=tgz
 }
 vercel build --prod
 vercel deploy --prebuilt --prod --archive=tgz
