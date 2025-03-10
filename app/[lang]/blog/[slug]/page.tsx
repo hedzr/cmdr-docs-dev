@@ -8,11 +8,11 @@ import {
   safeget,
 } from "@/lib/utils";
 import { createMetadata } from "@/lib/metadata";
-import { lang2iso } from "@/lib/i18n";
+import { i18n, lang2iso } from "@/lib/i18n";
 import { notFound } from "next/navigation";
 import { ComponentProps, FC, type HTMLAttributes, Suspense } from "react";
 import { blogPageProps } from "@/lib/types";
-import {filterPosts, getPages, sortPages} from "../util";
+import { filterPosts, getPages, sortPages } from "../util";
 import { Page } from "fumadocs-core/source";
 
 import defaultMdxComponents from "fumadocs-ui/mdx";
@@ -181,7 +181,7 @@ export default async function BlogPage(props: {
   let pageProps: prevNextProps = { prevNumber: 1, nextNumber: 1 };
   if (calcPrevAndNextPost) {
     const perPage = 7;
-    const query = '';
+    const query = "";
     // const { currentPage, perPage } = await getPageNumber();
     pageProps = calcPrevNext(lang, perPage, page, query);
   }
@@ -500,10 +500,42 @@ const calcPrevNext = (
   // _pageNum: number,
   perPage: number,
   currPost: Page<blogPageProps>,
-  query: string = '',
+  query: string = "",
 ): prevNextProps => {
+  if (currPost.data.footer) {
+    // performance optimized if `footer` is valid.
+    // see also `prevNextIdxTransformer` in source.tsx
+    const ft = currPost.data.footer;
+    // const getUrl = (slugs: string[] | undefined, lang: string | undefined) => {
+    //   const post = blog.getPage(slugs, lang);
+    //   return post?.url;
+    // };
+    const getUrl = (
+      slugs: string[] | undefined,
+      lang: string | undefined,
+      page: number | undefined,
+    ) => {
+      // const pp = (page ?? 1) !== 1 ? `?page=${page}` : "";
+      return lang == i18n.defaultLanguage
+        ? `/blog/${slugs?.join("/")}`
+        : `/${lang}/blog/${slugs?.join("/")}`;
+    };
+    const prevUrl = ft.prev?.url ?? getUrl(ft.prev?.slugs, lang, ft.prev?.page);
+    const nextUrl = ft.next?.url ?? getUrl(ft.next?.slugs, lang, ft.next?.page);
+    return {
+      prevUrl: prevUrl,
+      nextUrl: nextUrl,
+      prevTitle: ft.prev?.title,
+      nextTitle: ft.next?.title,
+      prevNumber: Math.floor(((ft.prev?.index ?? 1) + perPage - 1) / perPage),
+      nextNumber: Math.floor(((ft.next?.index ?? 1) + perPage - 1) / perPage),
+    };
+  }
+
   const pages: Page<blogPageProps>[] = getPages(lang);
-  const posts: Page<blogPageProps>[] = filterPosts(pages, lang, query);
+  const posts: Page<blogPageProps>[] = sortPages(
+    filterPosts(pages, lang, query),
+  );
   let prev: Page<blogPageProps> | undefined,
     next: Page<blogPageProps> | undefined,
     last: Page<blogPageProps>;

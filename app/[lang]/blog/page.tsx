@@ -16,7 +16,7 @@ import { Pagination, Search } from "@/components/blog/pager";
 
 import { Page } from "fumadocs-core/source";
 import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
-import {filterPosts, extractPostsByPage, getPages} from "./util";
+import {filterPosts, extractPostsByPage, getPages, sortPages} from "./util";
 import { ImageZoom } from "fumadocs-ui/components/image-zoom";
 import {blogPageProps} from "@/lib/types";
 
@@ -66,7 +66,7 @@ export default async function BlogIndexPage({
   // const ppp = pf(blog);
 
   const pages: Page<blogPageProps>[] = getPages(lang);
-  const { posts, maxPage } = extractPostsByPage(filterPosts(pages, lang, query),
+  const { posts, maxPage } = extractPostsByPage(sortPages(filterPosts(pages, lang, query)),
     currentPage,
     perPage,
   );
