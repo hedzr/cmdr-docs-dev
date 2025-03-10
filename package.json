@@ -16,7 +16,7 @@
   "scripts": {
     "dev": "next dev --turbopack # https://nextjscn.org/docs/architecture/turbopack",
     "build": "pnpm build:pre && next build && pnpm build:post",
-    "clean": "rm -rf .source .next",
+    "clean": "rm -rf .source .next .vercel/output",
     "build:pre": "tsx ./scripts/pre-build.mts",
     "build:post": "tsx ./scripts/post-build.mts",
     "build0": "next build",
