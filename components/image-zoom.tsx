@@ -89,8 +89,14 @@ export function ImageZoom({
   rmiz,
   ...props
 }: ImageZoomProps) {
-  const src = getImageSrc(props.src);
-  // console.log(`ImageZoom: ${src} | props:`, props);
+  let src = getImageSrc(props.src);
+  // console.log(`[ImageZoom] src=${src}, children:`, children);
+  if (src === "") src = "/assets/spot.png";
+  // if (typeof props.src === "string" && props.src === "")
+  //   props.src = src || "/assets/spot.png";
+
+  // console.log(`ImageZoom: ${src} | props:`, props.src, props);
+
   return (
     <Zoom
       zoomMargin={20}
@@ -102,13 +108,14 @@ export function ImageZoom({
         ...zoomInProps,
       }}
     >
-      {children ?? (
-        <SafeImage
-          blurDataURL={spot.blurDataURL}
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 900px"
-          {...props}
-        />
-      )}
+      {children ??
+        (props.src && (
+          <Image
+            blurDataURL={spot.blurDataURL}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 900px"
+            {...props}
+          />
+        ))}
     </Zoom>
   );
 }
