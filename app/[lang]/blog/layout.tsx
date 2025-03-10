@@ -1,25 +1,25 @@
 import { PropsWithChildren, ReactNode } from "react";
-import {AR_One_Sans, IBM_Plex_Mono} from "next/font/google";
+// import {AR_One_Sans, IBM_Plex_Mono} from "next/font/google";
 import Footer from "@/components/layout/footer";
 import getConfig from "next/config";
-import path from "path";
-import * as fs from "node:fs";
+// import path from "path";
+// import * as fs from "node:fs";
 
-const arOneSans = AR_One_Sans({
-  variable: "--font-ar-one-sans",
-  subsets: ["latin","latin-ext"],
-});
-
-// const azeretMono = Azeret_Mono({
-//   variable: "--font-azeret-mono",
-//   subsets: ["latin", "latin-ext"],
+// const arOneSans = AR_One_Sans({
+//   variable: "--font-ar-one-sans",
+//   subsets: ["latin","latin-ext"],
 // });
 
-const ibmPlexMono = IBM_Plex_Mono({
-  variable: "--font-ibm-plex",
-  subsets: ["latin", "latin-ext"],
-  weight: ["400"],
-});
+// // const azeretMono = Azeret_Mono({
+// //   variable: "--font-azeret-mono",
+// //   subsets: ["latin", "latin-ext"],
+// // });
+
+// const ibmPlexMono = IBM_Plex_Mono({
+//   variable: "--font-ibm-plex",
+//   subsets: ["latin", "latin-ext"],
+//   weight: ["400"],
+// });
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -91,7 +91,7 @@ export default function BlogLayout({
 
   return (
     <div
-      className={`flex flex-col items-start justify-center pt-8 pb-10 md:w-[87%] mx-auto ${arOneSans.variable} ${ibmPlexMono.variable} antialiased`}
+      className={`flex flex-col items-start justify-center pt-8 pb-10 md:w-[87%] mx-auto`}
     >
       {children}
       <Footer />
