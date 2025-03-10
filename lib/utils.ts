@@ -119,8 +119,8 @@ export function stringToDate(date: string) {
 }
 
 export function stringToDatetime(date: string | Date) {
-  if (date instanceof Date) return date;
   if (!date) return new Date(1973, 3, 13);
+  if (date instanceof Date) return date;
   try {
     const d = new Date(date);
     return d;
