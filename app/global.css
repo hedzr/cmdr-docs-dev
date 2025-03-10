@@ -114,27 +114,15 @@ article h1 {
 }
 article h2 {
   counter-reset: h3 0;
-  margin-left: -1.3em;
-  text-indent: 0em;
 }
 article h3:not(not-prose) {
   counter-reset: h4 0;
-  margin-left: -2.12em;
-  text-indent: 0em;
 }
 article h4 {
   counter-reset: h5 0;
-  margin-left: -3.23em;
-  text-indent: 0em;
 }
 article h5 {
   counter-reset: h6 0;
-  margin-left: -3.9em;
-  text-indent: 0em;
-}
-article h6 {
-  margin-left: -4.8em;
-  text-indent: 0em;
 }
 
 article h1:before {
@@ -178,6 +166,29 @@ article h6.nocount:before {
 article h3.not-prose,
 article a[data-card]:has(h3.nocount) {
   text-decoration: none !important;
+}
+
+/* blog headings */
+
+.blog h2 {
+  margin-left: -1.3em;
+  text-indent: 0em;
+}
+.blog h3:not(not-prose) {
+  margin-left: -2.12em;
+  text-indent: 0em;
+}
+.blog h4 {
+  margin-left: -3.23em;
+  text-indent: 0em;
+}
+.blog h5 {
+  margin-left: -3.9em;
+  text-indent: 0em;
+}
+.blog h6 {
+  margin-left: -4.8em;
+  text-indent: 0em;
 }
 
 /* blog pager */
