@@ -1,7 +1,7 @@
 import "../global.css";
 import { RootProvider } from "fumadocs-ui/provider";
 import { AR_One_Sans, IBM_Plex_Mono } from "next/font/google";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { I18nProvider, Translations } from "fumadocs-ui/i18n";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { PostHogProvider } from "../provider";
@@ -21,7 +21,7 @@ import { prodMode } from "@/lib/utils";
 
 const arOneSans = AR_One_Sans({
   variable: "--font-ar-one-sans",
-  subsets: ["latin","latin-ext"],
+  subsets: ["latin", "latin-ext"],
 });
 
 // const azeretMono = Azeret_Mono({
@@ -50,16 +50,22 @@ const cn: Partial<Translations> = {
 // Root Layout Here --------------------------------
 
 function wrapMonitorOrNot(children: ReactNode): ReactNode {
-  return prodMode ? <PostHogProvider>{children}</PostHogProvider> : children;
+  return prodMode ? (
+    <Suspense fallback={null}>
+      <PostHogProvider>{children}</PostHogProvider>
+    </Suspense>
+  ) : (
+    children
+  );
 }
 
 function wrapAnalyticsOrNot(): ReactNode {
   return prodMode ? (
-    <>
+    <Suspense fallback={null}>
       <SpeedInsights />
-      <GoogleAnalytics gaId="G-301DLP27SS" />
       <Analytics />
-    </>
+      <GoogleAnalytics gaId="G-301DLP27SS" />
+    </Suspense>
   ) : (
     <></>
   );
@@ -88,16 +94,19 @@ export default async function Layout({
       // base-vercel-url={process.env.VERCEL_URL || "not-spec"}
       className={arOneSans.className}
       suppressHydrationWarning
+      // className={`want`}
     >
-      <body className={`flex flex-col min-h-screen ${arOneSans.variable} ${ibmPlexMono.variable} antialiased`}>
+      <body
+        className={`flex flex-col min-h-screen ${arOneSans.variable} ${ibmPlexMono.variable} antialiased`}
+      >
         <I18nProvider
           locale={(await params).lang}
           locales={lang2display}
           translations={{ cn }[lang]}
         >
           {wrapMonitorOrNot(<RootProvider>{children}</RootProvider>)}
+          {wrapAnalyticsOrNot()}
         </I18nProvider>
-        {wrapAnalyticsOrNot()}
       </body>
     </html>
   );
