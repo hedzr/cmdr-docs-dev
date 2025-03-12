@@ -9,7 +9,6 @@ import { source } from '@/lib/source';
 // import { createFromSource } from 'fumadocs-core/search/server';
 import { createI18nSearchAPI } from 'fumadocs-core/search/server';
 import { i18n } from '@/lib/i18n';
-// @ts-expect-error -- untyped
 import { createTokenizer } from '@orama/tokenizers/mandarin';
 import { stopwords as mandarinStopwords } from "@orama/stopwords/mandarin";
 
@@ -46,44 +45,44 @@ import { stopwords as mandarinStopwords } from "@orama/stopwords/mandarin";
 // console.log(results);
 
 export const { GET } = createI18nSearchAPI('advanced', {
-    i18n,
-    localeMap: {
-        // the prop name should be its locale code in your i18n config, (e.g. `cn`)
-        cn: {
-            // options for the language
-            tokenizer: await createTokenizer({ stopWords: mandarinStopwords, }),
-            search: {
-                threshold: 0,
-                tolerance: 0,
-            },
-        },
-        tw: {
-            // options for the language
-            tokenizer: await createTokenizer(),
-            search: {
-                threshold: 0,
-                tolerance: 0,
-            },
-        },
-        // jp: {
-        //     // options for the language
-        //     tokenizer: await createTokenizerJP({
-        //         stopWords: japaneseStopwords,
-        //     }),
-        //     search: {
-        //         threshold: 0,
-        //         tolerance: 0,
-        //     },
-        // },
+  i18n,
+  localeMap: {
+    // the prop name should be its locale code in your i18n config, (e.g. `cn`)
+    cn: {
+      // options for the language
+      tokenizer: await createTokenizer({ stopWords: mandarinStopwords, }),
+      search: {
+        threshold: 0,
+        tolerance: 0,
+      },
     },
-    indexes: source.getLanguages().flatMap((entry) =>
-        entry.pages.map((page) => ({
-            title: page.data.title,
-            description: page.data.description,
-            structuredData: page.data.structuredData,
-            id: page.url,
-            url: page.url,
-            locale: entry.language,
-        })),
-    ),
+    tw: {
+      // options for the language
+      tokenizer: await createTokenizer(),
+      search: {
+        threshold: 0,
+        tolerance: 0,
+      },
+    },
+    // jp: {
+    //     // options for the language
+    //     tokenizer: await createTokenizerJP({
+    //         stopWords: japaneseStopwords,
+    //     }),
+    //     search: {
+    //         threshold: 0,
+    //         tolerance: 0,
+    //     },
+    // },
+  },
+  indexes: source.getLanguages().flatMap((entry) =>
+    entry.pages.map((page) => ({
+      title: page.data.title,
+      description: page.data.description,
+      structuredData: page.data.structuredData,
+      id: page.url,
+      url: page.url,
+      locale: entry.language,
+    })),
+  ),
 });
