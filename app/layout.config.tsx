@@ -14,7 +14,7 @@ import {
 // import Image from 'next/image';
 // import { FumadocsIcon } from '@/app/layout.client';
 // import Logo from '@/public/logo.png';
-// import Preview from '@/public/banner.png';
+// import Preview from '@/public/images/banner.webp';
 import { site } from "@/lib/metadata";
 
 export const linkItems: LinkItemType[] = [

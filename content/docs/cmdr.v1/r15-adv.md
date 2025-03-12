@@ -434,7 +434,7 @@ go run .
 
 `~~tree` 是一个内置的特殊的命令行参数。它能够以层级缩进的方式打印出你的app的全部子命令列表：
 
-![image-20200718084232522](/cmdr/ZLJBzSlrKigvw5I.png)
+![image-20200718084232522](/images/cmdr/ZLJBzSlrKigvw5I.png)
 
 这不仅有利于查找错误编码的关联关系，也有助于最终用户快速掌握 CLI 工具的全貌。
 
@@ -444,7 +444,7 @@ go run .
 
 这个输出内容的一个片段截取如下：
 
-![image-20200821162038070](/cmdr/iG2a7ctTUCyjVWx.png)
+![image-20200821162038070](/images/cmdr/iG2a7ctTUCyjVWx.png)
 
 一般来说，输出内容可能都是很长的，请自行尝试。
 
@@ -593,7 +593,7 @@ cmdr.Exec(buildRootCmd(),
 
 一条子命令的帮助屏通常看起来是这样的：
 
-![image-20200821154656864](/cmdr/mh9TnbYiwU6JN5g.png)
+![image-20200821154656864](/images/cmdr/mh9TnbYiwU6JN5g.png)
 
 在 Usages 段中，命令行组成部分被显示为 `app current-command-series tails` 格式。默认时 `tails` 的文本为 `[Sub-Commands] [tail args...] [Options] [Parent/Global Options]`。
 
@@ -609,7 +609,7 @@ certCmd := root.NewSubCommand("create", "c").
 
 在帮助屏幕的末尾，我们打印一段文字来做用法提示，默认时它是这样的：
 
-![image-20200821155606418](/cmdr/58BXjNRxa2VDgFr.png)
+![image-20200821155606418](/images/cmdr/58BXjNRxa2VDgFr.png)
 
 通过 `WithHelpTailLine(line)` 你可以取代这段文字。
 
@@ -685,7 +685,7 @@ type Handler func(cmd *Command, args []string) (err error)
 
 我们已经知道 `~~tree` 标志能够以树状结构打印出全部子命令：
 
-![image-20200923093341329](/cmdr/vXB4RMQuxai8dnY.png)
+![image-20200923093341329](/images/cmdr/vXB4RMQuxai8dnY.png)
 
 `--tree` 实际上是利用了 `cmdr` 内建的 `WalkAllCommands()` 所提供的遍历方式。
 
@@ -897,7 +897,7 @@ $ go build -v -race -buildmode=plugin -o ./ci/local/share/fluent/addons/demo.so 
 
 所有被找到的 `cmdr-addons` 所定义的命令及其标志集合，将被添加到 Addons 命令分组中，如同这样：
 
-![image-20200928202650337](/cmdr/hSqN57gMwyiXb9n.png)
+![image-20200928202650337](/images/cmdr/hSqN57gMwyiXb9n.png)
 
 而执行这些扩充的命令，和执行以前主程序中的子命令并无任何不同：
 
@@ -905,7 +905,7 @@ $ go build -v -race -buildmode=plugin -o ./ci/local/share/fluent/addons/demo.so 
 ./bin/fluent dx
 ```
 
-![image-20200928202944801](/cmdr/8eWbX3wPtJMBRC4.png)
+![image-20200928202944801](/images/cmdr/8eWbX3wPtJMBRC4.png)
 
 ### _3. 通过配置文件定义别名段
 
@@ -991,11 +991,11 @@ app:
 
 实际运行之后，第一级命令包括：
 
-![image-20200928204953507](/cmdr/ygPkv4NF8exV2lC.png)
+![image-20200928204953507](/images/cmdr/ygPkv4NF8exV2lC.png)
 
 `services` 子命令还包括嵌套命令：
 
-![image-20200928204933002](/cmdr/dkUWfAPSCa3Ls2t.png)
+![image-20200928204933002](/images/cmdr/dkUWfAPSCa3Ls2t.png)
 
 #### 命令别名
 
@@ -1023,7 +1023,7 @@ app:
 
 例如 fluent 样本示例支持一个顶级命令 “kb” 且允许 `--size xxx` 标志作为其选项。因此，`kx3` 这个命令别名将会展开为 "kb" 并且自带 `--size 2kb` 作为其附加参数。于是别名的执行结果如同这样：
 
-![image-20200928205051728](/cmdr/pmdEIoMTOGvBXx2.png)
+![image-20200928205051728](/images/cmdr/pmdEIoMTOGvBXx2.png)
 
 #### 可执行文件
 
@@ -1042,7 +1042,7 @@ app:
 
 其执行效果如同这样：
 
-![image-20200928205256947](/cmdr/wNrF3LWRgZQ2SKP.png)
+![image-20200928205256947](/images/cmdr/wNrF3LWRgZQ2SKP.png)
 
 #### shell 脚本
 

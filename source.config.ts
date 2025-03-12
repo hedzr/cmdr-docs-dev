@@ -60,6 +60,28 @@ const extensions = {
     overlay_image: z.string().optional(),
     overlay_filter: z.string().optional(),
   }).optional(),
+
+  // just for collection's transformers, pre-calculating
+  // the prev/next post links, titles, and pageNumbers
+  // (the perPage hardcoded to 7).
+  // For the relevant codes implemented, see also
+  // `prevNextIdxTransformer` in lib/source.tsx.
+  footer: z.object({
+    prev: z.object({
+      url: z.string().optional(),
+      title: z.string().optional(),
+      page: z.number(),
+      index: z.number(),
+      slugs: z.array(z.string()),
+    }).optional(),
+    next: z.object({
+      url: z.string().optional(),
+      title: z.string().optional(),
+      page: z.number(),
+      index: z.number(),
+      slugs: z.array(z.string()),
+    }).optional(),
+  }).optional(),
 };
 
 export const docs = defineDocs({

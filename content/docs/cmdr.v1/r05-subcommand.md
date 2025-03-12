@@ -120,7 +120,7 @@ Action 函数将会提供一个响应函数。当 `wget-cover` 被运行时，�
 
 这个前缀 `011` 不会被显示出来，但会影响到子命令/标志 的显示顺序。就像这样：
 
-![image-20200713221103126](/cmdr/wWCtVsLJyE9zToj.png)
+![image-20200713221103126](/images/cmdr/wWCtVsLJyE9zToj.png)
 
 我们可以看到 `--output-file` 和 `--append-output` 的顺序被定制过了。
 
@@ -276,7 +276,7 @@ func actionServerStart(cmd *cmdr.Command, args []string) (err error) {
 
 从 v1.7.21 起，主程序能够扫描扩展文件夹中的可执行的外部程序作为自己的 Extensions 子命令分组，从而允许动态扩展子命令集合、建立统一的 CLI 界面。
 
-![image-20200920174339255](/cmdr/bdvhoMjH6elENOT.png)
+![image-20200920174339255](/images/cmdr/bdvhoMjH6elENOT.png)
 
 在 cmdr 文档中，这个新特性被称作 the builtin pluggable extensions。
 
@@ -296,7 +296,7 @@ func actionServerStart(cmd *cmdr.Command, args []string) (err error) {
 
 一旦找到可用的可执行文件，则将其加入到主程序到 Extensions 命令分组中，所以看起来会像这样：
 
-![image-20200920175459167](/cmdr/ciqzb8xLQYRydtT.png)
+![image-20200920175459167](/images/cmdr/ciqzb8xLQYRydtT.png)
 
 你可以如同主程序到其它子命令一样地使用它：
 

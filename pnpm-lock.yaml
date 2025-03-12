@@ -207,6 +207,9 @@ importers:
       postcss:
         specifier: ^8.5.2
         version: 8.5.3
+      prettier:
+        specifier: ^3.5.3
+        version: 3.5.3
       rimraf:
         specifier: ^6.0.1
         version: 6.0.1
@@ -2741,8 +2744,8 @@ packages:
   preact@10.26.2:
     resolution: {integrity: sha512-0gNmv4qpS9HaN3+40CLBAnKe0ZfyE4ZWo5xKlC1rVrr0ckkEvJvAQqKaHANdFKsGstoxrY4AItZ7kZSGVoVjgg==, tarball: https://registry.npmmirror.com/preact/-/preact-10.26.2.tgz}
 
-  prettier@3.5.1:
-    resolution: {integrity: sha512-hPpFQvHwL3Qv5AdRvBFMhnKo4tYxp0ReXiPn2bxkiohEX6mBeBwEpBSQTkD458RaaDKQMYSp4hX4UtfUTA5wDw==, tarball: https://registry.npmmirror.com/prettier/-/prettier-3.5.1.tgz}
+  prettier@3.5.3:
+    resolution: {integrity: sha512-QQtaxnoDJeAkDvDKWCLiwIXkTgRhwYDEQCghU9Z6q03iyek/rxRh/2lC3HB7P8sWT2xC/y5JDctPLBIGzHKbhw==, tarball: https://registry.npmmirror.com/prettier/-/prettier-3.5.3.tgz}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -2763,7 +2766,7 @@ packages:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
 
   react-dom@19.0.0:
-    resolution: {integrity: sha512-4GV5sHFG0e/0AD4X+ySy6UJd3jVl1iNsNHdpad0qhABJ11twS3TTBnseqsKurKcsNqCEFeGL3uLpVChpIO3QfQ==}
+    resolution: {integrity: sha512-4GV5sHFG0e/0AD4X+ySy6UJd3jVl1iNsNHdpad0qhABJ11twS3TTBnseqsKurKcsNqCEFeGL3uLpVChpIO3QfQ==, tarball: https://registry.npmmirror.com/react-dom/-/react-dom-19.0.0.tgz}
     peerDependencies:
       react: ^19.0.0
 
@@ -2818,7 +2821,7 @@ packages:
         optional: true
 
   react@19.0.0:
-    resolution: {integrity: sha512-V8AVnmPIICiWpGfm6GLzCR/W5FXLchHop40W4nXBmdlEceh16rCN8O8LNWm5bh5XUX91fh7KpA+W0TgMKmgTpQ==}
+    resolution: {integrity: sha512-V8AVnmPIICiWpGfm6GLzCR/W5FXLchHop40W4nXBmdlEceh16rCN8O8LNWm5bh5XUX91fh7KpA+W0TgMKmgTpQ==, tarball: https://registry.npmmirror.com/react/-/react-19.0.0.tgz}
     engines: {node: '>=0.10.0'}
 
   readdirp@4.1.2:
@@ -2930,7 +2933,7 @@ packages:
     resolution: {integrity: sha512-+aWOz7yVScEGoKNd4PA10LZ8sk0A/z5+nXQG5giUO5rprX9jgYsTdov9qCchZiPIZezbZH+jRut8nPodFAX4Jg==, tarball: https://registry.npmmirror.com/sax/-/sax-1.4.1.tgz}
 
   scheduler@0.25.0:
-    resolution: {integrity: sha512-xFVuu11jh+xcO7JOAGJNOXld8/TcEHK/4CituBUeUb5hqxJLj9YuemAEuvm9gQ/+pgXYfbQuqAkiYu+u7YEsNA==}
+    resolution: {integrity: sha512-xFVuu11jh+xcO7JOAGJNOXld8/TcEHK/4CituBUeUb5hqxJLj9YuemAEuvm9gQ/+pgXYfbQuqAkiYu+u7YEsNA==, tarball: https://registry.npmmirror.com/scheduler/-/scheduler-0.25.0.tgz}
 
   scroll-into-view-if-needed@3.1.0:
     resolution: {integrity: sha512-49oNpRjWRvnU8NyGVmUaYG4jtTkNonFZI86MmGRDqBphEK2EXT9gdEUoQPZhuBM8yWHxCWbobltqYO5M4XrUvQ==, tarball: https://registry.npmmirror.com/scroll-into-view-if-needed/-/scroll-into-view-if-needed-3.1.0.tgz}
@@ -3478,7 +3481,7 @@ snapshots:
     dependencies:
       '@apidevtools/json-schema-ref-parser': 11.9.1
       js-yaml: 4.1.0
-      prettier: 3.5.1
+      prettier: 3.5.3
 
   '@iconify/types@2.0.0': {}
 
@@ -6169,7 +6172,7 @@ snapshots:
 
   preact@10.26.2: {}
 
-  prettier@3.5.1: {}
+  prettier@3.5.3: {}
 
   pretty-ms@9.2.0:
     dependencies:

@@ -1,18 +1,24 @@
 import { Metadata } from "next";
 import { blog, openapi, source } from "@/lib/source";
-import { formatDate2, isFieldValid, safe, safeget } from "@/lib/utils";
+import {
+  formatDate2,
+  isFieldValid,
+  prodMode,
+  safe,
+  safeget,
+} from "@/lib/utils";
 import { createMetadata } from "@/lib/metadata";
-import { lang2iso } from "@/lib/i18n";
+import { i18n, lang2iso } from "@/lib/i18n";
 import { notFound } from "next/navigation";
 import { ComponentProps, FC, type HTMLAttributes, Suspense } from "react";
 import { blogPageProps } from "@/lib/types";
-import { getPosts } from "../util";
+import { filterPosts, getPages, sortPages } from "../util";
 import { Page } from "fumadocs-core/source";
 
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Control } from "./page.client";
+import { A, Control } from "./page.client";
 import { Callout } from "@/components/callout";
 import { Card, Cards } from "@/components/card";
 import { CodeBlock, Pre } from "@/components/codeblock";
@@ -51,10 +57,11 @@ import {
   BlogBackToListButton,
   BlogTagButton,
   FooterNoCache,
-  TocPopoverHeader,
-} from "@/page.client";
+} from "./page.client";
+import { TocPopoverHeader } from "@/page.client";
 import { buttonVariants1 } from "@/components/ui/button1";
 import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
+import { ArrowUp } from "lucide-react";
 
 export const dynamic = "force-static";
 // export const dynamic = "force-dynamic";
@@ -68,7 +75,8 @@ export async function generateMetadata(props: {
   if (!page) notFound();
 
   const description =
-    page.data.description ?? "The library for building documentation sites";
+    (page.data.description || page.data.excerpt) ??
+    "The library for building documentation sites";
 
   return createMetadata(
     // metadataImage.withImage(page.slugs, {
@@ -143,6 +151,8 @@ const tocPopoverOptions = {
 };
 const useInlineTOC = false;
 
+const calcPrevAndNextPost = true;
+
 export default async function BlogPage(props: {
   params: Promise<{ slug: string; lang: string }>;
   // searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -158,7 +168,7 @@ export default async function BlogPage(props: {
 
   // const sp = await props.searchParams;
   const fm = page.data;
-  console.log(`--- blog page ${lang} / ${params.slug} ----`);
+  if (!prodMode) console.log(`--- blog page ${lang} / ${params.slug} ----`);
   const { body: Mdx, toc, lastModified } = await fm.load();
   // const Mdx = page.data.body;
   // const toc = page.data.toc;
@@ -169,9 +179,13 @@ export default async function BlogPage(props: {
   let lma: string =
     lastModified || get(fm, "last_modified_at") || get(fm, "lastModifiedAt");
 
-  const perPage = 7;
-  // const { currentPage, perPage } = await getPageNumber();
-  const pageProps = calcPrevNext(blog, lang, perPage, page);
+  let pageProps: prevNextProps = { prevNumber: 1, nextNumber: 1 };
+  if (calcPrevAndNextPost) {
+    const perPage = 7;
+    const query = "";
+    // const { currentPage, perPage } = await getPageNumber();
+    pageProps = calcPrevNext(lang, perPage, page, query);
+  }
 
   // @ts-ignore
   return (
@@ -189,7 +203,9 @@ export default async function BlogPage(props: {
         }}
       >
         <h1
-          className={`mb-2 text-3xl font-bold text-white ${safeget(page.data, "draft", false) ? "line-through italic" : ""}`}
+          className={`mb-2 text-3xl font-bold text-white ${
+            safeget(page.data, "draft", false) ? "line-through italic" : ""
+          }`}
         >
           {page.data.title}
         </h1>
@@ -208,7 +224,7 @@ export default async function BlogPage(props: {
         className={`container blog flex flex-col px-0 py-8 lg:flex-row lg:px-4min-w-0 prose-zinc1 dark:prose-invert md:prose-md lg:prose-lg prose-headings:a:underline:none w-[85vw] sm:w-full sm:mx-auto prose-code:text-sm prose-code:leading-6 prose-headings:scroll-m-20 prose-code:font-code prose-code:p-1 prose-code:rounded-md prose-pre:border pt-2 prose-code:before:content-none prose-code:after:content-none !min-w-full prose-img:rounded-md prose-img:border`}
         // prose md:prose-md lg:prose-lg prose-${base} dark:prose-invert dark:prose-code:bg-${ref}-900 dark:prose-pre:bg-${ref}-900 prose-code:bg-${ref}-100 prose-pre:bg-${ref}-100 dark:prose-code:text-${base}-300 prose-code:text-${ref}-700
       >
-        <div className="min-w-0  flex-1 p-4">
+        <div className="min-w-0 flex-1 p-4">
           {useInlineTOC ? (
             <InlineTOC items={toc} />
           ) : (
@@ -227,6 +243,7 @@ export default async function BlogPage(props: {
               </TocPopoverContent>
             </TocPopoverHeader>
           )}
+          <A name={"top-of-page"} />
           <Mdx
             components={{
               ...defaultMdxComponents,
@@ -279,33 +296,13 @@ export default async function BlogPage(props: {
               Tab,
             }}
           />
-          <Suspense>
-            <FooterNoCache lang={lang} {...pageProps} />
-          </Suspense>
-          {/* <div className="mt-32 w-full">
-            {prev ? (
-              <div className="left prev newer">
-                <Link href={bundle(prev.url, prevNumber)}>
-                  <ChevronLeft className="-ms-1 size-4 shrink-0 rtl:rotate-180" />
-                  Newer:
-                  <p>{prev.data.title || ""}</p>
-                </Link>
-              </div>
-            ) : (
-              <></>
-            )}
-            {next ? (
-              <div className="float-right right next older">
-                <Link href={bundle(next.url, nextNumber)}>
-                  <ChevronRight className="-ms-1 size-4 shrink-0 rtl:rotate-180" />
-                  Older:
-                  <p>{next.data.title || ""}</p>
-                </Link>
-              </div>
-            ) : (
-              <></>
-            )}
-          </div> */}
+          {calcPrevAndNextPost ? (
+            <Suspense>
+              <FooterNoCache lang={lang} {...pageProps} />
+            </Suspense>
+          ) : (
+            <></>
+          )}
           <HandlingKeyboardLeftAndRight />
         </div>
 
@@ -374,24 +371,16 @@ export default async function BlogPage(props: {
           </div>
 
           <Control url={page.url} />
+        </div>
 
-          {/* <Toc>
-            {tocOptions.header}
-            <h3 className="inline-flex items-center gap-1.5 text-sm text-fd-muted-foreground">
-              <Text className="size-4" />
-              <I18nLabel label="toc" />
-            </h3>
-            <TOCScrollArea>
-              {tocOptions.style === "clerk" ? (
-                <ClerkTOCItems items={toc} />
-              ) : (
-                <TOCItems items={toc} />
-              )}
-            </TOCScrollArea>
-            {tocOptions.footer}
-          </Toc> */}
+        <div className="fixed bottom-4 right-8 lg:right-[250px] shrink-0 overflow-hidden rounded-full items-center justify-center">
+          {/*  <!--suppress HtmlUnknownAnchorTarget --> */}
+          <Link href="#top-of-page" className="">
+            <ArrowUp className="w-10 h-10" />
+          </Link>
         </div>
       </article>
+
       <div
         id="tip-kb"
         className="mr-4 mb-4 disabled m-full text-sm text-zinc-600"
@@ -404,151 +393,6 @@ export default async function BlogPage(props: {
     </>
   );
 }
-
-// async function BlogPageOld({
-//   params,
-//   searchParams,
-// }: {
-//   params: Promise<{
-//     slug: string;
-//     lang: string;
-//   }>;
-//   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
-// }) {
-//   const { slug, lang } = await params;
-//   const sp = await searchParams;
-//   const pageNumber = Number(sp?.page || "1") || 1;
-//
-//   console.log(`blog p${pageNumber} - `, lang, slug, sp);
-//
-//   // const prms = await params;
-//   // const lang = prms.lang;
-//   // const sp = await searchParams;
-//   // const pageNumber = Number(sp.page || prms.page) || 1;
-//   const res = await getBlogForSlug(slug);
-//   if (!res) {
-//     console.log("not found:", res);
-//     notFound();
-//   }
-//
-//   const fm = res.frontmatter;
-//
-//   let tags: string[] = [];
-//   let categories: string[] = [];
-//   if (fm.tags) tags = Array.isArray(fm.tags) ? fm.tags : fm.tags.split(/[,; ]/);
-//   if (fm.categories)
-//     categories = Array.isArray(fm.categories)
-//       ? fm.categories
-//       : fm.categories.split(/[,; ]/);
-//   // console.log(`blog page ${pageNumber} ----`);
-//
-//   const get = (fm: any, v: string) => {
-//     return v in fm ? fm[v] : "";
-//   };
-//   let lma: string = get(fm, "lastModifiedAt") || get(fm, "last_modified_at");
-//
-//   return (
-//     <article className="lg:w-[93%] md:[99%] mx-auto mb-32">
-//       <div className="flex flex-col-1 gap-x-3">
-//         <Link
-//           className={buttonVariants1({
-//             variant: "link",
-//             className: "!mx-0 !px-0 mb-7 !-ml-1 ",
-//           })}
-//           href="/blog"
-//         >
-//           <ArrowLeftIcon className="w-4 h-4 mr-1.5" /> Back to List
-//         </Link>
-//         <span className="inline-flex items-center justify-center text-sm font-medium mr-1.5 h-10 px-4 py-2 !mx-0 !px-0 mb-7 !-ml-1">
-//           {" | "}
-//         </span>
-//         <Link
-//           className={buttonVariants1({
-//             variant: "secondary",
-//             className: "!mx-0 !px-0 mb-7 !-ml-1 ",
-//           })}
-//           href="/"
-//         >
-//           Home
-//         </Link>
-//       </div>
-//       <div className="flex flex-col gap-3 pb-7 w-full border-b mb-4">
-//         <p className="text-muted-foreground text-sm blog-date">
-//           {formatDate(fm.date, lang)}
-//         </p>
-//         <h1
-//           className={`sm:text-4xl text-3xl font-extrabold blog-title ${fm.draft ? "line-through" : ""}`}
-//         >
-//           {fm.title}
-//           {fm.draft ? (
-//             <span className="align-top capcapitalize italic text-sm font-medium text-zink-600/76">
-//               draft
-//             </span>
-//           ) : (
-//             <></>
-//           )}
-//         </h1>
-//         <div className="mt-6 flex flex-col gap-3">
-//           <p className="text-sm text-muted-foreground">Posted by</p>
-//           <div className="blog-authors">
-//             {fm.authors ? (
-//               <AuthorCards authors={fm.authors} />
-//             ) : fm.author ? (
-//               <AuthorCard author={fm.author} />
-//             ) : (
-//               <AuthorCard
-//                 author={{
-//                   username: "hedzr",
-//                   avatar: "",
-//                   handle: "",
-//                   handleUrl: "",
-//                 }}
-//               />
-//             )}
-//           </div>
-//         </div>
-//       </div>
-//       <div className="blog-content !w-full">
-//         <Typography>{res.content}</Typography>
-//
-//         <div className="mt-4">
-//           <div id="blog-tail-row">
-//             <div id="blog-categories" className="inline mr-4">
-//               <div className="inline -m-1">
-//                 {categories.map((it) => {
-//                   return (
-//                     <span
-//                       className="rounded gap-2 p-2 py-1 m-1 border-1 border-zinc-400 text-sm text-zinc-900 bg-zinc-500"
-//                       key={it}
-//                     >
-//                       {it}
-//                     </span>
-//                   );
-//                 })}
-//               </div>
-//             </div>
-//             <div id="blog-tags" className="inline mr-4">
-//               {tags.map((it) => {
-//                 return (
-//                   <Link
-//                     href={`/${lang}/blog/?query=%23${it}&page=${pageNumber}`}
-//                     className="rounded gap-2 p-2 py-1 m-1 border-1 border-zinc-400 text-sm text-zinc-900 bg-sky-500"
-//                     key={it}
-//                   >
-//                     {it}
-//                   </Link>
-//                 );
-//               })}
-//             </div>
-//             <div id="last-modified" className="my-4 text-sm text-zinc-400">
-//               Last Updated At: {lma}
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </article>
-//   );
-// }
 
 type AuthorT = {
   username?: string;
@@ -643,26 +487,67 @@ const calcTags = (fm: blogPageProps) => {
   return { tags, categories };
 };
 
+interface prevNextProps {
+  prevUrl?: string | undefined;
+  nextUrl?: string | undefined;
+  prevTitle?: string | undefined;
+  nextTitle?: string | undefined;
+  prevNumber: number;
+  nextNumber: number;
+}
+
 const calcPrevNext = (
-  blog: any,
   lang: string,
   // _pageNum: number,
   perPage: number,
-  page: Page<blogPageProps>,
-) => {
-  const pages = [...blog.getPages(lang)];
-  const posts = getPosts(pages, lang, "");
-  let prev: typeof page | undefined,
-    next: typeof page | undefined,
-    last: typeof page;
+  currPost: Page<blogPageProps>,
+  query: string = "",
+): prevNextProps => {
+  if (currPost.data.footer) {
+    // performance optimized if `footer` is valid.
+    // see also `prevNextIdxTransformer` in source.tsx
+    const ft = currPost.data.footer;
+    // const getUrl = (slugs: string[] | undefined, lang: string | undefined) => {
+    //   const post = blog.getPage(slugs, lang);
+    //   return post?.url;
+    // };
+    const getUrl = (
+      slugs: string[] | undefined,
+      lang: string | undefined,
+      page: number | undefined,
+    ) => {
+      // const pp = (page ?? 1) !== 1 ? `?page=${page}` : "";
+      return lang == i18n.defaultLanguage
+        ? `/blog/${slugs?.join("/")}`
+        : `/${lang}/blog/${slugs?.join("/")}`;
+    };
+    const prevUrl = ft.prev?.url ?? getUrl(ft.prev?.slugs, lang, ft.prev?.page);
+    const nextUrl = ft.next?.url ?? getUrl(ft.next?.slugs, lang, ft.next?.page);
+    return {
+      prevUrl: prevUrl,
+      nextUrl: nextUrl,
+      prevTitle: ft.prev?.title,
+      nextTitle: ft.next?.title,
+      prevNumber: Math.floor(((ft.prev?.index ?? 1) + perPage - 1) / perPage),
+      nextNumber: Math.floor(((ft.next?.index ?? 1) + perPage - 1) / perPage),
+    };
+  }
+
+  const pages: Page<blogPageProps>[] = getPages(lang);
+  const posts: Page<blogPageProps>[] = sortPages(
+    filterPosts(pages, lang, query),
+  );
+  let prev: Page<blogPageProps> | undefined,
+    next: Page<blogPageProps> | undefined,
+    last: Page<blogPageProps>;
   let prevNumber: number = 1,
     nextNumber: number = 1,
     n: number = 1;
   posts.map((it) => {
-    if (it.url === page.url) {
+    if (it.url === currPost.url) {
       prev = last;
       prevNumber = Math.floor((n + perPage - 1) / perPage);
-    } else if (last && last.url === page.url) {
+    } else if (last && last.url === currPost.url) {
       next = it;
       nextNumber = Math.floor((n + perPage - 1) / perPage);
     }

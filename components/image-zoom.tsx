@@ -5,7 +5,7 @@ import { type ImgHTMLAttributes } from "react";
 import "./image-zoom.css";
 import Zoom, { type UncontrolledProps } from "react-medium-image-zoom";
 import { useEffect, useState } from "react";
-import spot from "@/public/spot.png";
+import spot from "@/public/assets/spot.png";
 import {
   StaticImport,
   StaticRequire,
@@ -18,13 +18,13 @@ export interface SafeImageProps
   src: string | StaticImport; // Primary image source
   fallbackSrc?: string; // Default image source (optional)
   alt: string; // Alt text for accessibility
-  width?: number; // Optional width for the image
-  height?: number; // Optional height for the image
+  width?: number | `${number}`; // Optional width for the image
+  height?: number | `${number}`; // Optional height for the image
 }
 
 export const SafeImage = ({
   src, // Primary image source
-  fallbackSrc = "/spot.png", // Default fallback image
+  fallbackSrc = "/assets/spot.png", // Default fallback image
   alt = "Image", // Default alt text
   width = spot.width,
   height = spot.height,
@@ -43,19 +43,15 @@ export const SafeImage = ({
      Accepts HTTPS/HTTP links as-is.
    */
   const checkImage = (src: string | StaticImport) => {
-    if (typeof src === "string") {
-      if (!src.startsWith("https") && !src.startsWith("http")) {
-        setValidSrc(src.startsWith("/") ? src : "/" + src); // Ensure valid relative path
-        return;
-      }
-      setValidSrc(src); // Use the absolute URL as-is
-    } else {
-      const get = (c, p) => {
-        return c ? (p in c ? c[p] : undefined) : undefined;
-      };
-      setValidSrc(get(get(src, "default"), "src") || get(src, "src") || "");
+    const uri = getImageSrc(src);
+    // console.log("checkImage: src", src, "uri", uri);
+    if (!uri.startsWith("https") && !uri.startsWith("http")) {
+      setValidSrc(uri.startsWith("/") ? uri : "/" + uri); // Ensure valid relative path
+      return;
     }
+    setValidSrc(uri); // Use the absolute URL as-is
   };
+  // console.log(`SafeImage validSrc: ${validSrc}`);
   return (
     <Image
       src={validSrc} // The current valid source
@@ -93,7 +89,14 @@ export function ImageZoom({
   rmiz,
   ...props
 }: ImageZoomProps) {
-  const src = getImageSrc(props.src);
+  let src = getImageSrc(props.src);
+  // console.log(`[ImageZoom] src=${src}, children:`, children);
+  if (src === "") src = "/assets/spot.png";
+  // if (typeof props.src === "string" && props.src === "")
+  //   props.src = src || "/assets/spot.png";
+
+  // console.log(`ImageZoom: ${src} | props:`, props.src, props);
+
   return (
     <Zoom
       zoomMargin={20}
@@ -105,13 +108,14 @@ export function ImageZoom({
         ...zoomInProps,
       }}
     >
-      {children ?? (
-        <SafeImage
-          blurDataURL={spot.blurDataURL}
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 900px"
-          {...props}
-        />
-      )}
+      {children ??
+        (props.src && (
+          <Image
+            blurDataURL={spot.blurDataURL}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 900px"
+            {...props}
+          />
+        ))}
     </Zoom>
   );
 }

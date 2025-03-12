@@ -1,7 +1,7 @@
 // blogPageProps
 
-import {BaseCollectionEntry, MarkdownProps} from "fumadocs-mdx/config";
-import {z} from "zod";
+import { BaseCollectionEntry, MarkdownProps } from "fumadocs-mdx/config";
+import { z } from "zod";
 
 export type blogPageProps = {
   draft: boolean;
@@ -31,6 +31,24 @@ export type blogPageProps = {
         teaser?: string | undefined;
         overlay_image?: string | undefined;
         overlay_filter?: string | undefined;
+      }
+    | undefined;
+  footer?:
+    | {
+        prev?: {
+          url?: string;
+          title?: string;
+          page: number;
+          index: number;
+          slugs: string[];
+        };
+        next?: {
+          url?: string;
+          title?: string;
+          page: number;
+          index: number;
+          slugs: string[];
+        };
       }
     | undefined;
 } & BaseCollectionEntry & { load: () => Promise<MarkdownProps> };

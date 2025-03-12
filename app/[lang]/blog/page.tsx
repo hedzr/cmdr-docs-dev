@@ -1,16 +1,11 @@
 // import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 // import { Button } from "@/components/ui/button2";
 // // import { BlogMdxFrontmatter, getAllBlogs } from "@/lib/markdown";
-import {
-  formatDate2,
-  prodMode,
-  safeget,
-} from "@/lib/utils";
+import { formatDate2, prodMode, safeget } from "@/lib/utils";
 // import { ChevronRightIcon, CircleIcon } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
-import spot from "@/public/default.png";
-import Image, { type ImageProps } from "next/image";
+import spot from "@/public/assets/spot.png";
 import { Suspense } from "react";
 import { Pagination, Search } from "@/components/blog/pager";
 // import { TemplateString } from "next/dist/lib/metadata/types/metadata-types";
@@ -19,12 +14,11 @@ import { Pagination, Search } from "@/components/blog/pager";
 // import Footer from "@/components/layout/footer";
 // import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
 
-import { blog } from "@/lib/source";
-import { LoaderOutput, MetaData, Page } from "fumadocs-core/source";
-import { BaseCollectionEntry, MarkdownProps } from "fumadocs-mdx/config";
-import { objectOutputType, ZodTypeAny } from "zod";
+import { Page } from "fumadocs-core/source";
 import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
-import { filterPostsByPage, getPosts } from "./util";
+import {filterPosts, extractPostsByPage, getPages, sortPages} from "./util";
+import { ImageZoom } from "fumadocs-ui/components/image-zoom";
+import {blogPageProps} from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -42,16 +36,16 @@ export const metadata: Metadata = {
   description: SITE_SLOGAN,
 };
 
-function safeTitle(md: Metadata): string {
-  let title: string = "The Latest Posts";
-  if (md.title) {
-    if (typeof md.title === "string") title = md.title.toString();
-    else if (typeof md.title === "object") {
-      if ("default" in md.title) title = md.title["default"].toString();
-    }
-  }
-  return title;
-}
+// function safeTitle(md: Metadata): string {
+//   let title: string = "The Latest Posts";
+//   if (md.title) {
+//     if (typeof md.title === "string") title = md.title.toString();
+//     else if (typeof md.title === "object") {
+//       if ("default" in md.title) title = md.title["default"].toString();
+//     }
+//   }
+//   return title;
+// }
 
 export default async function BlogIndexPage({
   params,
@@ -61,21 +55,20 @@ export default async function BlogIndexPage({
     lang: string;
     query?: string;
   }>;
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams?: Promise<{ [_key: string]: string | string[] | undefined }>;
 }) {
   const sp = await searchParams;
   const query = sp?.query || "";
   const currentPage = Number(sp?.page) || 1;
-  const perPage = 7;
+  const perPage = Number(sp?.perpage) || 7;
   const lang = (await params).lang;
 
   // const ppp = pf(blog);
 
-  const pages = [...blog.getPages(lang)];
-  const { posts, maxPage } = filterPostsByPage(
-    getPosts(pages, lang, query),
+  const pages: Page<blogPageProps>[] = getPages(lang);
+  const { posts, maxPage } = extractPostsByPage(sortPages(filterPosts(pages, lang, query)),
     currentPage,
-    perPage
+    perPage,
   );
 
   const svg = `<svg viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'>
@@ -94,9 +87,12 @@ export default async function BlogIndexPage({
   // const length = Math.min(blogs.items.length, blogs.maxpage);
   // console.log("lang:", lang, "| count:", blogs.items.length);
 
-  let title: string = safeTitle(metadata);
+  // let title: string = safeTitle(metadata);
 
-  console.log(`index - page: ${currentPage}, total: ${posts.length}`, sp, lang);
+  if (!prodMode)
+    console.log(
+      `--- blog.index: ${currentPage}/${perPage}/${lang}, total: ${posts.length}, sp: ${sp}`,
+    );
   // console.log(blog.getLanguages());
 
   const bundle = (url: string, page: number): string => {
@@ -105,7 +101,7 @@ export default async function BlogIndexPage({
   };
 
   return (
-    <main className="container max-sm:px-0 md:py-12">
+    <main className="container max-sm:px-0 md:py-2">
       <div
         className="h-[113px] p-8 md:h-[213px] md:p-12"
         style={{
@@ -134,6 +130,10 @@ export default async function BlogIndexPage({
         <div>
           {posts.map((post) => {
             const draft = safeget(post.data, "draft", false);
+            const img = post.data.header?.teaser || spot.src; // safeget(post.data, "header", { teaser: "" }).teaser || spot
+            // console.log(
+            //   `  list ${post.data.date}: ${post.slugs}, teaser: ${img}`,
+            // );
             return draft && prodMode ? (
               <></>
             ) : (
@@ -145,13 +145,10 @@ export default async function BlogIndexPage({
                   }`}
                 >
                   <div>
-                    <Image
+                    <ImageZoom
                       className="w-42 ml-2 float-right rounded-lg shadow-lg"
-                      src={
-                        safeget(post.data, "header", { teaser: "" }).teaser ||
-                        spot
-                      }
-                      alt={post.slugs.join(" ")}
+                      src={img}
+                      alt={post.slugs.join("/")}
                       width="200"
                       height="160"
                     />
@@ -234,9 +231,9 @@ export default async function BlogIndexPage({
 //   );
 // }
 
-function BlogTable(query: string, currentPage: number) {
-  return <>empty</>;
-}
+// function BlogTable(_query: string, _currentPage: number) {
+//   return <>empty</>;
+// }
 
 function BlogTableSkeleton() {
   return <>empty</>;

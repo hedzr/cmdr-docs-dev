@@ -53,7 +53,7 @@ isdelve 提供的检测函数，目的在于检测 dlv 调试器有否在线。�
 > -tags=delve
 > ```
 >
-> [![Goland Run/Debug Configurations window](/cmdr/fPKA2.png)](/cmdr/fPKA2.png)
+> [![Goland Run/Debug Configurations window](/images/cmdr/fPKA2.png)](/images/blog/fPKA2.png)
 >
 > ------
 >
@@ -172,7 +172,7 @@ const (
 
 其界面形如下面的输出：
 
-![image-20200724131056493](/cmdr/wgFbJzSMeYZ1XNy.png)
+![image-20200724131056493](/images/cmdr/wgFbJzSMeYZ1XNy.png)
 
 可以见到，借助 cmdr 的增强的短选项，我们可以实现和 flag 完全等价的 CLI 界面。
 

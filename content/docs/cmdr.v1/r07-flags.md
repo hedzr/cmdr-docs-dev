@@ -290,7 +290,7 @@ See Also: [hedzr/cmdr-examples](https://github.com/hedzr/cmdr-examples/blob/mast
 
 请看截图：
 
-![image-20200720085008948](/cmdr/cbhykDz31GfsRPW.png)
+![image-20200720085008948](/images/cmdr/cbhykDz31GfsRPW.png)
 
 一般来说，`deprecation` 应该是以版本号开始的，因为打印时的样式会自动附加 `"deprecated "` 前缀，为了文理通顺，你需要这样构造 `deprecation`。如果有必要，也可以添加更多文字给它。
 
@@ -446,7 +446,7 @@ ValidArgs 提供一个字符串数组用于对标志的命令行输入值进行�
 
 如果想要得到一个错误提示，可以使用 `cmdr.WithIgnoreWrongEnumValue(ignore = true)` 方式来调用 `cmdr.Exec(root, opts...`)，这将会导致用户无效输入被抛出为 `cmdr.errWrongEnumValue`，你可以在此基础上考虑拦截该错误并再处理。
 
-![image-20200720111415976](/cmdr/GBRxCVg72fjoIrH.png)
+![image-20200720111415976](/images/cmdr/GBRxCVg72fjoIrH.png)
 
 :::
 
@@ -476,7 +476,7 @@ See Also: [hedzr/cmdr-examples](https://github.com/hedzr/cmdr-examples/blob/mast
 
 对于标记为 required 的标志，如果用户没有在命令行显式地提供参数值，则会导致一个错误被抛出。如果你标记了多个必需的标志，则它们会被一一罗列在错误信息中。你可以考虑拦截该错误后自行决定输出的文本内容，否则如果采用 `logrus.Fatalf("error: %v", err)` 会得到类似于这样的输出：
 
-![image-20200724141654339](/cmdr/6kMyWwacIlXU4Ai.png)
+![image-20200724141654339](/images/cmdr/6kMyWwacIlXU4Ai.png)
 
 :::tip
 
