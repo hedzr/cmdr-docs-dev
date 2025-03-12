@@ -75,7 +75,8 @@ export async function generateMetadata(props: {
   if (!page) notFound();
 
   const description =
-    page.data.description ?? "The library for building documentation sites";
+    (page.data.description || page.data.excerpt) ??
+    "The library for building documentation sites";
 
   return createMetadata(
     // metadataImage.withImage(page.slugs, {
