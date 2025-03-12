@@ -100,7 +100,7 @@ export default async function Layout({
         className={`flex flex-col min-h-screen ${arOneSans.variable} ${ibmPlexMono.variable} antialiased`}
       >
         <I18nProvider
-          locale={(await params).lang}
+          locale={lang}
           locales={lang2display}
           translations={{ cn }[lang]}
         >
