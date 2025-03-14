@@ -3,11 +3,14 @@ import { HomeLayout } from "fumadocs-ui/layouts/home";
 import { baseOptions } from "../../layout.config";
 
 import { baseUrl, createMetadata, site } from "@/lib/metadata";
+import { previewMode } from "@/lib/utils";
+
+const preview = previewMode ? " [Preview]" : "";
 
 export const metadata = createMetadata({
   title: {
-    template: `%s | ${site.title}`,
-    default: `${site.title} - for our Open Projects`,
+    template: `%s | ${site.title}${preview}`,
+    default: `${site.title}${preview} - for our Open Projects`,
   },
   description: site.desc,
   // "a command-line arguments parser and app framework with hierarchical settings supporting",

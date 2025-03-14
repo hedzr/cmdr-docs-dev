@@ -5,12 +5,15 @@ import { baseOptions, linkItems } from "../../layout.config";
 import { source } from "@/lib/source";
 import { baseUrl, createMetadata, site } from "@/lib/metadata";
 import "katex/dist/katex.min.css";
+import { previewMode } from "@/lib/utils";
+
+const preview = previewMode ? " [Preview]" : "";
 
 export const metadata = createMetadata({
   metadataBase: baseUrl,
   title: {
-    template: `%s | ${site.title}`,
-    default: site.title,
+    template: `%s | ${site.title}${preview}`,
+    default: `${site.title}${preview}`,
   },
   description: site.desc,
   robots: {

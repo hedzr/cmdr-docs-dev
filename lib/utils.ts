@@ -8,6 +8,7 @@ import getConfig from 'next/config'
 // prodMode or dev/preview mode ------------------------
 
 export const prodMode = process.env.NODE_ENV === "production";
+export const previewMode = process.env.NEXT_PUBLIC_VERCEL_ENV === "preview";
 
 // -----------------------------------------------------
 
