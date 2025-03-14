@@ -7,6 +7,7 @@ export default async function BlogPage(props: {
   if (sp.slugs?.length === 3) {
     // cat 1, cat 2, slug
     const slug = sp.slugs[2];
+    console.log(`redirecting to /${sp.lang}/blog/${slug}`);
     redirect(`/${sp.lang}/blog/${slug}`);
   }
   return (
