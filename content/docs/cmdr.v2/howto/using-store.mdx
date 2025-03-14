@@ -1,0 +1,103 @@
+---
+title: Using Store
+---
+
+## 介绍
+
+`hedzr/Store`，是延续 cmdr.v1 的 `Option Store` 概念，并进行了独立的抽象，
+然后在此基础上完全重新设计和实现的配置管理库，
+同时它也是一个高性能的内存键值对软件包，并且支持用句点（`.`）分隔路径的方式构建出来的层次化数据结构。
+
+将 `Store` 用于实现 http Router，in-memory high-speed Cache 是完全可能的。
+在重构 `Store` 的过程中，我们非常注意尽可能地实现高性能、低碎片分配（几乎零分配）的代码。
+`Store` 的当前实现在性能方面有很好的竞争力。
+
+由于脱胎于 `Option Store`，所以 `Store` 理所当然地和 `cmdr.v2` 进行了紧密的无缝集成。
+同时，你还可以从 `cmdr.v2` 中完全剥离 `hedzr/Store` 的集成关系。
+
+## 主要能力
+
+```go
+conf := store.New()
+conf.Set("app.debug", false)
+conf.Set("app.verbose", true)
+conf.Set("app.dump", 3)
+conf.Set("app.logging.file", "/tmp/1.log")
+conf.Set("app.server.start", 5)
+
+ss := conf.WithPrefix("app.logging")
+ss.Set("rotate", 6)
+ss.Set("words", []any{"a", 1, false})
+ss.Set("keys", map[any]any{"a": 3.13, 1.73: "zz", false: true})
+
+// Tag, Comment & Description
+conf.Set("app.bool", "[on,off,   true]")
+conf.SetComment("app.bool", "desc: a bool slice", "cmmt: remarks here")
+conf.SetTag("app.bool", []any{"on", "off", true})
+
+// TTL to clear the node data to zero
+conf.SetTTL("app.bool", 15 * time.Second, func(_ *radix.TTL[any], nd radix.Node[any]) {
+  t.Logf("%q (%q) cleared", "app.bool", nd.Data())
+})  // since v1.2.5
+defer conf.Close()  // when you used SetTTL, the Close() is must be had.
+
+// Set/create a node at once by SetEx()
+conf.SetEx("app.logging.auto-stop", true,
+  func(path string, oldData any, node radix.Node[any], trie radix.Trie[any]) {
+    trie.SetTTL(path, 30*time.Minute,
+      func(s *radix.TTL[any], node radix.Node[any]) {
+          trie.Remove(node.Key()) // erase the key with the node
+      })
+    // Or:
+    trie.SetTTLFast(node, 3*time.Second, nil)
+    // Or:
+    node.SetTTL(3*time.Second, trie, nil)
+  })
+
+// inspect it
+states.Env().SetNoColorMode(true) // to disable ansi escape sequences in dump output
+fmt.Println(conf.Dump())
+```
+
+The dumping result looks like (internal data structure):
+
+```text
+  app.                          <B>
+    d                           <B>
+      ebug                      <L> app.debug => false
+      ump                       <L> app.dump => 3
+    verbose                     <L> app.verbose => true
+    logging.                    <B>
+      file                      <L> app.logging.file => /tmp/1.log
+      rotate                    <L> app.logging.rotate => 6
+      words                     <L> app.logging.words => [a 1 false]
+      keys                      <L> app.logging.keys => map[a:3.13 1.73:zz false:true]
+    server.start                <L> app.server.start => 5
+    bool                        <L> app.bool => [on,off,   true] // remarks here | tag = [on off true] ~ a bool slice
+```
+
+As you seen, the internal structure will be printed out for the deep researching.
+
+![image-20240221115843477](/images/cmdr/image-20240221115843477.png)
+
+## 内幕
+
+`Store` 经过了完全的重设计，其核心数据结构基于 Trie-tree 的改进版 Radix-tree，在每个节点中存储其路径片段而不是限于每个节点单个字符，也不采用传统 Trie-tree 的 `children [256]char` 的设计方式。传统方式以 ASCII 字符表为预设支持，用固定数据来表达下级节点，这不仅失去了 Unicode 支持能力，也比较浪费内存，同时由于每个节点只表示路径字符串的一个字符，所以有更高的深度和更慢的搜索匹配速度。
+
+改进的 Radix-tree 通常允许在每个节点存储一个多字符的路径片段，有效地压缩了 trie node 深度，加速了搜索性能。进一步地，由于我们存储的是 `[]rune`，因此在 Unicode 支持上是完备的。
+
+在上面的运行时输出中，你可以探究 `Store` 的内部结构。
+
+## Learn More
+
+<Cards>
+  <Card title="Learn more about `hedzr/store`" href="/docs/store/" />
+  <Card title="`hedzr/store` on Github" href="https://github.com/hedzr/store" />
+  <Card title="`hedzr/logg` on Github" href="https://github.com/hedzr/logg" />
+  <Card
+    title="`hedzr/evendeep` on Github"
+    href="https://github.com/hedzr/evendeep"
+  />
+  <Card title="`hedzr/is` on Github" href="https://github.com/hedzr/is" />
+  {/* <Card title="Learn more about Fumadocs" href="https://fumadocs.vercel.app" /> */}
+</Cards>
