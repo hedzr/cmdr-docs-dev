@@ -23,7 +23,7 @@ yarn dev
 
 Open <http://localhost:3000> with your browser to see the result.
 
-## Learn More
+### Learn More
 
 To learn more about Next.js and Fumadocs, take a look at the following
 resources:
@@ -32,3 +32,11 @@ resources:
   features and API.
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 - [Fumadocs](https://fumadocs.vercel.app) - learn about Fumadocs
+
+
+
+## LICENSE
+
+Codes: Apache 2.0
+
+Docs: [CC4-BY-NC-SA](http://creativecommons.org/licenses/by-nc-sa/4.0/) (*知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议*)
