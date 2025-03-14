@@ -1,0 +1,126 @@
+---
+title: 命令：执行外部程序
+description: Invoking program
+---
+
+## 执行外部程序、Shell 命令
+
+`.InvokeShell(shellCmdLine)` 和 `.UseShell(shellPath)` 可以被用于执行 Shell 命令（例如 `ls -la`），后者可以附加指定采用哪一个 Shell，如果没有显式地指定则采用用户系统的默认 Shell。
+
+`.InvokeProc(program)` 可以被用于执行一个外部可执行文件。
+
+以 macOS 为例，`.InvokeProc("say 'hello world'")` 可以执行 say 命令并以语音方式读出“hello world”文本。
+
+program 不应该是 Shell 命令，例如 bash 的 echo 命令是不能直接被用作 program 的，要使用 `bash -c echo "hello"` 的语法。
+
+其典型的用途是执行一个 GUI app。
+
+### 定义
+
+`examples/demo/` 展示了 invokeXXX 的用法，详见 `cmd/invoke.go`：
+
+<Tabs items={['demo/main.go', 'cmd/invoke.go', 'cmd/all.go']}>
+
+<Tab key="demo/main.go">
+
+```go title=demo/main.go
+package main
+
+import (
+	"context"
+	"os"
+
+	"github.com/hedzr/cmdr/v2"
+	"github.com/hedzr/cmdr/v2/cli"
+	"github.com/hedzr/cmdr/v2/examples/cmd"
+	logz "github.com/hedzr/logg/slog"
+)
+
+const (
+	appName = "demo-app"
+	desc    = ``
+	version = cmdr.Version
+	author  = ``
+)
+
+func main() {
+	app := cmdr.Create(appName, version, author, desc).
+    With(func(app cli.App) {
+	  }).
+		// [!code highlight:1]
+    WithAdders(cmd.Commands...).
+    Build()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	if err := app.Run(ctx); err != nil {
+		logz.ErrorContext(ctx, "Application Error:", "err", err) // stacktrace if in debug mode/build
+		os.Exit(app.SuggestRetCode())
+	} else if rc := app.SuggestRetCode(); rc != 0 {
+		os.Exit(rc)
+	}
+}
+```
+
+</Tab>
+
+<Tab key="cmd/invoke.go">
+
+```go title=cmd/invoke.go
+package cmd
+
+import (
+	"github.com/hedzr/cmdr/v2/cli"
+)
+
+type invokeCmd struct{}
+
+func (invokeCmd) Add(app cli.App) {
+	app.Cmd("invoke").
+		With(func(b cli.CommandBuilder) {
+			// [!code highlight:2]
+			b.Cmd("shell").InvokeShell(`ls -la`).UseShell("/bin/bash").OnAction(nil).Build()
+			b.Cmd("proc").InvokeProc(`say "hello, world!"`).OnAction(nil).Build()
+		})
+}
+```
+
+</Tab>
+<Tab key="cmd/all.go">
+
+```go title=cmd/all.go
+package cmd
+
+var Commands = []cli.Adder{
+	jumpCmd{},
+	wrongCmd{},
+	invokeCmd{},
+	presetCmd{},
+}
+```
+
+</Tab>
+</Tabs>
+
+### 运行时
+
+上面的示例程序的运行时效果如同这样：
+
+```bash
+$ go run ./examples/demo invoke shell
+... ls results ...
+$ go run ./examples/demo invoke proc
+(play void with say)
+$
+```
+
+### 额外的话题
+
+<Cards>
+  <Card title="Required" href="../howto/required-flag" />
+  <Card title="Toggle Group" href="../howto/toggle-group-of-flags" />
+  <Card title="Head Like" href="../howto/head-like-flag" />
+  <Card title="Valid Args" href="../howto/valid-args-flag" />
+  <Card title="External Tool" href="../howto/flag-with-external-flag" />
+</Cards>

@@ -1,0 +1,84 @@
+---
+title: 命令：重定向
+description: Redirect To...
+---
+
+## 重定向根命令到某个子命令
+
+`.SetRedirectTo(subcmd)` 为根命令提供一个重定向目的地。
+
+`重定向根命令到子命令`，可以让命令行输入 `app` 等价于输入了 `app a b c`，这对于有的情形可能是有用的。
+
+想象一下 `pnpm` 这样的包管理器命令，`pnpm dev` 实际上等价于 `pnpm run dev` 子命令，都是去运行 `package.json` 的 `scripts` 节里的 `dev` 条目所定义的命令行。
+
+> **TODO**  
+> cmdr.v2 有设想为 RedirectTo 加上 fallback: bool 的子特性。
+>
+> 但这一设想尚未定型，也没有纳入计划表。
+
+### 定义
+
+你需要调用到 RootCommand 的 `*CmdS.SetRedirectTo(dottedCmdPath)` 接口。达到这一目的的途径可能有多种，下面是一个示例，
+
+```go title="redirect-to-subcmd/main.go"
+func main() {
+	app := cmdr.Create(appName, version, author, desc).With(func(app cli.App) {
+		// [!code highlight:7]
+		// redirect root commands into "wrong" subcmd for testing.
+		//
+		// For a dad command such as "server" command, it
+		// would translate `app start|stop` -> `app server start|stop`.
+		app.WithRootCommand(func(root *cli.RootCommand) {
+			root.SetRedirectTo("wrong")
+		})
+	}).WithAdders(cmd.Commands...).Build()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	if err := app.Run(ctx); err != nil {
+		logz.ErrorContext(ctx, "Application Error:", "err", err) // stacktrace if in debug mode/build
+		os.Exit(app.SuggestRetCode())
+	} else if rc := app.SuggestRetCode(); rc != 0 {
+		os.Exit(rc)
+	}
+}
+```
+
+完整的源代码可以参考 [examples/redirect-to-subcmd]。
+
+在范例中，`WithAdders()` 将会为 app 添加两套子命令：`jump to` 以及 `wrong`。这是标准的 `examples/cmd/` 子包用于演示目的的基础设施。
+
+而 `With(func(app cli.App){...})` 闭包则提供一个流式调用中操作 app 对象的机会。
+在这里，`app.WithRootCommand(...)` 可以用于操作 `SetRedirectTo` 接口函数。
+
+现在，运行 `app` 的效果就和 `app wrong` 相同。
+
+### 多级命令
+
+如果想要重定向到多级子命令，可以使用 `dottedPath`。例如跳转到 `jump to` 子命令，可以使用 `SetRedirectTo("jump.to")` 来达成。
+
+### 运行时
+
+上面的示例程序的运行时效果如同这样：
+
+```bash
+$ go run ./examples/redirect-to-subcmd
+the duration is: 0s
+22:57:12.597014+08:00| [ERR] Application Error:                   err="[io: read/write on closed pipe | something's wrong | permission denied]" ./examples/redirect-to-subcmd/main.go:38 main.main
+$
+```
+
+返回的 Application Error 显示出根命令已经正确转向到了 “wrong” 子命令。
+
+此时根命令默认功能就不再是显示帮助屏了，为了显示帮助屏，你需要显式地 `-h`/`--help`。
+
+### 额外的话题
+
+<Cards>
+  <Card title="Required" href="../howto/required-flag" />
+  <Card title="Toggle Group" href="../howto/toggle-group-of-flags" />
+  <Card title="Head Like" href="../howto/head-like-flag" />
+  <Card title="Valid Args" href="../howto/valid-args-flag" />
+  <Card title="External Tool" href="../howto/flag-with-external-flag" />
+</Cards>

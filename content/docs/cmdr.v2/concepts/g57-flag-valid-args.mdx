@@ -1,0 +1,146 @@
+---
+title: 标志：枚举值
+description: Valid Args
+---
+
+## 枚举值
+
+可以为一个标志设置有效枚举值集合。这样的标志要求用户输入的值必须在有效集合之中。
+
+一般来说，该标志的默认值应该是字符串值，除非预设的代码接受自动转换，转换由标准的 Go 转换接口完成。
+
+### 定义
+
+`.ValidArgs(...)` 可以为标志设置用于校验目的的枚举值列表。
+
+<Tabs items={['main.go', 'valid-args.go']}>
+
+<Tab key="main.go">
+
+```go title=main.go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+
+	"gopkg.in/hedzr/errors.v3"
+
+	"github.com/hedzr/cmdr/v2"
+	"github.com/hedzr/cmdr/v2/cli"
+	"github.com/hedzr/is/term/color"
+	logz "github.com/hedzr/logg/slog"
+)
+
+const (
+	appName = "valid-args"
+	desc    = `a sample to show u how to using enum values in option.`
+	version = cmdr.Version
+	author  = ``
+)
+
+func main() {
+	app := cmdr.Create(appName, version, author, desc).
+		With(func(app cli.App) {}).
+		// [!code highlight]
+		WithBuilders(validArgsCommand).
+		WithAdders().
+		Build()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	if err := app.Run(ctx); err != nil {
+		// [!code highlight:9]
+		if errors.Is(err, cli.ErrValidArgs) {
+			fmt.Printf(color.StripLeftTabsC(`
+				The input is not in valid list:
+
+				<font color="red">%s</red>
+				`),
+				err)
+			os.Exit(1)
+		}
+		logz.ErrorContext(ctx, "Application Error:", "err", err) // stacktrace if in debug mode/build
+		os.Exit(app.SuggestRetCode())
+	} else if rc := app.SuggestRetCode(); rc != 0 {
+		os.Exit(rc)
+	}
+}
+
+// [!code highlight:25]
+func validArgsCommand(parent cli.CommandBuilder) { //nolint:revive
+	parent.Flg("enum", "e").
+		Description("valid args option", "").
+		Group("Test").
+		ValidArgs("apple", "banana", "orange").
+		Default("").
+		Build()
+
+	// give root command an action to handle it
+	parent.OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+		v := cmd.Store().MustString("enum")
+		println("enum value is: ", v)
+		return
+	})
+
+	parent.Examples(`Try to use value-args app,
+
+	  $ $APP -e apple
+	    this command works ok.
+	  $ $APP -e mongo
+	    can't work because valid args are: apple, banana, and orange.
+	  $ $APP --help
+	    check out the valid values in help screen.
+	`)
+}
+```
+
+</Tab>
+
+<Tab key="valid-args.go">
+
+```go title=valid-args.go
+package examples
+
+import (
+	"github.com/hedzr/cmdr/v2/cli"
+)
+
+func AddValidArgsFlag(c cli.CommandBuilder) { //nolint:revive
+	c.Flg("fruit", "fr").
+		Default("").
+		Description("the message.", "").
+		Group("Valid Args").
+		PlaceHolder("FRUIT").
+		ValidArgs("apple", "banana", "orange").
+		Build()
+}
+```
+
+</Tab>
+</Tabs>
+
+### 运行时
+
+一个运行时未能满足枚举列表要求的反馈如同这样：
+
+```bash
+$ go run ./examples/valid-args -e mongo
+The input is not in valid list:
+
+Flag "Flg{'.enum'}" expects a valid input is in list: [apple banana orange] | cmd=Cmd{''}
+exit status 1
+$
+```
+
+### 额外的话题
+
+<Cards>
+  <Card title="Required" href="../howto/required-flag" />
+  <Card title="Toggle Group" href="../howto/toggle-group-of-flags" />
+  <Card title="Head Like" href="../howto/head-like-flag" />
+  <Card title="Valid Args" href="../howto/valid-args-flag" />
+  <Card title="External Tool" href="../howto/flag-with-external-flag" />
+</Cards>

@@ -1,0 +1,140 @@
+---
+title: 标志：必须项
+description: Required Flag
+---
+
+## 必须项
+
+一个必须的（Required）标志，要求终端用户必须在命令行中显式地给出参数值，否则 app 将会拒绝进一步执行。
+
+cmdr 在分析命令行参数的过程中追踪每一标志的命中次数，所以 Required 标志的内部校验算法等价于检查该标志的命中次数是否大于等于 1，是的话则通过，反之则抛出必须项未满足的 exception。
+
+### 定义一个必须项
+
+`.Required()` 可以做到。
+
+<Tabs items={['main.go', 'required.go']}>
+
+<Tab key="main.go">
+
+```go title=main.go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+
+	"gopkg.in/hedzr/errors.v3"
+
+	"github.com/hedzr/cmdr/v2"
+	"github.com/hedzr/cmdr/v2/cli"
+	"github.com/hedzr/cmdr/v2/examples"
+	"github.com/hedzr/is/term/color"
+	logz "github.com/hedzr/logg/slog"
+)
+
+const (
+	appName = "required"
+	desc    = `a sample to show u what error raised by a missed required flag.`
+	version = cmdr.Version
+	author  = `The Example Authors`
+)
+
+func main() {
+	app := cmdr.Create(appName, version, author, desc).
+		With(func(app cli.App) {
+			app.OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+        msg := cmd.Store().MustString("required")
+				println(`Hello, World.`, msg)
+				return
+			})
+		}).
+		// [!code highlight]
+		WithBuilders(examples.AddRequiredFlag).
+		WithAdders().
+		Build()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	if err := app.Run(ctx); err != nil {
+		// [!code highlight:9]
+		if errors.Is(err, cli.ErrRequiredFlag) {
+			fmt.Printf(color.StripLeftTabsC(`
+				The <b>REQUIRED</b> Flag not present:
+
+				<font color="red">%s</red>
+				`),
+				err)
+			os.Exit(1)
+		}
+		logz.ErrorContext(ctx, "Application Error:", "err", err) // stacktrace if in debug mode/build
+		os.Exit(app.SuggestRetCode())
+	} else if rc := app.SuggestRetCode(); rc != 0 {
+		os.Exit(rc)
+	}
+}
+```
+
+</Tab>
+
+<Tab key="required.go">
+
+```go title=required.go
+package examples
+
+import (
+	"github.com/hedzr/cmdr/v2/cli"
+)
+
+// AddRequiredFlag _
+//
+// Sample code,
+//
+//	app.RootBuilder(examples.AddRequiredFlag)
+//
+// Or,
+//
+//	app := cmdr.Create(appName, version, author, desc).
+//		WithBuilders(examples.AddRequiredFlag).
+//		Build()
+//	app.Run(context.TODO())
+func AddRequiredFlag(c cli.CommandBuilder) { //nolint:revive
+	c.Flg("required", "r").
+		Default("").
+		// [!code highlight]
+		Required(true).
+		Description("the required text string wanted.", "").
+		Group("Test").
+		Build()
+}
+```
+
+</Tab>
+</Tabs>
+
+### 运行时
+
+一个运行时未能满足要求的必须项标志的反馈如同这样：
+
+```bash
+$ go run ./examples/required/
+The REQUIRED Flag not present:
+
+Flag "Flg{'.required'}" is REQUIRED | cmd=Cmd{''}
+$
+
+$ go run ./examples/required/ -r xyz
+Hello, World. xyz
+```
+
+### 额外的话题
+
+<Cards>
+  <Card title="Required" href="../howto/required-flag" />
+  <Card title="Toggle Group" href="../howto/toggle-group-of-flags" />
+  <Card title="Head Like" href="../howto/head-like-flag" />
+  <Card title="Valid Args" href="../howto/valid-args-flag" />
+  <Card title="External Tool" href="../howto/flag-with-external-flag" />
+</Cards>

@@ -2,6 +2,7 @@ import { PropsWithChildren, ReactNode } from "react";
 // import {AR_One_Sans, IBM_Plex_Mono} from "next/font/google";
 import Footer from "@/components/layout/footer";
 import getConfig from "next/config";
+import { createMetadata, baseUrl, site } from "@/lib/metadata";
 // import path from "path";
 // import * as fs from "node:fs";
 
@@ -29,6 +30,32 @@ import getConfig from "next/config";
 // const geistMono = Geist_Mono({
 //   variable: "--font-geist-mono",
 //   subsets: ["latin"],
+// });
+
+export const metadata = createMetadata({
+  metadataBase: baseUrl,
+  title: {
+    default: site.blog.title!,
+    template: `%s | ${site.blog.title}`,
+  },
+  robots: {
+    follow: true,
+    index: true,
+  },
+  description: site.blog.slogan,
+});
+
+// export const metadata = createMetadata({
+//   metadataBase: baseUrl,
+//   title: {
+//     template: `%s | ${site.title}`,
+//     default: site.title,
+//   },
+//   description: site.desc,
+//   robots: {
+//     follow: true,
+//     index: true,
+//   },
 // });
 
 // const littleDebug = true;
@@ -89,9 +116,11 @@ export default function BlogLayout({
   //   // }
   // }
 
+  // md:w-[${site.blog.md.width}] lg:w-[${site.blog.lg.width}] xl:w-[${site.blog.xl.width}] 2xl:w-[${site.blog.xl2.width}]
+
   return (
     <div
-      className={`flex flex-col items-start justify-center pt-8 pb-10 md:w-[87%] mx-auto`}
+      className={`flex flex-col items-start justify-center pt-8 pb-10 mx-auto md:w-[86%] xl:w-[77%]`}
     >
       {children}
       <Footer />

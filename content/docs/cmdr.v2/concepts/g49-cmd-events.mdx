@@ -1,0 +1,34 @@
+---
+title: 命令：事件响应函数
+description: OnXXX event handlers...
+---
+
+## 关联于命令的 Event Handlers
+
+标准的事件响应函数有：
+
+- `.PreAction(...OnPreInvokeHandler)`
+- `.PostAction(...OnPostInvokeHandler)`
+- `.OnAction(...OnInvokeHandler)`
+- `.OnMatch(...OnCommandMatchedHandler)`
+
+它们对应着一个子命令将要被执行（OnAction），之前（PreAction），和之后（PostAction）。
+
+此外，下面的回调函数被用于加载动态子命令以及标志：
+
+- `.OnEvalSubcommands(...)`
+- `.OnEvalSubcommandsOnce(...)`
+- `.OnEvalFlags(...)`
+- `.OnEvalFlagsOnce(...)`
+
+详细的用法，可以参考 `jump/to` 子命令的实现代码。
+
+### 额外的话题
+
+<Cards>
+  <Card title="Required" href="../howto/required-flag" />
+  <Card title="Toggle Group" href="../howto/toggle-group-of-flags" />
+  <Card title="Head Like" href="../howto/head-like-flag" />
+  <Card title="Valid Args" href="../howto/valid-args-flag" />
+  <Card title="External Tool" href="../howto/flag-with-external-flag" />
+</Cards>

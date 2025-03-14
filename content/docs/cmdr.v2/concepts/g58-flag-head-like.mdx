@@ -1,0 +1,138 @@
+---
+title: 标志：`Head -1` 风格
+description: Head like
+---
+
+## `Head -1` 风格
+
+GNU head 命令行工具有一个特别的方式输入一个行数计数值：`head -n`。
+
+在这里，`n` 是一个正整数值。
+例如 `head -3` 表示从标准输入中筛选前三行文本出来，其他行抛弃。
+
+cmdr 允许你使用相同的技术来接受用户输入。
+
+一般来说，一个标志的默认值应该是正整数值，然后用户输入 `-number` 时将会自动被转换为 `--flag number`。
+
+> 由于命令行输入的语义限制，在整个应用程序中你只能为一个标志启用 `Head Like` 风格。
+
+### 定义
+
+`.HeadLike(true)` 可以为标志设置 Head Like 风格。
+
+<Tabs items={['main.go', 'head-like.go']}>
+
+<Tab key="main.go">
+
+```go title=main.go
+package main
+
+import (
+	"context"
+	"os"
+
+	"github.com/hedzr/cmdr/v2"
+	"github.com/hedzr/cmdr/v2/cli"
+	"github.com/hedzr/cmdr/v2/examples"
+	logz "github.com/hedzr/logg/slog"
+)
+
+const (
+	appName = "head-like"
+	desc    = `a sample to show u how to build a facade like "head -123".`
+	version = cmdr.Version
+	author  = ``
+)
+
+func main() {
+	app := cmdr.Create(appName, version, author, desc).
+		With(func(app cli.App) {}).
+		// [!code highlight]
+		WithBuilders(examples.AddHeadLikeFlag).
+		WithAdders().
+		Build()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	if err := app.Run(ctx); err != nil {
+		logz.ErrorContext(ctx, "Application Error:", "err", err) // stacktrace if in debug mode/build
+		os.Exit(app.SuggestRetCode())
+	} else if rc := app.SuggestRetCode(); rc != 0 {
+		os.Exit(rc)
+	}
+}
+```
+
+</Tab>
+
+<Tab key="head-like.go">
+
+```go title=head-like.go
+package examples
+
+import (
+	"context"
+
+	"github.com/hedzr/cmdr/v2/cli"
+)
+
+func AddHeadLikeFlag(parent cli.CommandBuilder)           { AddHeadLikeFlagImpl(parent) }
+func AddHeadLikeFlagWithoutCmd(parent cli.CommandBuilder) { AddHeadLikeFlagImpl(parent, true) }
+
+func AddHeadLikeFlagImpl(parent cli.CommandBuilder, dontHandlingParentCmd ...bool) { //nolint:revive
+	parent.Flg("lines", "l").
+		Description("`head -1` like", "").
+		Group("Head Like").
+		HeadLike(true).
+		Default(1).
+		Required(true).
+		Build()
+
+	var noHpc bool
+	for _, p := range dontHandlingParentCmd {
+		if p {
+			noHpc = true
+		}
+	}
+	if !noHpc {
+		// give root command an action to handle it
+		parent.OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+			lines := cmd.Store().MustInt("lines")
+			println("using lines: ", lines)
+			return
+		})
+	}
+
+	parent.Examples(`Try to use head-like app,
+
+	  $ $APP -567
+	    this command request 567 lines just like "$APP --lines 567"
+	`)
+}
+```
+
+</Tab>
+</Tabs>
+
+### 运行时
+
+上面的示例程序的运行时效果如同这样：
+
+```bash
+$ go run ./examples/head-like -8
+using lines:  8
+$ go run ./examples/head-like -123
+using lines:  123
+$
+```
+
+### 额外的话题
+
+<Cards>
+  <Card title="Required" href="../howto/required-flag" />
+  <Card title="Toggle Group" href="../howto/toggle-group-of-flags" />
+  <Card title="Head Like" href="../howto/head-like-flag" />
+  <Card title="Valid Args" href="../howto/valid-args-flag" />
+  <Card title="External Tool" href="../howto/flag-with-external-flag" />
+</Cards>

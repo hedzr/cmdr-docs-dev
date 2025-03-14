@@ -16,25 +16,26 @@ import { Pagination, Search } from "@/components/blog/pager";
 
 import { Page } from "fumadocs-core/source";
 import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
-import {filterPosts, extractPostsByPage, getPages, sortPages} from "./util";
+import { filterPosts, extractPostsByPage, getPages, sortPages } from "./util";
 import { ImageZoom } from "fumadocs-ui/components/image-zoom";
-import {blogPageProps} from "@/lib/types";
+import { blogPageProps } from "@/lib/types";
+import { site } from "@/lib/metadata";
 
 export const dynamic = "force-dynamic";
 
-const SITE_NAME = "hzSomthing";
-const SITE_SLOGAN = `All the latest blogs and news, straight from the team.`;
-export const metadata: Metadata = {
-  title: {
-    default: SITE_NAME!,
-    template: `%s | ${SITE_NAME}`,
-  },
-  robots: {
-    follow: true,
-    index: true,
-  },
-  description: SITE_SLOGAN,
-};
+// const SITE_NAME = "hzSomthing";
+// const SITE_SLOGAN = `All the latest blogs and news, straight from the team.`;
+// export const metadata: Metadata = {
+//   title: {
+//     default: SITE_NAME!,
+//     template: `%s | ${SITE_NAME}`,
+//   },
+//   robots: {
+//     follow: true,
+//     index: true,
+//   },
+//   description: SITE_SLOGAN,
+// };
 
 // function safeTitle(md: Metadata): string {
 //   let title: string = "The Latest Posts";
@@ -66,7 +67,8 @@ export default async function BlogIndexPage({
   // const ppp = pf(blog);
 
   const pages: Page<blogPageProps>[] = getPages(lang);
-  const { posts, maxPage } = extractPostsByPage(sortPages(filterPosts(pages, lang, query)),
+  const { posts, maxPage } = extractPostsByPage(
+    sortPages(filterPosts(pages, lang, query)),
     currentPage,
     perPage,
   );
@@ -114,9 +116,9 @@ export default async function BlogIndexPage({
         }}
       >
         <h1 className="mb-4 border-b-4 border-fd-foreground pb-2 text-4xl font-bold md:text-5xl">
-          {SITE_NAME}
+          {site.blog.title}
         </h1>
-        <p className="text-sm md:text-base">{SITE_SLOGAN}</p>
+        <p className="text-sm md:text-base">{site.blog.slogan}</p>
       </div>
       <div className="mt-1 flex items-center justify-between gap-2 md:mt-2 mb-4">
         <Search placeholder="Search Posts (by such as `cxx`, `go`, `calendar`, etc.) ..." />
