@@ -6,6 +6,8 @@ Live at [docs.hedzr.com](https://docs.hedzr.com/), hosted by [Vercel](https://ww
 
 Creative subdomain: [cmdr-docs.vercel.app](https://cmdr-docs.vercel.app).
 
+Preview site (for `dev` branch): [preview.hedzr.com](https://preview.hedzr.com/) (need authentication to vercel).
+
 ## Thanks To fumadocs
 
 This is a Next.js application generated with
@@ -32,8 +34,6 @@ resources:
   features and API.
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 - [Fumadocs](https://fumadocs.vercel.app) - learn about Fumadocs
-
-
 
 ## LICENSE
 
