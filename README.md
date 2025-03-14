@@ -1,4 +1,12 @@
-# my-fuma
+# docs.hedzr.com
+
+The source repo of our opensource projects.
+
+Live at [docs.hedzr.com](https://docs.hedzr.com/), hosted by [Vercel](https://www.vercel.com).
+
+Creative subdomain: [cmdr-docs.vercel.app](https://cmdr-docs.vercel.app).
+
+## Thanks To fumadocs
 
 This is a Next.js application generated with
 [Create Fumadocs](https://github.com/fuma-nama/fumadocs).
@@ -13,7 +21,7 @@ pnpm dev
 yarn dev
 ```
 
-Open http://localhost:3000 with your browser to see the result.
+Open <http://localhost:3000> with your browser to see the result.
 
 ## Learn More
 
