@@ -6,6 +6,24 @@ import * as process from "node:process";
 export const site = {
   title: 'cmdr.docs',
   desc: "The Documentations and News of hedzr's Open Source Projects",
+  // blog: {
+  //   md: {
+  //     width: '86%',
+  //   },
+  //   lg: {
+  //     width: '79%',
+  //   },
+  //   xl: {
+  //     width: '73%',
+  //   },
+  //   'xl2': {
+  //     width: '69%',
+  //   }
+  // }
+  blog: {
+    title: 'hzSomthing',
+    slogan: 'All the latest blogs and news, straight from the team.',
+  }
 };
 
 export const metadataImage = createMetadataImage({
