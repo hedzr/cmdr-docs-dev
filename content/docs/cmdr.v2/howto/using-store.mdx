@@ -80,6 +80,31 @@ As you seen, the internal structure will be printed out for the deep researching
 
 ![image-20240221115843477](/images/cmdr/image-20240221115843477.png)
 
+> `<B>` is branch, `<L>` is leaf.
+>
+> Leaf node contains data, comment, description and tag (any value).
+>
+> To speed up the tree, any delimiter char is a part of the path.
+
+The `store` provides advanced APIs to extract the typed data from some a node,
+
+```go
+iData := conf.MustInt("app.logging.rotate")
+stringData := conf.MustString("app.logging.rotate")
+debugMode := conf.MustBool("app.debug")
+...
+```
+
+The searching tools are also used to locate whether a key exists or not:
+
+```go
+found := conf.Has("app.logging.rotate")
+node, isBranch, isPartialMatched, found := conf.Locate("app.logging.rotate")
+t.Logf("%v | %s | %v |     | %v, %v, found", node.Data(), node.Comment(), node.Tag(), isBranch, isPartialMatched, found)
+```
+
+`Locate` is a more friendly `Has` test for the developers when they want to inspect more extra information after searching.
+
 ## 内幕
 
 `Store` 经过了完全的重设计，其核心数据结构基于 Trie-tree 的改进版 Radix-tree，在每个节点中存储其路径片段而不是限于每个节点单个字符，也不采用传统 Trie-tree 的 `children [256]char` 的设计方式。传统方式以 ASCII 字符表为预设支持，用固定数据来表达下级节点，这不仅失去了 Unicode 支持能力，也比较浪费内存，同时由于每个节点只表示路径字符串的一个字符，所以有更高的深度和更慢的搜索匹配速度。
