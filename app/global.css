@@ -25,6 +25,12 @@
    SFMono-Regular,
 */
 
+aside div[data-state] > a.folder {
+  /* font-weight: bold; */
+  font-style: italic;
+  /* color: chocolate !important; */
+}
+
 article ol {
   list-style: decimal;
 }
@@ -34,11 +40,11 @@ article ul {
 }
 
 article a {
-  @apply text-sky-400;
+  @apply text-sky-500;
 }
-article a[data-card] {
+/* article a[data-card] {
   color: inherit !important;
-}
+} */
 
 code,
 kbd,
@@ -104,12 +110,23 @@ h3,
 h4,
 h5,
 h6 {
-  /*margin: 2em 0 1.67em;*/
+  margin: 2em 0 1.67em;
   line-height: 1.2;
-  @apply text-zinc-300;
+  @apply text-zinc-500;
+}
+
+h1 a[data-card],
+h2 a[data-card],
+h2 a[data-card] code,
+h3 a[data-card],
+h4 a[data-card],
+h5 a[data-card],
+h6 a[data-card] {
+  @apply text-zinc-500;
 }
 
 article h1 {
+  margin: 0.2em 0 0em !important;
   counter-reset: h2 0;
 }
 article h2 {
@@ -166,6 +183,7 @@ article h6.nocount:before {
 article h3.not-prose,
 article a[data-card]:has(h3.nocount) {
   text-decoration: none !important;
+  margin: 4px !important;
 }
 
 /* blog headings */
