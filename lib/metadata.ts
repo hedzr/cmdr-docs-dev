@@ -4,7 +4,7 @@ import { source } from './source';
 import * as process from "node:process";
 
 export const site = {
-  title: 'cmdr.docs',
+  title: 'hzDocs',
   desc: "The Documentations and News of hedzr's Open Source Projects",
   // blog: {
   //   md: {

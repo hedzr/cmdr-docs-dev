@@ -6,8 +6,8 @@ import { baseUrl, createMetadata, site } from "@/lib/metadata";
 
 export const metadata = createMetadata({
   title: {
-    template: `%s | ${site.title} - News`,
-    default: `${site.title} - News`,
+    template: `%s | ${site.title}`,
+    default: `${site.title} - for our Open Projects`,
   },
   description: site.desc,
   // "a command-line arguments parser and app framework with hierarchical settings supporting",
