@@ -5,6 +5,27 @@ description: WithXXX Options...
 
 ## cmdr WithOpts
 
+- `WithUnmatchedAsError(b bool)`
+- `WithStore(conf store.Store, topLevelPrefix ...string)`
+- `WithRawStore(conf store.Store)`
+- `WithExternalLoaders(loaders ...cli.Loader)`
+- `WithExternalLoadersReplaced(loaders ...cli.Loader)`
+- `WithTasksBeforeParse(tasks ...cli.Task)`
+- `WithTasksParsed(tasks ...cli.Task)`
+- `WithTasksBeforeRun(tasks ...cli.Task)`
+- `WithTasksAfterRun(tasks ...cli.Task)`
+- `WithTasksPostCleanup(tasks ...cli.Task)`
+- `WithTasksSetupPeripherals(tasks ...cli.Task)`
+- `WithPeripherals(peripherals PeripheralMap)`
+  - `Peripheral(name string) basics.Peripheral`
+  - `PeripheralT[T basics.Peripheral](name string) T`
+- `WithSortInHelpScreen(b bool)`
+- `WithDontGroupInHelpScreen(b bool)`
+- `WithDontExecuteAction(b bool)`
+- `WithForceDefaultAction(b bool)`
+- `WithAutoEnvBindings(b bool, prefix ...string)`
+- `WithConfig(conf *cli.Config)`
+
 ### 额外的话题
 
 <Cards>
