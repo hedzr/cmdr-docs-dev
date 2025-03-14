@@ -1,0 +1,160 @@
+---
+title: 命令：预设参数
+description: Preset Args
+---
+
+## 执行外部程序、Shell 命令
+
+`.PresetCmdLines(args...)` 为命令提供附加的预设参数值。这些给定的预设参数将在自动附着于相应命令，而无需用户显式地输入它们。
+
+例如 `preset/cmd` 子命令带有预设参数 `-pv`，那么当用户输入 `app preset cmd` 时，就相当于提供了完整的命令行 `app preset cmd -p -v`。
+
+### 定义
+
+`examples/demo/` 展示了 `preset args` 的用法，详见 `cmd/preset.go`：
+
+<Tabs items={['demo/main.go', 'cmd/preset-cmdline.go', 'cmd/all.go']}>
+
+<Tab key="demo/main.go">
+
+```go title=demo/main.go
+package main
+
+import (
+	"context"
+	"os"
+
+	"github.com/hedzr/cmdr/v2"
+	"github.com/hedzr/cmdr/v2/cli"
+	"github.com/hedzr/cmdr/v2/examples/cmd"
+	logz "github.com/hedzr/logg/slog"
+)
+
+const (
+	appName = "demo-app"
+	desc    = ``
+	version = cmdr.Version
+	author  = ``
+)
+
+func main() {
+	app := cmdr.Create(appName, version, author, desc).
+    With(func(app cli.App) {
+	  }).
+		// [!code highlight:1]
+    WithAdders(cmd.Commands...).
+    Build()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	if err := app.Run(ctx); err != nil {
+		logz.ErrorContext(ctx, "Application Error:", "err", err) // stacktrace if in debug mode/build
+		os.Exit(app.SuggestRetCode())
+	} else if rc := app.SuggestRetCode(); rc != 0 {
+		os.Exit(rc)
+	}
+}
+```
+
+</Tab>
+
+<Tab key="cmd/preset-cmdline.go">
+
+```go title=cmd/preset-cmdline.go
+package cmd
+
+import (
+	"context"
+
+	"github.com/hedzr/cmdr/v2/cli"
+)
+
+type presetCmd struct{}
+
+func (presetCmd) Add(app cli.App) {
+	app.Cmd("preset", "p").
+		Description("preset command").
+		With(func(b cli.CommandBuilder) {
+			b.Flg("preset", "p").
+				Default(false).
+				Description("preset arg").
+				Build()
+			b.Cmd("cmd", "c").
+				// [!code highlight:1]
+				PresetCmdLines(`-pv`).
+				OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+					_, err = app.DoBuiltinAction(ctx, cli.ActionDefault)
+					return
+				}).Build()
+		})
+}
+```
+
+</Tab>
+<Tab key="cmd/all.go">
+
+```go title=cmd/all.go
+package cmd
+
+var Commands = []cli.CmdAdder{
+	jumpCmd{},
+	wrongCmd{},
+	invokeCmd{},
+	presetCmd{},
+}
+```
+
+</Tab>
+</Tabs>
+
+### 运行时
+
+上面的示例程序的运行时效果如同这样：
+
+```bash
+$ go run ./examples/demo preset cmd
+demo-app v2.1.0 ~ Copyright © 2025 by demo-app Authors ~ All Rights Reserved.
+
+Usage:
+
+  $ demo-app preset cmd [Options...][files...]
+
+Parent Flags (Cmd{'preset'}):
+  -p, --preset                                preset arg (Default: true)
+
+Global Flags:
+  [Misc]
+    -V, --version,--ver,--versions            Show app versions information (Default: false)
+    -h, --help,--info,--usage                 Show this help screen (-?) [Env: HELP] (Default: false)
+
+Type '-h'/'-?' or '--help' to get command help screen.
+More: '-D'/'--debug', '-V'/'--version', '-#'/'--build-info', '--no-color'...
+
+
+Matched commands:
+- 1. p | Cmd{'preset'}
+- 2. c | Cmd{'preset.cmd'}
+
+Matched flags:
+- 1. p (+1) Flg{'preset.preset'} /short/ | [owner: Cmd{'preset'}]
+- 2. v (+1) Flg{'.verbose'} /short/ | [owner: Cmd{''}]
+
+ACTIONS:
+
+$
+```
+
+`preset cmd` 子命令的 OnAction 函数执行 cmdr 内置的调试目的的响应函数，打印出命中信息。
+
+其中，`Matched commands` 一节显示了命中的子命令，而 `Matched flags` 显示了命中的标志。在这里，`p` 和 `v` 标志都分别被成功地匹配了，它们并未由终端用户亲自输入，而是由预设参数表中自动附着于 `cmd` 子命令。
+
+### 额外的话题
+
+<Cards>
+  <Card title="Required" href="../howto/required-flag" />
+  <Card title="Toggle Group" href="../howto/toggle-group-of-flags" />
+  <Card title="Head Like" href="../howto/head-like-flag" />
+  <Card title="Valid Args" href="../howto/valid-args-flag" />
+  <Card title="External Tool" href="../howto/flag-with-external-flag" />
+</Cards>

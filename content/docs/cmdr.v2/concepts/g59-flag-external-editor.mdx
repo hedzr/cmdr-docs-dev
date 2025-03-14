@@ -1,0 +1,124 @@
+---
+title: 标志：调用外部工具获得输入
+description: Using external editor
+---
+
+## 调用外部编辑器获取文字输入
+
+git 命令行工具的 commit 支持 `-m msg` 方式来提供提交注释文字。同时，如果用户没有给出 msg 参数，那么 git 将会调用 Shell 的编辑器，通常是 vim 或者 nano（取决于环境变量 `EDITOR`指向谁）。
+
+cmdr 支持同样的交互方案。
+
+一个使用了 `ExternalEditor(envVarName)` 标注的标志将获得和 `git -m` 相同的交互表现。
+
+> 提前指定的 envVarName 为要查询的 Shell 编辑器的预设环境变量名。
+>
+> 例如，如果你的环境变量中有 `EDITOR=nano` 的设置，那么 `ExternalEditor("EDITOR")` 将会选用 nano 作为 Shell 全屏编辑器，并在操作系统临时文件夹中建立一个临时文件来接受用户编辑输入。当用户存盘退出 nano 时，这个临时文件中的文本内容将被赋予该标志。
+>
+> 有时候，你也可能使用 `envVarName` 为 `LESS`, `MAN` 等等来达到特定效果。
+
+一般来说，启用了 `ExternalEditor(envVarName)` 风格的标志必须具有字符串值的默认值。
+
+### 定义
+
+`.ExternalEditor(envVarName)` 可以为标志设置 `External Editor` 风格。
+
+<Tabs items={['main.go', 'external-editor.go']}>
+
+<Tab key="main.go">
+
+```go title=main.go
+package main
+
+import (
+	"context"
+	"os"
+
+	"github.com/hedzr/cmdr/v2"
+	"github.com/hedzr/cmdr/v2/cli"
+	"github.com/hedzr/cmdr/v2/examples"
+	logz "github.com/hedzr/logg/slog"
+)
+
+const (
+	appName = "external-editor"
+	desc    = `a sample to show u how to use external editor flag.`
+	version = cmdr.Version
+	author  = `The Example Authors`
+)
+
+func main() {
+	app := cmdr.Create(appName, version, author, desc).
+		With(func(app cli.App) {
+			// [!code highlight:5]
+			app.OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+				msg := cmd.Store().MustString("message")
+				println(`Hello, World.`, msg)
+				return
+			})
+		}).
+		// [!code highlight]
+		WithBuilders(examples.AddExternalEditorFlag).
+		WithAdders().
+		Build()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	if err := app.Run(ctx); err != nil {
+		logz.ErrorContext(ctx, "Application Error:", "err", err) // stacktrace if in debug mode/build
+		os.Exit(app.SuggestRetCode())
+	} else if rc := app.SuggestRetCode(); rc != 0 {
+		os.Exit(rc)
+	}
+}
+```
+
+</Tab>
+
+<Tab key="external-editor.go">
+
+```go title=external-editor.go
+package examples
+
+import (
+	"github.com/hedzr/cmdr/v2/cli"
+)
+
+func AddExternalEditorFlag(c cli.CommandBuilder) { //nolint:revive
+	c.Flg("message", "m", "msg").
+		Default("").
+		Description("the message requesting.", "").
+		Group("External Editor").
+		PlaceHolder("MESG").
+		ExternalEditor(cli.ExternalToolEditor).
+		Build()
+}
+```
+
+</Tab>
+</Tabs>
+
+### 运行时
+
+上面的示例程序的运行时效果如同这样：
+
+```bash
+$ go run ./examples/external-editor -m 123
+Hello, World. 123
+$ go run ./examples/external-editor -m
+(open nano and waiting for user's input...)
+Hello, World. dsada
+
+$
+```
+
+### 额外的话题
+
+<Cards>
+  <Card title="Required" href="../howto/required-flag" />
+  <Card title="Toggle Group" href="../howto/toggle-group-of-flags" />
+  <Card title="Head Like" href="../howto/head-like-flag" />
+  <Card title="Valid Args" href="../howto/valid-args-flag" />
+  <Card title="External Tool" href="../howto/flag-with-external-flag" />
+</Cards>

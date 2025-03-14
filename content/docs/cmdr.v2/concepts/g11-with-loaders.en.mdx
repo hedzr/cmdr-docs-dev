@@ -222,7 +222,7 @@ exit status 1
 
 The notable point is the highlight line, which shows the value of `app.tiny3.foo` was loaded properly.
 
-### Searching the settings folders
+### Searching the settings folders [#auto-search-config-files]
 
 [hedzr/cmdr-loaders](https://github.com/hedzr/cmdr-loaders) provides a file loader to compliant with GNU Folder Spec,
 _UNIX Filesystem Conventions_ ([wiki](https://en.wikipedia.org/wiki/Unix_filesystem#Conventional_directory_layout))
@@ -250,7 +250,7 @@ In loading, `hedzr/cmdr-loaders` could parse the file format by its extension na
 
 It's possible to mix all them up.
 
-### Write-Back the Changeset
+### Write-Back the Changeset [#write-back]
 
 For `Alternative` setting source, `Write-Back` machnism is supported: once the app terminating, the modified subset of app settings in memory will be written into `Alternative` file.
 

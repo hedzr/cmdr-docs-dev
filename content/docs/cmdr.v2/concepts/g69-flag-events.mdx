@@ -1,0 +1,32 @@
+---
+title: 标志：事件响应函数
+description: OnXXX event handlers...
+---
+
+## 关联标志的 Event Handlers
+
+标准的事件响应函数有：
+
+- `.OnParseValue(...OnParseValueHandler)`
+- `.OnMatched(...OnMatchedHandler)`
+- `.OnChanging(...OnChangingHandler)`
+- `.OnChanged(...OnChangedHandler)`
+- `.OnSet(...OnSetHandler)`
+
+它们对应着一个子命令将要被解析（OnParseValue），解析成功（OnMatched），将要接受用户输入的新值（OnChanging），接受用户值（OnChanged），和接受编程修改值（OnSet）。
+
+OnSet 和 OnChanged 的区别是，前者会在 `cmd.Store().Set("some.key", newval)` 的过程中被触发，代表编程方式修改值，而后者通常代表着命令行中的一个标志被解析正确并赋值。
+
+cmdr-loaders 与 cmdr 的协作被集成管理，因此在 cmdr-loaders loading 外部源的过程中，OnSet 并不会被触发，这个过程被视为初始化加载过程。
+
+而当加载完毕，程序运行期的变更将被自动记录，从而产生一个变更集。这个变更集将被自动回写到 Alternative 类别的外部配置文件中。具体特性详见 [外部源回写](../g11-with-loaders#write-back)。
+
+### 额外的话题
+
+<Cards>
+  <Card title="Required" href="../howto/required-flag" />
+  <Card title="Toggle Group" href="../howto/toggle-group-of-flags" />
+  <Card title="Head Like" href="../howto/head-like-flag" />
+  <Card title="Valid Args" href="../howto/valid-args-flag" />
+  <Card title="External Tool" href="../howto/flag-with-external-flag" />
+</Cards>

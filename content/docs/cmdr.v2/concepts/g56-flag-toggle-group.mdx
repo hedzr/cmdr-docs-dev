@@ -1,0 +1,230 @@
+---
+title: 标志：可翻转组
+description: Toggleable Group/Toggle Group
+---
+
+## 可翻转组
+
+可以将一组标志归为一组，且令其取值被翻转。即，当一个标志被命中时，上一标志设定的值被覆盖。
+
+一般来说，这组标志的默认值均为布尔量，有且仅有一个标志可以被预设为默认值 `true`。
+
+这样的一个可翻转组相当于 UI 界面中的 Radio Group。
+
+### 定义
+
+`.ToggleGroup(toggleGroupName)` 可以设置标志为可翻转组的组成部分。
+
+`toggleGroupName` 值相同的标志将被组织为同一组，此时它们的分组（Group）名也被同时设置。
+
+在 `OnAction` 执行阶段，可以通过 `cmd.Store().MustBool(toggleGroupName)` 获得最终设定值。
+
+<Tabs items={['main.go', 'toggle-group.go']}>
+
+<Tab key="main.go">
+
+```go title=main.go
+package main
+
+import (
+	"context"
+	"os"
+
+	"github.com/hedzr/cmdr/v2"
+	"github.com/hedzr/cmdr/v2/cli"
+	"github.com/hedzr/cmdr/v2/examples"
+	logz "github.com/hedzr/logg/slog"
+)
+
+const (
+	appName = "toggle-group"
+	desc    = `a sample to show u what looking of a toggleable-group option in the help screen.`
+	version = cmdr.Version
+	author  = `The Example Authors`
+)
+
+func main() {
+	app := cmdr.Create(appName, version, author, desc).
+		With(func(app cli.App) {}).
+		// [!code highlight]
+		WithBuilders(examples.AddToggleGroupCommand).
+		WithAdders().
+		Build()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	if err := app.Run(ctx); err != nil {
+		logz.ErrorContext(ctx, "Application Error:", "err", err) // stacktrace if in debug mode/build
+		os.Exit(app.SuggestRetCode())
+	} else if rc := app.SuggestRetCode(); rc != 0 {
+		os.Exit(rc)
+	}
+}
+```
+
+</Tab>
+
+<Tab key="toggle-group.go">
+
+```go title=toggle-group.go
+package examples
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/hedzr/cmdr/v2/cli"
+)
+
+// AddToggleGroupCommand _
+//
+// Sample code,
+//
+//	app.RootBuilder(examples.AddToggleGroupCommand)
+//
+// Or,
+//
+//	app := cmdr.Create(appName, version, author, desc).
+//		WithBuilders(examples.AddToggleGroupCommand).
+//		Build()
+//	app.Run(context.TODO())
+// [!code fold:59]
+func AddToggleGroupCommand(parent cli.CommandBuilder) { //nolint:revive
+	// toggle-group-test - without a default choice
+
+	parent.Cmd("tg-test", "tg").
+		Description("toggable group, with a default choice", "tg test new features,\nverbose long descriptions here.").
+		Group("Toggleable Group").
+		OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+			fmt.Printf("*** Got fruit (toggle group): %v\n", cmd.Store().MustString("fruit"))
+
+			// fmt.Printf("> STDIN MODE: %v \n", cmd.Set().MustBool("mx-test.stdin"))
+			// fmt.Println()
+
+			_, _ = cmd, args
+			return
+		}).
+		With(func(cb cli.CommandBuilder) {
+			cb.Flg("apple", "").
+				Default(false).
+				Description("the test text.", "").
+				ToggleGroup("fruit").
+				Build()
+			cb.Flg("banana", "").
+				Default(false).
+				Description("the test text.", "").
+				ToggleGroup("fruit").
+				Build()
+			cb.Flg("orange", "").
+				Default(true).
+				Description("the test text.", "").
+				ToggleGroup("fruit").
+				Build()
+		})
+
+	// tg2 - with a default choice
+
+	parent.Cmd("tg-test2", "tg2", "toggle-group-test2").
+		Description("toggable group 2, without default choice", "tg2 test new features,\nverbose long descriptions here.").
+		Group("Toggleable Group").
+		OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+			fmt.Printf("*** Got fruit (toggle group): %v\n", cmd.Store().MustString("fruit"))
+			_, _ = cmd, args
+
+			fmt.Printf("> STDIN MODE: %v \n", cmd.Set().MustBool("mx-test.stdin"))
+			fmt.Println()
+			return
+		}).
+		With(func(cb cli.CommandBuilder) {
+			cb.Flg("apple", "a").
+				Default(true).
+				Description("the test text.", "").
+				ToggleGroup("fruit").
+				Build()
+			cb.Flg("banana", "b").
+				Default(false).
+				Description("the test text.", "").
+				ToggleGroup("fruit").
+				Build()
+			cb.Flg("orange", "o").
+				Default(false).
+				Description("the test text.", "").
+				ToggleGroup("fruit").
+				Build()
+		})
+}
+
+func AddToggleGroupFlags(c cli.CommandBuilder) { //nolint:revive
+	c.Flg("apple", "a").
+		Default(false).
+		Description("the test text.", "").
+		ToggleGroup("fruit").
+		Group("Toggleable Group").
+		Build()
+
+	c.Flg("banana", "b").
+		Default(false).
+		Description("the test text.", "").
+		ToggleGroup("fruit").
+		Group("Toggleable Group").
+		Build()
+
+	c.Flg("orange", "o").
+		Default(true).
+		Description("the test text.", "").
+		ToggleGroup("fruit").
+		Group("Toggleable Group").
+		Build()
+}
+```
+
+</Tab>
+</Tabs>
+
+### 运行时
+
+可翻转组在帮助屏中会有较为明显的显示，如同下面的例子。同时，用户输入也能被取得：
+
+```bash
+$ go run ./examples/toggle-group tg2 --help
+toggle-group v2.1.0 ~ Copyright © 2025 by The Example Authors ~ All Rights Reserved.
+
+Usage:
+
+  $ toggle-group tg-test2 [Options...][files...]
+
+Description:
+
+  tg2 test new features,
+  verbose long descriptions here.
+
+Flags:
+  [fruit]
+    -a, --apple                               [x] the test text. (Default: true)
+    -b, --banana                              [ ] the test text. (Default: false)
+    -o, --orange                              [ ] the test text. (Default: false)
+
+Global Flags:
+  [Misc]
+    -h, --help,--info,--usage                 Show this help screen (-?) [Env: HELP] (Default: true)
+
+Type '-h'/'-?' or '--help' to get command help screen.
+More: '-D'/'--debug', '-V'/'--version', '-#'/'--build-info', '--no-color'...
+
+$ go run ./examples/toggle-group tg2 -b
+*** Got fruit (toggle group): banana
+> STDIN MODE: false
+
+$
+```
+
+### 额外的话题
+
+<Cards>
+  <Card title="Required" href="../howto/required-flag" />
+  <Card title="Toggle Group" href="../howto/toggle-group-of-flags" />
+  <Card title="Head Like" href="../howto/head-like-flag" />
+  <Card title="Valid Args" href="../howto/valid-args-flag" />
+  <Card title="External Tool" href="../howto/flag-with-external-flag" />
+</Cards>
