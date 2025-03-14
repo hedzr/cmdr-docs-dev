@@ -2,6 +2,7 @@ import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
 import { type LinkItemType } from "fumadocs-ui/layouts/docs";
 import {
   AlbumIcon,
+  BookOpen,
   // Book,
   // ComponentIcon,
   // Heart,
@@ -80,12 +81,13 @@ export const baseOptions: BaseLayoutProps = {
     ),
     transparentMode: "none",
   },
-  githubUrl: "https://github.com/hedzr/cmdr-docs/",
+  githubUrl: "https://github.com/hedzr/cmdr-docs-dev/",
   links: [
     {
       text: "Documentation",
       url: "/docs",
       active: "nested-url",
+      icon: <BookOpen />,
     },
     // {
     //   text: "Bulletin",
