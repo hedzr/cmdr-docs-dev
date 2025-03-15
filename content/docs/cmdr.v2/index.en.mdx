@@ -67,13 +67,16 @@ The help screen looks like,
 
 ![tiny0-help-screen](/images/cmdr/v2/guide/2025-02-16T09.14.24.png)
 
-### Deep In It
+### Deeper In It
 
-In this tiny app, we do not refer to a standard `Store`, so a dummy one created internally, which discards any requests.
+In this tiny app, we do not refer to a standard `Store`, so a dummy one was created internally, which would discard any requests.
 
-So `cmd.Store().MustBool("full")` cannot return the right value input by end user. The replaced way is, detecting the hit times of `full` in parsing will tell us that `--full` or `-f` had been typed on command line.
+Due to the reason, The call to `cmd.Store().MustBool("full")` cannot return the proper value input by end user. So the replacement is, detecting the hit times of `full` in parsing will tell us that `--full` or `-f` had been typed on command line.
 
-As a sample, when user typed `app --full -f`, the hit times would be 2.
+> `cmdr.ParsedState()` will provides the details of parsing state.
+> But it's not used here.
+
+As a fact, when user typed `app --full -f`, the hit times would be 2.
 
 `cmd.FlagBy("full")` could locate to the right `*Flag` object by it long-title.
 Similarly, `cmd.SubCmdBy("xxx")` could be used for look up a subcommand.
@@ -86,6 +89,42 @@ Both of them are searching for the child directly. But if you want the descendan
 - `FindFlagRecursive`
 
 As the methods of `*cli.CmdS`, they aren't exposed on `interface Cmd` currently. So it might need a `Type Assertion` before you can access them.
+
+## Design
+
+`cmdr.v2` takes these dependencies:
+
+- `hedzr/store`[^1]
+- `hedzr/evendeep`[^2]
+- `hedzr/logg`[^3]
+- `hedzr/is`[^4]
+- `hedzr/errors` (`gopkg.in/hedzr/errors.v3`)
+
+Also `cmdr.v2` refers to go stdlib and golang.org/x libraries.
+
+In generally, we do not refer to other third-party libraries.
+
+But here's a exception while you're using `hedzr/store` and `hedzr/cmdr-loaders` for loading the external configuration files/sources. For parsing the file format such as TOML and YAML, we need those common libraries, for example, `gopkg.in/yaml.v3`, and so on.
+
+`cmdr.v2` try to make the dependencies more concise. This would provide a simple supplier chain to you.
+
+```mermaid
+graph BT
+  hzis(hedzr/is)-->hzlogg(hedzr/logg/slog)
+  hzis-->hzdiff(hedzr/evendeep)
+  hzlogg-->hzdiff
+  hzerrors(gopkg.in/hedzr/errors.v3)-->hzdiff
+  hzerrors-->hzstore(hedzr/store)
+  hzis-->hzstore(hedzr/store)
+  hzlogg-->hzstore(hedzr/store)
+  hzdiff-->hzstore(hedzr/store)
+  hzlogg-->cmdr(hedzr/cmdr/v2)
+  hzis-->cmdr
+  hzlogg-->cmdr
+  hzdiff-->cmdr
+  hzstore-->cmdr
+
+```
 
 ## Learn More
 
@@ -109,3 +148,13 @@ As the methods of `*cli.CmdS`, they aren't exposed on `interface Cmd` currently.
     href="https://github.com/hedzr/is"
   />
 </Cards>
+
+## Footnotes
+
+[^1]: `hedzr/store` is a high-performance configure management library
+
+[^2]: `hedzr/evendeep` offers a customizable deepcopy tool to you. There are also deepequal, deepdiff tools in it.
+
+[^3]: `hedzr/logg` provides a slog like and colorful logging library
+
+[^4]: `hedzr/is` is a basic environ detectors library

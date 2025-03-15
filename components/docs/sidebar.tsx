@@ -1,7 +1,7 @@
-'use client';
-import { ChevronDown, ExternalLink, SidebarIcon } from 'lucide-react';
-import * as Base from 'fumadocs-core/sidebar';
-import { usePathname } from 'next/navigation';
+"use client";
+import { ChevronDown, ExternalLink, SidebarIcon } from "lucide-react";
+import * as Base from "fumadocs-core/sidebar";
+import { usePathname } from "next/navigation";
 import {
   type ButtonHTMLAttributes,
   createContext,
@@ -13,27 +13,27 @@ import {
   useMemo,
   useRef,
   useState,
-} from 'react';
-import Link, { type LinkProps } from 'fumadocs-core/link';
-import { useOnChange } from 'fumadocs-core/utils/use-on-change';
-import { cn } from '../../lib/cn';
-import { ScrollArea, ScrollViewport } from '../ui/scroll-area';
-import { isActive } from '../../lib/is-active';
+} from "react";
+import Link, { type LinkProps } from "fumadocs-core/link";
+import { useOnChange } from "fumadocs-core/utils/use-on-change";
+import { cn } from "../../lib/cn";
+import { ScrollArea, ScrollViewport } from "../ui/scroll-area";
+import { isActive } from "../../lib/is-active";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '../ui/collapsible';
-import { type ScrollAreaProps } from '@radix-ui/react-scroll-area';
-import { useSidebar } from 'fumadocs-ui/provider';
-import { cva } from 'class-variance-authority';
+} from "../ui/collapsible";
+import { type ScrollAreaProps } from "@radix-ui/react-scroll-area";
+import { useSidebar } from "fumadocs-ui/provider";
+import { cva } from "class-variance-authority";
 import type {
   CollapsibleContentProps,
   CollapsibleTriggerProps,
-} from '@radix-ui/react-collapsible';
-import type { PageTree } from 'fumadocs-core/server';
-import { useTreeContext, useTreePath } from 'fumadocs-ui/provider';
-import type { SidebarComponents } from './shared';
+} from "@radix-ui/react-collapsible";
+import type { PageTree } from "fumadocs-core/server";
+import { useTreeContext, useTreePath } from "fumadocs-ui/provider";
+import type { SidebarComponents } from "./shared";
 
 export interface SidebarProps extends HTMLAttributes<HTMLElement> {
   /**
@@ -59,13 +59,13 @@ interface InternalContext {
 }
 
 const itemVariants = cva(
-  'relative flex flex-row items-center gap-2 rounded-md p-2 text-start text-fd-muted-foreground [overflow-wrap:anywhere] md:py-1.5 [&_svg]:size-4 [&_svg]:shrink-0',
+  "relative flex flex-row items-center gap-2 rounded-md p-2 text-start text-fd-muted-foreground [overflow-wrap:anywhere] md:py-1.5 [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       active: {
-        true: 'bg-fd-primary/10 text-fd-primary',
+        true: "bg-fd-primary/10 text-fd-primary",
         false:
-          'transition-colors hover:bg-fd-accent/50 hover:text-fd-accent-foreground/80 hover:transition-none',
+          "transition-colors hover:bg-fd-accent/50 hover:text-fd-accent-foreground/80 hover:transition-none",
       },
     },
   },
@@ -89,13 +89,13 @@ export function CollapsibleSidebar(props: SidebarProps) {
   });
 
   const onEnter: PointerEventHandler = useCallback((e) => {
-    if (e.pointerType === 'touch' || closeTimeRef.current > Date.now()) return;
+    if (e.pointerType === "touch" || closeTimeRef.current > Date.now()) return;
     window.clearTimeout(timerRef.current);
     setHover(true);
   }, []);
 
   const onLeave: PointerEventHandler = useCallback((e) => {
-    if (e.pointerType === 'touch') return;
+    if (e.pointerType === "touch") return;
     window.clearTimeout(timerRef.current);
 
     timerRef.current = window.setTimeout(
@@ -116,16 +116,16 @@ export function CollapsibleSidebar(props: SidebarProps) {
       onPointerLeave={collapsed ? onLeave : undefined}
       data-collapsed={collapsed}
       className={cn(
-        'md:transition-all',
+        "md:transition-all",
         collapsed &&
-          'md:-me-(--fd-sidebar-width) md:translate-x-[calc(var(--fd-sidebar-offset)*-1)] rtl:md:translate-x-(--fd-sidebar-offset)',
-        collapsed && hover && 'z-50 md:translate-x-0',
-        collapsed && !hover && 'md:opacity-0',
+          "md:-me-(--fd-sidebar-width) md:translate-x-[calc(var(--fd-sidebar-offset)*-1)] rtl:md:translate-x-(--fd-sidebar-offset)",
+        collapsed && hover && "z-50 md:translate-x-0",
+        collapsed && !hover && "md:opacity-0",
         props.className,
       )}
       style={
         {
-          '--fd-sidebar-offset': 'calc(var(--fd-sidebar-width) - 20px)',
+          "--fd-sidebar-offset": "calc(var(--fd-sidebar-width) - 20px)",
         } as object
       }
     />
@@ -153,22 +153,22 @@ export function Sidebar({
         blockScrollingWidth={768} // md
         {...props}
         className={cn(
-          'fixed top-[calc(var(--fd-banner-height)+var(--fd-nav-height))] z-30 bg-fd-card text-sm md:sticky md:h-(--fd-sidebar-height)',
-          'max-md:inset-x-0 max-md:bottom-0 max-md:bg-fd-background/80 max-md:text-[15px] max-md:backdrop-blur-lg max-md:data-[open=false]:invisible',
+          "fixed top-[calc(var(--fd-banner-height)+var(--fd-nav-height))] z-30 bg-fd-card text-sm md:sticky md:h-(--fd-sidebar-height)",
+          "max-md:inset-x-0 max-md:bottom-0 max-md:bg-fd-background/80 max-md:text-[15px] max-md:backdrop-blur-lg max-md:data-[open=false]:invisible",
           props.className,
         )}
         style={
           {
             ...props.style,
-            '--fd-sidebar-height':
-              'calc(100dvh - var(--fd-banner-height) - var(--fd-nav-height))',
+            "--fd-sidebar-height":
+              "calc(100dvh - var(--fd-banner-height) - var(--fd-nav-height))",
           } as object
         }
       >
         <div
           {...inner}
           className={cn(
-            'flex size-full max-w-full flex-col pt-2 md:ms-auto md:w-(--fd-sidebar-width) md:border-e md:pt-4',
+            "flex size-full max-w-full flex-col pt-2 md:ms-auto md:w-(--fd-sidebar-width) md:border-e md:pt-4",
             inner?.className,
           )}
         >
@@ -183,7 +183,7 @@ export function SidebarHeader(props: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       {...props}
-      className={cn('flex flex-col gap-2 px-4 empty:hidden', props.className)}
+      className={cn("flex flex-col gap-2 px-4 empty:hidden", props.className)}
     >
       {props.children}
     </div>
@@ -195,7 +195,7 @@ export function SidebarFooter(props: HTMLAttributes<HTMLDivElement>) {
     <div
       {...props}
       className={cn(
-        'flex flex-col border-t px-4 py-3 empty:hidden',
+        "flex flex-col border-t px-4 py-3 empty:hidden",
         props.className,
       )}
     >
@@ -206,11 +206,11 @@ export function SidebarFooter(props: HTMLAttributes<HTMLDivElement>) {
 
 export function SidebarViewport(props: ScrollAreaProps) {
   return (
-    <ScrollArea {...props} className={cn('h-full', props.className)}>
+    <ScrollArea {...props} className={cn("h-full", props.className)}>
       <ScrollViewport
         className="p-4"
         style={{
-          maskImage: 'linear-gradient(to bottom, transparent, white 12px)',
+          maskImage: "linear-gradient(to bottom, transparent, white 12px)",
         }}
       >
         {props.children}
@@ -226,7 +226,7 @@ export function SidebarSeparator(props: HTMLAttributes<HTMLParagraphElement>) {
     <p
       {...props}
       className={cn(
-        'inline-flex items-center gap-2 mb-2 px-2 text-sm font-medium [&_svg]:size-4 [&_svg]:shrink-0',
+        "inline-flex items-center gap-2 mb-2 px-2 text-sm font-medium [&_svg]:size-4 [&_svg]:shrink-0",
         props.className,
       )}
       style={{
@@ -298,7 +298,7 @@ export function SidebarFolderTrigger(props: CollapsibleTriggerProps) {
   return (
     <CollapsibleTrigger
       {...props}
-      className={cn(itemVariants({ active: false }), 'w-full')}
+      className={cn(itemVariants({ active: false }), "w-full")}
       style={{
         paddingInlineStart: getOffset(level),
         ...props.style,
@@ -308,7 +308,7 @@ export function SidebarFolderTrigger(props: CollapsibleTriggerProps) {
       {props.children}
       <ChevronDown
         data-icon
-        className={cn('ms-auto transition-transform', !open && '-rotate-90')}
+        className={cn("ms-auto transition-transform", !open && "-rotate-90")}
       />
     </CollapsibleTrigger>
   );
@@ -326,9 +326,14 @@ export function SidebarFolderLink(props: LinkProps) {
     <Link
       {...props}
       data-active={active}
-      className={cn(itemVariants({ active }), 'w-full', props.className)}
+      className={cn(
+        itemVariants({ active }),
+        "w-full",
+        props.className,
+        "folder",
+      )}
       onClick={(e) => {
-        if ((e.target as HTMLElement).hasAttribute('data-icon')) {
+        if ((e.target as HTMLElement).hasAttribute("data-icon")) {
           setOpen((prev) => !prev);
           e.preventDefault();
         } else {
@@ -345,7 +350,7 @@ export function SidebarFolderLink(props: LinkProps) {
       {props.children}
       <ChevronDown
         data-icon
-        className={cn('ms-auto transition-transform', !open && '-rotate-90')}
+        className={cn("ms-auto transition-transform", !open && "-rotate-90")}
       />
     </Link>
   );
@@ -355,7 +360,7 @@ export function SidebarFolderContent(props: CollapsibleContentProps) {
   const ctx = useInternalContext();
 
   return (
-    <CollapsibleContent {...props} className={cn('relative', props.className)}>
+    <CollapsibleContent {...props} className={cn("relative", props.className)}>
       <Context.Provider
         value={useMemo(
           () => ({
@@ -395,13 +400,13 @@ export function SidebarCollapseTrigger(
 function useFolderContext() {
   const ctx = useContext(FolderContext);
 
-  if (!ctx) throw new Error('Missing sidebar folder');
+  if (!ctx) throw new Error("Missing sidebar folder");
   return ctx;
 }
 
 function useInternalContext(): InternalContext {
   const ctx = useContext(Context);
-  if (!ctx) throw new Error('<Sidebar /> component required.');
+  if (!ctx) throw new Error("<Sidebar /> component required.");
 
   return ctx;
 }
@@ -424,17 +429,17 @@ export function SidebarPageTree(props: {
       return items.map((item, i) => {
         const id = `${item.type}_${i}`;
 
-        if (item.type === 'separator') {
+        if (item.type === "separator") {
           if (Separator) return <Separator key={id} item={item} />;
           return (
-            <SidebarSeparator key={id} className={cn(i !== 0 && 'mt-8')}>
+            <SidebarSeparator key={id} className={cn(i !== 0 && "mt-8")}>
               {item.icon}
               {item.name}
             </SidebarSeparator>
           );
         }
 
-        if (item.type === 'folder') {
+        if (item.type === "folder") {
           const children = renderSidebarList(item.children, level + 1);
 
           if (Folder)
@@ -513,8 +518,8 @@ function Border({ level, active }: { level: number; active?: boolean }) {
   return (
     <div
       className={cn(
-        'absolute w-px inset-y-2 z-[2] start-3',
-        active && 'bg-fd-primary',
+        "absolute w-px inset-y-2 z-[2] start-3",
+        active && "bg-fd-primary",
       )}
     />
   );
