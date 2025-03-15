@@ -20,58 +20,53 @@ println(cmdr.Set().MustString("logging.file"))
 
 但有时候，将一颗子树抽出并映射到 struct 中可能是有用的。
 
-`cmdr.v2` 通过 `Store` 对象的方法 `GetSectionFrom()` 来实现这样的映射。其原型为：
+`cmdr.v2` 通过 `Store` 对象的方法 `To() / GetSectionFrom()` 来实现这样的映射。其原型为：
 
 ```go
-GetSectionFrom(path string, holder any, opts ...MOpt[T]) (err error)
+To(path string, holder any, opts ...MOpt[T]) (err error)
 ```
 
-使用方法如下：
+同时，`cmdr.To(path, holder, opts...)` 是更便捷的调用。使用方法如下：
 
 <Tabs items={["Test 1", "Test 2"]}>
 
 <Tab key="Test 1">
 ```go
-func TestStoreGetSectionFrom(t *testing.T) {
+func TestTo(t *testing.T) {
 	ctx := context.Background()
 	app := cmdr.Create("app", "v1", `author`, `desc`,
 		cli.WithArgs("test-app", "--debug"),
-	).
-		With(func(app cli.App) {
-			app.OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
-				b := cmdr.Store().MustBool("debug")
-				println("debug flag: ", b)
-				if !b {
-					t.Fail()
-				}
-				println(cmdr.Set().Dump())
-
-    			type manS struct {
-    				Dir  string
-    				Type int
-    			}
-    			type genS struct {
-    				Manual manS
-    			}
-    			var v genS
-    			err = cmdr.Set().GetSectionFrom("cmd.generate", &v)
-    			if err != nil {
-    				t.Fail()
-    			}
-    			if v.Manual.Type != 1 {
-    				t.Fail()
-    			}
-    			return
-    		})
-    	}).
-    	Build()
-    err := app.Run(ctx)
-    if err != nil {
-    	t.Errorf("Error: %v", err)
-    }
-
+	).OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+		b := cmdr.Store().MustBool("debug")
+		println("debug flag: ", b)
+		if !b {
+			t.Fail()
+		}
+		println(cmdr.Set().Dump())
+		type manS struct {
+			Dir  string
+			Type int
+		}
+		type genS struct {
+			Manual manS
+		}
+		var v genS
+		// [!code highlight:1]
+		err = cmdr.To("cmd.generate", &v)
+		if err != nil {
+			t.Fail()
+		}
+		if v.Manual.Type != 1 {
+			t.Fail()
+		}
+		return
+	}).
+		Build()
+	err := app.Run(ctx)
+	if err != nil {
+		t.Errorf("Error: %v", err)
+	}
 }
-
 ````
 </Tab>
 
@@ -83,69 +78,72 @@ func TestStore_GetSectionFrom(t *testing.T) {
 	conf.Set("app.server.sites", -1)
 	t.Logf("\nPath\n%v\n", conf.Dump())
 
-	type loggingS struct {
-		File   uint
-		Rotate uint64
-		Words  []any
-	}
+    type loggingS struct {
+    	File   uint
+    	Rotate uint64
+    	Words  []any
+    }
 
-	type serverS struct {
-		Start int
-		Sites int
-	}
+    type serverS struct {
+    	Start int
+    	Sites int
+    }
 
-	type appS struct {
-		Debug   bool
-		Dump    int
-		Verbose bool
-		Logging loggingS
-		Server  serverS
-	}
+    type appS struct {
+    	Debug   bool
+    	Dump    int
+    	Verbose bool
+    	Logging loggingS
+    	Server  serverS
+    }
 
-	type cfgS struct {
-		App appS
-	}
+    type cfgS struct {
+    	App appS
+    }
 
-	var ss cfgS
-	err := conf.GetSectionFrom("", &ss)
-	t.Logf("cfgS: %v | err: %v", ss, err)
+    var ss cfgS
+    err := conf.GetSectionFrom("", &ss)
+    t.Logf("cfgS: %v | err: %v", ss, err)
 
-	assertEqual(t, []any{"a", 1, false}, ss.App.Logging.Words)
-	assertEqual(t, -1, ss.App.Server.Sites)
+    assertEqual(t, []any{"a", 1, false}, ss.App.Logging.Words)
+    assertEqual(t, -1, ss.App.Server.Sites)
 
-	if !reflect.DeepEqual(ss.App.Logging.Words, []any{"a", 1, false}) {
-		t.Fail()
-	}
+    if !reflect.DeepEqual(ss.App.Logging.Words, []any{"a", 1, false}) {
+    	t.Fail()
+    }
 
-	err = conf.GetSectionFrom("nonexist", nil)
-	t.Log("nothing happened")
+    err = conf.GetSectionFrom("nonexist", nil)
+    t.Log("nothing happened")
 
-	err = conf.GetSectionFrom("nonexist", &ss)
-	t.Logf("cfgS: %v | err: %v", ss, err)
-	if err != nil {
-		t.Fail()
-	}
-	assertTrue(t, ss.App.Server.Sites == -1)
+    err = conf.GetSectionFrom("nonexist", &ss)
+    t.Logf("cfgS: %v | err: %v", ss, err)
+    if err != nil {
+    	t.Fail()
+    }
+    assertTrue(t, ss.App.Server.Sites == -1)
+
 }
 
-func newBasicStore(opts ...Opt) *storeS {
-	conf := New(opts...)
-	conf.Set("app.debug", false)
-	// t.Logf("\nPath\n%v\n", conf.dump())
-	conf.Set("app.verbose", true)
-	// t.Logf("\nPath\n%v\n", conf.dump())
-	conf.Set("app.dump", 3)
-	conf.Set("app.logging.file", "/tmp/1.log")
-	conf.Set("app.server.start", 5)
+func newBasicStore(opts ...Opt) \*storeS {
+conf := New(opts...)
+conf.Set("app.debug", false)
+// t.Logf("\nPath\n%v\n", conf.dump())
+conf.Set("app.verbose", true)
+// t.Logf("\nPath\n%v\n", conf.dump())
+conf.Set("app.dump", 3)
+conf.Set("app.logging.file", "/tmp/1.log")
+conf.Set("app.server.start", 5)
 
-	// conf.Set("app.logging.rotate", 6)
-	// conf.Set("app.logging.words", []string{"a", "1", "false"})
+    // conf.Set("app.logging.rotate", 6)
+    // conf.Set("app.logging.words", []string{"a", "1", "false"})
 
-	ss := conf.WithPrefix("app.logging")
-	ss.Set("rotate", 6)
-	ss.Set("words", []string{"a", "1", "false"})
-	return conf.(*storeS)
+    ss := conf.WithPrefix("app.logging")
+    ss.Set("rotate", 6)
+    ss.Set("words", []string{"a", "1", "false"})
+    return conf.(*storeS)
+
 }
+
 ````
 
 </Tab>
@@ -185,3 +183,4 @@ func newBasicStore(opts ...Opt) *storeS {
   <Card title="Chapter: Using Store" href="../using-store/" />
   <Card title="`hedzr/store` on Github" href="https://github.com/hedzr/store" />
 </Cards>
+````
