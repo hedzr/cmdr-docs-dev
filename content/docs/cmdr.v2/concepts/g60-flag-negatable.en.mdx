@@ -1,0 +1,162 @@
+---
+title: "Flag: Negatable"
+description: Negatable Flag with `--no-` prefix
+---
+
+## Negatable Flag
+
+```go
+b.Flg("warning", "w").
+	Description("negatable flag: <code>--no-warning</code> is available", "").
+	Group("Negatable").
+	Negatable(true).
+	Default(false).
+	Build()
+```
+
+A negatable flag like `--warning` has a companion buddy `--no-warning`.
+The two flags are just the opposite.
+
+While end user typed `--no-warning`, the `app.cmd.no-warning` key in the `Store` will be set to `true`, on the contrary, `app.cmd.warning` key will be set to `false`.
+
+> Internally, these two flags are in a same Toggleable Group.
+
+A negatable Flag always holds a boolean Default value, in generally,
+
+### Define
+
+To define negatable flag by `.Negatable(true).Default(false)` call:
+
+<Tabs items={['main.go', 'negatable.go']}>
+
+<Tab key="main.go">
+
+```go title="main.go"
+package main
+
+import (
+	"context"
+	"os"
+
+	"github.com/hedzr/cmdr/v2"
+	"github.com/hedzr/cmdr/v2/cli"
+	"github.com/hedzr/cmdr/v2/examples"
+	"github.com/hedzr/cmdr/v2/examples/devmode"
+	// logz "github.com/hedzr/logg/slog"
+)
+
+const (
+	appName = "negatable"
+	desc    = `a sample to demo negatable flag.`
+	version = cmdr.Version
+	author  = ``
+)
+
+func main() {
+	app := cmdr.Create(appName, version, author, desc).
+		With(func(app cli.App) { logz.Debug("in dev mode?", "mode", devmode.InDevelopmentMode()) }).
+		// [!code highlight]
+		WithBuilders(examples.AddNegatableFlag).
+		// WithAdders().
+		// override the onAction defined in examples.AddNegatableFlag()
+		OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+			// logz.PrintlnContext(ctx, cmd.Set().Dump())
+
+			v := cmd.Store().MustBool("warning")
+			w := cmd.Store().MustBool("no-warning")
+			println("warning flag: ", v)
+			println("no-warning flag: ", w)
+			return
+		}).
+		Build()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	if err := app.Run(ctx); err != nil {
+		logz.ErrorContext(ctx, "Application Error:", "err", err) // stacktrace if in debug mode/build
+		os.Exit(app.SuggestRetCode())
+	} else if rc := app.SuggestRetCode(); rc != 0 {
+		os.Exit(rc)
+	}
+}
+```
+
+</Tab>
+
+<Tab key="negatable.go">
+
+```go title="negatable.go"
+package examples
+
+import (
+	"context"
+
+	"github.com/hedzr/cmdr/v2/cli"
+)
+
+func AddNegatableFlag(parent cli.CommandBuilder)           { AddNegatableFlagImpl(parent) }
+func AddNegatableFlagWithoutCmd(parent cli.CommandBuilder) { AddNegatableFlagImpl(parent, true) }
+
+func AddNegatableFlagImpl(parent cli.CommandBuilder, dontHandlingParentCmd ...bool) {
+	// [!code highlight:6]
+	parent.Flg("warning", "w").
+		Description("negatable flag: <code>--no-warning</code> is available", "").
+		Group("Negatable").
+		Negatable(true).
+		Default(false).
+		Build()
+
+	var noHpc bool
+	for _, p := range dontHandlingParentCmd {
+		if p {
+			noHpc = true
+		}
+	}
+	if !noHpc {
+		// give root command an action to handle it
+		parent.OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+			v := cmd.Store().MustBool("warning")
+			w := cmd.Store().MustBool("no-warning")
+			println("warning flag: ", v)
+			println("no-warning flag: ", w)
+			return
+		})
+	}
+
+	parent.Examples(`Try to use negatable flag,
+
+	  $ $APP --no-warning
+	    <code>cmd.Store().MustBool("no-warning")</code> will be 'true'.
+	  $ $APP --warning
+	    <code>cmd.Store().MustBool("warning")</code> will be 'true'.
+	`)
+}
+```
+
+</Tab>
+</Tabs>
+
+### Run
+
+The example app has these following outputs:
+
+```bash
+$ go run ./examples/negatable --no-warning
+warning flag:  false
+no-warning flag:  true
+$ go run ./examples/negatable --warning
+warning flag:  true
+no-warning flag:  false
+$
+```
+
+### Learn More
+
+<Cards>
+  <Card title="Required" href="../howto/required-flag" />
+  <Card title="Toggle Group" href="../howto/toggle-group-of-flags" />
+  <Card title="Head Like" href="../howto/head-like-flag" />
+  <Card title="Valid Args" href="../howto/valid-args-flag" />
+  <Card title="External Tool" href="../howto/flag-with-external-flag" />
+</Cards>

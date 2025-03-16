@@ -1,0 +1,164 @@
+---
+title: 标志：自动否定
+description: Negatable Flag with `--no-` prefix
+---
+
+## Negatable 自动否定
+
+```go
+b.Flg("warning", "w").
+	Description("negatable flag: <code>--no-warning</code> is available", "").
+	Group("Negatable").
+	Negatable(true).
+	Default(false).
+	Build()
+```
+
+一个带有自动否定风格的标志 `--warning`，自动配套一个反向标志 `--no-warning`。
+两个标志的作用是相反的。
+
+cmdr 将会为 `--warning` 自动生成一个隐性的标志对象 `--no-warning`，从而支持对两者的正确解析。
+
+如果终端用户输入了 `--no-warning`，则相应的 Store 条目 `app.cmd.no-warning` 会被置为 `true`，同时 `--warning` 对应的条目 `app.cmd.warning` 将被置为 `false`；反之亦然。
+
+> 在内部，这两条标志被隐性地组织为一个 Toggleable Group，从而具有自动翻转的效果。
+
+通常来说，带有自动否定风格的标志必须具有 bool 默认值。
+
+### 定义
+
+`.Negatable(true).Default(false)` 可以为标志设置 Negatable 风格。
+
+<Tabs items={['main.go', 'negatable.go']}>
+
+<Tab key="main.go">
+
+```go title="main.go"
+package main
+
+import (
+	"context"
+	"os"
+
+	"github.com/hedzr/cmdr/v2"
+	"github.com/hedzr/cmdr/v2/cli"
+	"github.com/hedzr/cmdr/v2/examples"
+	"github.com/hedzr/cmdr/v2/examples/devmode"
+	// logz "github.com/hedzr/logg/slog"
+)
+
+const (
+	appName = "negatable"
+	desc    = `a sample to demo negatable flag.`
+	version = cmdr.Version
+	author  = ``
+)
+
+func main() {
+	app := cmdr.Create(appName, version, author, desc).
+		With(func(app cli.App) { logz.Debug("in dev mode?", "mode", devmode.InDevelopmentMode()) }).
+		// [!code highlight]
+		WithBuilders(examples.AddNegatableFlag).
+		// WithAdders().
+		// override the onAction defined in examples.AddNegatableFlag()
+		OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+			// logz.PrintlnContext(ctx, cmd.Set().Dump())
+
+			v := cmd.Store().MustBool("warning")
+			w := cmd.Store().MustBool("no-warning")
+			println("warning flag: ", v)
+			println("no-warning flag: ", w)
+			return
+		}).
+		Build()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	if err := app.Run(ctx); err != nil {
+		logz.ErrorContext(ctx, "Application Error:", "err", err) // stacktrace if in debug mode/build
+		os.Exit(app.SuggestRetCode())
+	} else if rc := app.SuggestRetCode(); rc != 0 {
+		os.Exit(rc)
+	}
+}
+```
+
+</Tab>
+
+<Tab key="negatable.go">
+
+```go title="negatable.go"
+package examples
+
+import (
+	"context"
+
+	"github.com/hedzr/cmdr/v2/cli"
+)
+
+func AddNegatableFlag(parent cli.CommandBuilder)           { AddNegatableFlagImpl(parent) }
+func AddNegatableFlagWithoutCmd(parent cli.CommandBuilder) { AddNegatableFlagImpl(parent, true) }
+
+func AddNegatableFlagImpl(parent cli.CommandBuilder, dontHandlingParentCmd ...bool) {
+	// [!code highlight:6]
+	parent.Flg("warning", "w").
+		Description("negatable flag: <code>--no-warning</code> is available", "").
+		Group("Negatable").
+		Negatable(true).
+		Default(false).
+		Build()
+
+	var noHpc bool
+	for _, p := range dontHandlingParentCmd {
+		if p {
+			noHpc = true
+		}
+	}
+	if !noHpc {
+		// give root command an action to handle it
+		parent.OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+			v := cmd.Store().MustBool("warning")
+			w := cmd.Store().MustBool("no-warning")
+			println("warning flag: ", v)
+			println("no-warning flag: ", w)
+			return
+		})
+	}
+
+	parent.Examples(`Try to use negatable flag,
+
+	  $ $APP --no-warning
+	    <code>cmd.Store().MustBool("no-warning")</code> will be 'true'.
+	  $ $APP --warning
+	    <code>cmd.Store().MustBool("warning")</code> will be 'true'.
+	`)
+}
+```
+
+</Tab>
+</Tabs>
+
+### 运行时
+
+上面的示例程序的运行时效果如同这样：
+
+```bash
+$ go run ./examples/negatable --no-warning
+warning flag:  false
+no-warning flag:  true
+$ go run ./examples/negatable --warning
+warning flag:  true
+no-warning flag:  false
+$
+```
+
+### 额外的话题
+
+<Cards>
+  <Card title="Required" href="../howto/required-flag" />
+  <Card title="Toggle Group" href="../howto/toggle-group-of-flags" />
+  <Card title="Head Like" href="../howto/head-like-flag" />
+  <Card title="Valid Args" href="../howto/valid-args-flag" />
+  <Card title="External Tool" href="../howto/flag-with-external-flag" />
+</Cards>
