@@ -224,7 +224,7 @@ The test codes:
 import "github.com/hedzr/is/term/color"
 
 func TestGetCPT(t *testing.T) {
-t.Logf("%v", color.GetCPT().Translate(`<code>code</code> | <kbd>CTRL</kbd>
+  t.Logf("%v", color.GetCPT().Translate(`<code>code</code> | <kbd>CTRL</kbd>
     <b>bold / strong / em</b>
     <i>italic / cite</i>
     <u>underline</u>
@@ -281,12 +281,13 @@ type Peripheral interface {
 
 在你的 app 中，可以使用 `RegisterPeripheral` 注册一个基础设施，并提供 defer 调用以便关闭所有这些对象。
 
-````go
+```go
 func main() {
   defer is.Closers().Close()
 
   // ...RegisterPeripheral yours
 }
+```
 
 The `Closers()` collects all closable objects and allow shutting down them at once.
 
@@ -319,7 +320,7 @@ func main() {
 
     basics.RegisterPeripheral(&redisHub{})
 }
-````
+```
 
 #### with `cmdr`
 

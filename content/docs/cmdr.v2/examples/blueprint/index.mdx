@@ -1,0 +1,231 @@
+---
+title: Blueprint
+icon: CircleHelp # uses lucide-react icons here
+---
+
+## Blueprint
+
+`blueprint` app 展示了我们推荐的一种项目组织方法。源代码可以在 `hedzr/cmdr-tests` 的 [这里](https://github.com/hedzr/cmdr-tests/tree/master/examples/blueprint/) 找到。
+
+<Tabs items={["Project Layout", "main.go", "cmd/all.go", "cmd/soundex.go"]}>
+
+<Tab value="Project Layout">
+
+<Files>
+  <Folder name="examples/blueprint/" defaultOpen>
+    <Folder name="cmd/" defaultOpen>
+      <File name="all.go" />
+      <File name="soundex.go" />
+    </Folder>
+    <File name="main.go" />
+  </Folder>
+</Files>
+
+</Tab>
+
+<Tab value="main.go">
+
+```go title="main.go"
+package main
+
+import (
+	"context"
+	"os"
+
+	loaders "github.com/hedzr/cmdr-loaders"
+	"github.com/hedzr/cmdr-tests/examples/blueprint/cmd"
+	"github.com/hedzr/cmdr/v2"
+	"github.com/hedzr/cmdr/v2/cli"
+	"github.com/hedzr/cmdr/v2/examples/devmode"
+	"github.com/hedzr/cmdr/v2/pkg/logz"
+)
+
+const (
+	appName = "blueprint"
+	desc    = `a good blueprint for you.`
+	version = cmdr.Version
+	author  = `The Examples Authors`
+)
+
+func main() {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	app := prepareApp(cmd.Commands...) // define your own commands implementations with cmd/*.go
+	if err := app.Run(ctx); err != nil {
+		logz.ErrorContext(ctx, "Application Error:", "err", err) // stacktrace if in debug mode/build
+		os.Exit(app.SuggestRetCode())
+	} else if rc := app.SuggestRetCode(); rc != 0 {
+		os.Exit(rc)
+	}
+}
+
+func prepareApp(commands ...cli.CmdAdder) cli.App {
+	return loaders.Create(
+		appName, version, author, desc,
+
+		cmdr.WithAutoEnvBindings(true),  // default it's false
+		cmdr.WithSortInHelpScreen(true), // default it's false
+		// cmdr.WithDontGroupInHelpScreen(false), // default it's false
+		// cmdr.WithForceDefaultAction(false),
+	).
+		// importing devmode package and run its init():
+		With(func(app cli.App) { logz.Debug("in dev mode?", "mode", devmode.InDevelopmentMode()) }).
+		WithBuilders(
+			// examples.AddHeadLikeFlagWithoutCmd, // add a `--line` option, feel free to remove it.
+			// examples.AddToggleGroupFlags,       //
+			// examples.AddTypedFlags,             //
+			// examples.AddKilobytesFlag,          //
+			// examples.AddValidArgsFlag,          //
+		).
+		WithAdders(commands...).
+		Build()
+}
+```
+
+</Tab>
+
+<Tab value="cmd/all.go">
+
+```go title="cmd/all.go"
+package cmd
+
+import (
+	"github.com/hedzr/cmdr/v2/cli"
+)
+
+var Commands = append(
+	[]cli.CmdAdder{
+		sndx{},
+	},
+	// cmd.Commands...,
+)
+```
+
+</Tab>
+<Tab value="cmd/soundex.go">
+
+```go title="cmd/soundex.go"
+package cmd
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/hedzr/cmdr/v2/cli"
+	"github.com/hedzr/cmdr/v2/pkg/text"
+)
+
+type sndx struct{}
+
+func (sndx) Add(app cli.App) {
+	app.Cmd("soundex", "snd", "sndx", "sound").
+		Description("soundex test").
+		Group("Test").
+		TailPlaceHolders("[text1, text2, ...]").
+		OnAction(soundex).
+		Build()
+}
+
+func soundex(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+	_, _ = cmd, args
+	for ix, s := range args {
+		fmt.Printf("%5d. %s => %s\n", ix, s, text.Soundex(s))
+	}
+	return
+}
+```
+
+</Tab>
+
+</Tabs>
+
+`cmdr-tests` 中的 `blueprint` 具有完整的应用程序基础能力。
+除了集成了 `Store` 提供的完整的配置数据管理功能之外，也包含了自动装载配置源的功能。
+
+此外，`blueprint` 在所有的方面都具备基本的支持。所以从这里开始你可以立即投入功能性开发。
+
+### 如何开始
+
+在有了 blueprint 的基础架构之后，你可以添加子命令。
+
+例如我们想要增加一个 `hello` 子命令，那么首先可以在 cmd/ 文件夹中增加一个 hello.go 源文件，内容如下：
+
+```go title="cmd/hello.go"
+package cmd
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/hedzr/cmdr/v2/cli"
+	"github.com/hedzr/cmdr/v2/pkg/text"
+)
+
+type helloCmd struct{}
+
+func (helloCmd) Add(app cli.App) {
+	app.Cmd("hello", "hi").
+		Description("hello test").
+		Group("Test").
+		OnAction(helloCmdRun).
+		Build()
+}
+
+func helloCmdRun(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+	_, _ = cmd, args
+	for ix, s := range args {
+		fmt.Printf("%5d. %s => %s\n", ix, s, text.Soundex(s))
+	}
+	return
+}
+
+```
+
+然后将 `helloCmd{}` 实例加入 `cmd/all.go` 的 `Commands` 中：
+
+```go title="cmd/all.go"
+package cmd
+
+import (
+	"github.com/hedzr/cmdr/v2/cli"
+)
+
+var Commands = append(
+	[]cli.CmdAdder{
+		sndx{},
+    helloCmd{},
+	},
+	// cmd.Commands...,
+)
+```
+
+现在 hello 子命令就添加就绪了，运行显示帮助屏将会得到下面的结果：
+
+```bash
+$ go run ./examples/blueprint/ -h
+blueprint v2.1.1 ~ Copyright © 2025 by The Examples Authors ~ All Rights Reserved.
+
+Usage:
+
+  $ blueprint  [Options...][files...]
+
+Description:
+
+  a good blueprint for you.
+
+Commands:
+  [Test]
+    snd, soundex, sndx, sound                 soundex test
+    hello                                     hello test
+
+Global Flags:
+  [Misc]
+    -h, --help,--info,--usage                 Show this help screen (-?) [Env: HELP] (Default: true)
+
+Type '-h'/'-?' or '--help' to get command help screen.
+More: '-D'/'--debug', '-V'/'--version', '-#'/'--build-info', '--no-color'...
+
+$
+```
+
+:end:

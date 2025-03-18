@@ -1,11 +1,3 @@
 {
-  "pages": [
-    "index",
-    "redirect-to",
-    "toggle-group",
-    "head-like",
-    "external-tool",
-    "valid-args",
-    "required"
-  ]
+  "pages": ["index", "..."]
 }

@@ -106,7 +106,7 @@ func (jumpCmd) Add(app cli.App) {
 		Group("Test").
 		// Group(cli.UnsortedGroup).
 		// Hidden(false).
-		// OnEvaluateSubCommands(dyncmd.OnEvalJumpSubCommands).
+		OnEvaluateSubCommands(dyncmd.OnEvalJumpSubCommands).
 		// Both With(cb) and Build() to end a building sequence
 		With(func(b cli.CommandBuilder) {
 			b.Cmd("to").

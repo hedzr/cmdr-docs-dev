@@ -1,0 +1,61 @@
+---
+title: 标志：加号 `+` 前缀
+description: 可识别的加号前缀
+---
+
+## `+ShortFlag` 模式
+
+当用户输入 `+Flag` 时，cmdr 将其视为 `-ShortFlag` 和 `--LongFlag` 的变体。
+
+例如一个标志定义如下：
+
+```go
+b.Flg("warning", "w").
+	Description("negatable flag: <code>--no-warning</code> is available", "").
+	Group("Negatable").
+	LeadingPlusSign(true). // allow `+w` parsed ok
+	Default(false).
+	Build()
+```
+
+那么 `-w +w --warning` 都是合法有效的命令行输入。
+
+一旦 `+w` 被成功识别，那么相应的 `(*Flag).LeadingPlusSign() bool` 将会为 `true`。
+此时你的 `OnAction` 响应函数可以通过取得该标志值来调整自己的应用逻辑。
+
+```go
+		OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+			wf := cmd.FlagBy("warning")
+			if wf != nil && wf.LeadingPlusSign() {
+				println("warning flag with leading plus sign: +w FOUND.")
+			}
+			return
+		}).
+		Build()
+```
+
+### 运行时
+
+上面的示例程序的运行时效果如同这样：
+
+```bash
+$ go run ./examples/leading-plus +w
+warning flag with leading plus sign: +w FOUND.
+$
+```
+
+### 用途
+
+LeadingPlusSign 被 cmdr 识别，但并不预设其含义。
+
+它的实际用途由你在编码 OnAction 和实现业务逻辑时被最终定义。
+
+### 额外的话题
+
+<Cards>
+  <Card title="Required" href="../howto/required-flag" />
+  <Card title="Toggle Group" href="../howto/toggle-group-of-flags" />
+  <Card title="Head Like" href="../howto/head-like-flag" />
+  <Card title="Valid Args" href="../howto/valid-args-flag" />
+  <Card title="External Tool" href="../howto/flag-with-external-flag" />
+</Cards>
