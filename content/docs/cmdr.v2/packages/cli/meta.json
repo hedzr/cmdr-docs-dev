@@ -1,6 +1,6 @@
 {
   "title": "cli",
-  "description": "The docs framework for cmdr v2",
+  "description": "The core APIs for cmdr v2",
   "icon": "Package",
   "root": false,
   "defaultOpen": false,
