@@ -1,0 +1,24 @@
+---
+title: 产品发布之前
+description: 基于 cmdr 的 app 有哪些额外检查表
+icon: CircleHelp # uses lucide-react icons here
+---
+
+## List
+
+在产品部署之后，典型的文件夹在上一节中已经有所介绍。
+
+但在产品部署之前，尤其是在项目开发过程中，显然无法在 app 部署目的地进行操作。
+作为一种解决方案，cmdr 将 `<PROJECT>/ci/` 当作一个前置搜索目录：
+
+- `<PROJECT>/ci/etc/<app>/<app>.toml`
+- `<PROJECT>/ci/etc/<app>/conf.d/*.toml`
+- `<PROJECT>/ci/pkg/usr.local.lib/<app>/ext/*`
+
+如上，开发时的 etc 配置文件夹会被自动搜索（由 `cmdr-loaders` 予以支持），而 pkg 文件夹映射了动态命令的加载目录（由 litecmd.go 予以支持）。
+
+类似地，你可以进行相应的其他拓展。
+
+这样做的好处在于，当你采用打包工具时，上述文件夹可以被简单地复制到部署目标目录中。
+
+:end:
