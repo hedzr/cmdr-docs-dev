@@ -12,7 +12,22 @@ description: cmdr 是一个命令行参数处理框架，同时还提供应用�
 >
 > 那就没必要画蛇添足了。
 
-### About cmdr
+{/* Welcome to the docs! You can start writing documents in `/content/docs/index.mdx`. */}
+{/* <Cards> */}
+{/* <Card title="Learn more about Next.js" href="https://nextjs.org/docs" /> */}
+{/* <Card title="Learn more about Fumadocs" href="https://fumadocs.vercel.app" /> */}
+{/* </Cards> */}
+
+## What is Next?
+
+### Golang Libraries
+
+<Cards>
+  <Card title="cmdr 参考手册 (Go)" href="./cmdr.v2/" />
+  <Card title="Store 参考手册 (Go)" href="./store/" />
+</Cards>
+
+#### About cmdr
 
 cmdr 是一个命令行参数处理框架，同时还提供应用程序设置集的集成能力。
 
@@ -22,15 +37,78 @@ cmdr 是一个命令行参数处理框架，同时还提供应用程序设置集
 cmdr 也是一个跨语言的软件库。我们用几种开发语言（Golang，C++，C# 等等）实现了 cmdr 统一的界面。
 这些软件库在不同语言环境中提供基本一致的编程界面以及相似的终端用户体验。
 
-{/* Welcome to the docs! You can start writing documents in `/content/docs/index.mdx`. */}
-{/* <Cards> */}
-{/* <Card title="Learn more about Next.js" href="https://nextjs.org/docs" /> */}
-{/* <Card title="Learn more about Fumadocs" href="https://fumadocs.vercel.app" /> */}
-{/* </Cards> */}
+#### Store
 
-## What is Next?
+[Store](https://github.com/hedzr/store) 被用于集成到 cmdr 中提供配置管理功能。
 
-<Cards>
-  <Card title="cmdr 参考手册 (Go)" href="./cmdr.v2/" />
-  <Card title="Store 参考手册 (Go)" href="./store/" />
-</Cards>
+同时 Store 也提供一个通用的、高性能的层次性数据的键值对管理，所以你可以将其视为内存高速缓存，Redis-like，或者 httprouter 路由解析工具，等等。
+
+Store 支持键值对的自动清除（TTL）功能。
+
+Store 也支持内建的 `/[id]/` 路由解析和匹配功能。
+
+#### progressbar
+
+[progressbar](https://github.com/hedzr/progressbar) 是一个完全无依赖（好像是这样）的控制台进度条。
+
+初始的意图是为了复刻 python install 时候的进度条外观，后来则集成了大量的其他风格，划分为 Stepper 和 Spinner 两类。
+
+然后在此基础上，progressbar 提供了一些包装方法来方便你将后台任何与进度条相互结合，尤其是针对分步骤的多线绪任务。
+
+### C++ Libraries
+
+#### fsm-cxx
+
+[fsm-cxx](https://github.com/hedzr/fsm-cxx) 是一个实验性的研究库，主要提供有限自动机的实现方案，同时也是状态机理论的一种研究。
+
+#### undo-cxx
+
+[undo-cxx](https://github.com/hedzr/undo-cxx)
+
+#### cmdr-cxx
+
+[cmdr-cxx](https://github.com/hedzr/cmdr-cxx)
+
+#### Others
+
+### VSCode Extensions
+
+#### Go Main Runner
+
+基本上，[Go Main Runner](https://github.com/hedzr/vscode-ext-go-main-runner) 只做一件事：就地运行 golang 项目中的 main 函数而无需移开鼠标、或者进行命令行输入。
+
+#### Zig Main runner
+
+类似地，[Zig Main Runner](https://github.com/hedzr/vscode-ext-zig-main-runner) 是为了就地运行 zig 项目中 main 函数。
+
+#### Remarks
+
+这两个 VSCode 插件都包含一些细微的调整，目的在于简化生活。
+
+例如 Go Main Runner 包含到官方 Golang 插件的依赖，所以打开一个 vscode workspace 之后 Enable Go Main Runner 你就能自动为工作区使能 Golang 相关的插件支持。你并不需要额外的其他花哨的插件，对于 Golang 开发来说，其它的插件往往意义不大——但 Go Main Runner 或许能够成为例外。
+
+当然，取决于开发内容，这里所说的其他插件不包含语法高亮、formatters 之类的插件，我主要是指类似于 Go Mod List 之类似乎有用、似乎无用的插件。至于 Go Main Runner 本身是不是有用，也是取决于你的项目是有很多 main 函数呢，还是只有一个 cli 入口。
+
+### NextJS/React Libraries
+
+#### cmdr-docs-dev
+
+[cmdr-docs-dev](https://github.com/hedzr/cmdr-docs-dev) 是本 docsite 的源代码 repo。
+
+它是使用 NextJS + Fumadocs + Tailwind 构造的，主要是利用了 MDX 的核心功能来建立基于 Markdown 的 docsite。
+
+技术性不强。
+
+但是考虑到事前数年来的对 docsite generators/makers 的挑选、评估，加上在这个框架上投入了相当的精力来做整合，所以我个人认为可能它对你或许是具有启发性的。
+
+### Shell Frameworks
+
+#### bash.sh
+
+[bash.sh](https://github.com/hedzr/bash.sh) 包含了最必要的基础函数集，并将它们组织为一种有利于自由扩展的单一主文件结构，可以被视为是做 ops shell 脚本开发的较好的起点。
+
+单纯在 bash.sh 中查证基础环境探测技术也是有益的。
+
+### more
+
+还有很多。
