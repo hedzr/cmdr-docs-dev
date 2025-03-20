@@ -21,7 +21,11 @@ description: OnXXX event handlers...
 - `.OnEvalFlags(...)`
 - `.OnEvalFlagsOnce(...)`
 
-详细的用法，可以参考 `jump/to` 子命令的实现代码。
+类似的特性还包括从配置文件的特定位置（`alias` Section）加载别名命令的能力：
+
+- `.OnEvaluateSubCommandsFromConfig("alias")`
+
+详细的用法，可以参考 [`jump/to` 子命令](https://github.com/hedzr/cmdr/tree/master/examples/cmd/jump.go) 的实现代码。
 
 ### 额外的话题
 
