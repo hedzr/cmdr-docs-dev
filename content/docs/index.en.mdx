@@ -5,22 +5,84 @@ description: About cmdr
 
 ## Documentation
 
-Welcome to the docs! You can start writing documents in `/content/docs/index.mdx`.
+Here is a Documentation Site about the Open Source Projects of mine.
 
-```js
-const lorem = ipsum(dolor, sit);
-// !callout[/amet/] This is a callout
-const [amet, consectetur] = [0, 0];
-lorem.adipiscing((sed, elit) => {
-  if (sed) {
-    amet += elit;
-  }
-});
-```
+## What is Next?
 
-## Learn More
+### Golang Libraries
 
 <Cards>
   <Card title="Cmdr(-go) v2 Documentation" href="./cmdr.v2/" />
-  <Card title="Cmdr(-go) v1 Documentation" href="./cmdr.v1/" />
+  {/* <Card title="Cmdr(-go) v1 Documentation" href="./cmdr.v1/" /> */}
+  <Card title="Store Manual (Go)" href="./store/" />
 </Cards>
+
+#### About cmdr
+
+`cmdr` is a command-line parser, app framework, and integrated with app settings management and config source loaders optionally.
+
+`cmdr` helps to focus your sight into the bussiness logic developments.
+
+We have `cmdr-series` in serveral different languages, including C++, Golang, and C#, and so on. All the versions have a unify API for developers and end-users.
+
+#### Store
+
+[Store](https://github.com/hedzr/store) has been integrated into `cmdr` to provide configuration management abilities.
+
+In another angle, `Store` is also providing a general purpose key-value storage in memory. So using it for Cache, Redis-like, or httprouter parser are both possible.
+
+Store provides auto-reset a key in timeout (TTL).
+
+Store provides the matching on `/[id]/` routes and returning the matched state.
+
+#### progressbar
+
+[progressbar](https://github.com/hedzr/progressbar) is a terminal progressbar library in golang.
+
+The original intent of `progressbar` is for covering a python install like progressbar. It's done. And after several iterations it evoluates a riched-theme progressbar library which can provide more facades in console ui. It includes `Stepper` and `Spinner` now.
+
+`progress` also provides more friendly api to support for coding the multi-routines tasks.
+
+### C++ Libraries
+
+#### fsm-cxx
+
+[fsm-cxx](https://github.com/hedzr/fsm-cxx) is a experimental finite-state machine library in c++17 or higher.
+
+#### undo-cxx
+
+[undo-cxx](https://github.com/hedzr/undo-cxx)
+
+#### cmdr-cxx
+
+[cmdr-cxx](https://github.com/hedzr/cmdr-cxx)
+
+#### Others
+
+### VSCode Extensions
+
+#### Go Main Runner
+
+Basically, [Go Main Runner](https://github.com/hedzr/vscode-ext-go-main-runner) just do one thing at: run a `main()` function in golang inplace without mouse motion or keyboard typings.
+
+#### Zig Main runner
+
+[Zig Main Runner](https://github.com/hedzr/vscode-ext-zig-main-runner) is for running `main()` in zig project.
+
+### NextJS/React Libraries
+
+#### cmdr-docs-dev
+
+[cmdr-docs-dev](https://github.com/hedzr/cmdr-docs-dev) is the source repo about this docsite.
+
+It built with NextJS + Fumadocs + Tailwind.
+
+### Shell Frameworks
+
+#### bash.sh
+
+[bash.sh](https://github.com/hedzr/bash.sh) is a single-main-file shell script developing framework.
+
+### more
+
+More.
