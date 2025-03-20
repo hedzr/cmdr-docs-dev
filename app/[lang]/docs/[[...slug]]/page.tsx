@@ -137,21 +137,17 @@ export default async function Page(props: {
         />
         {/*{page.data.index ? <DocsCategory page={page} from={source} /> : null}*/}
       </DocsBody>
-      {prodMode ? (
-        <Rate
-          onRateAction={async (url, feedback) => {
-            "use server";
-          }}
-          // onRateAction={async (url, feedback) => {
-          //   "use server";
-          //   // const posthog = usePostHog();
-          //   posthog.capture("rate_docs", feedback);
-          //   // see also: https://us.posthog.com/project/130354/onboarding/web_analytics?step=install
-          // }}
-        />
-      ) : (
-        <></>
-      )}
+      <Rate
+        onRateAction={async (url, feedback) => {
+          "use server";
+        }}
+        // onRateAction={async (url, feedback) => {
+        //   "use server";
+        //   // const posthog = usePostHog();
+        //   posthog.capture("rate_docs", feedback);
+        //   // see also: https://us.posthog.com/project/130354/onboarding/web_analytics?step=install
+        // }}
+      />
       <HandlingKeyboardLeftAndRight />
     </DocsPage>
   );

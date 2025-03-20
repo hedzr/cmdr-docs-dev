@@ -374,16 +374,16 @@ func main() {
         // }).
         WithOnSignalCaught(func(sig os.Signal, wg *sync.WaitGroup) {
             println()
-            logz.Debug("signal caught", "sig", sig)
+            // logz.Debug("signal caught", "sig", sig)
             if err := server.Shutdown(); err != nil {
                 logz.Error("server shutdown error", "err", err)
             }
             cancel()
         }).
-        Wait(func(stopChan chan<- os.Signal, wgShutdown *sync.WaitGroup) {
+        WaitFor(func(closer func()) {
             logz.Debug("entering looper's loop...")
 
-            server.WithOnShutdown(func(err error, ss net.Server) { wgShutdown.Done() })
+            server.WithOnShutdown(func(err error, ss net.Server) { closer() })
             err := server.ListenAndServe(ctx, nil)
             if err != nil {
                 logz.Fatal("server serve failed", "err", err)
