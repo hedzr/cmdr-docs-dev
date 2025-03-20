@@ -285,4 +285,56 @@ b.Flg("full", "f").
 
 所以你也可以不必启用自动环境变量的绑定能力。
 
+## 内置的 `jsonLoader`
+
+事实上 `cmdr.v2` 内置了一个超级微型的 json loader，所以即使你没有通过 `hedzr/cmdr-loaders` 来搜索外部配置文件和加载它们，也仍然能够至少载入一个 JSON 格式的配置文件。
+
+这个 `jsonLoader` 将会尝试载入当前目录下的 `.<app>.json` 或者 `<app>.json` 配置文件。以 `examples/tiny/lite` app 为例，它将会尝试加载 `lite-app.json`，其参考内容如下：
+
+```json
+{
+  "logging": {
+    "file": "/var/log/lite-app/stdout.log",
+    "rotate": 7,
+    "slice-size": "10M",
+    "slice-size-comment": "a kilo-bytes field here"
+  },
+
+  "lite-app": {
+    "hello": "world"
+  }
+}
+```
+
+加载后相应的子项为：
+
+```bash
+# go run ./examples/tiny/lite ~~debug
+
+Store:
+  app.                          <B>
+    cmd.                        <B>
+      ...
+    l                           <B>
+      ogging.                   <B>
+        file                    <L> app.logging.file => /var/log/lite-app/stdout.log
+        rotate                  <L> app.logging.rotate => 7
+        slice-size              <L> app.logging.slice-size => 10M
+          -comment              <L> app.logging.slice-size-comment => a kilo-bytes field here
+      ite-app.hello             <L> app.lite-app.hello => world
+
+
+Matched flags:
+- 1. debug (+1) Flg{'.debug'} /TILDE/ | [owner: Cmd{''}]
+
+ACTIONS:
+- ShowDebug
+
+```
+
+之所以是 JSON 格式而非 TOML 或者其他，这是因为如此我们才能避免在 cmdr.v2 core
+中引入额外的第三方包作为依赖。
+
+实际上你完全可以借助于 `hedzr/store` 所提供的 providers 以及 codecs，自行实现 `hedzr/cmdr-loaders` 中所包含的全部功能。
+
 :end:
