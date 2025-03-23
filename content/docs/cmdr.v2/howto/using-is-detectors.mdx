@@ -402,4 +402,33 @@ func runClient(ctx context.Context, ss net.Server, l stdnet.Listener) {
 }
 ```
 
+#### `WaitFor()`
+
+在 `WaitFor()` 回调函数体内，你可以启动你的服务。它们不必在 go routine 中被启动，而是可以直接放在 `WaitFor()` 回调函数体内。这是因为 `Catcher()` 将在一个 go routine 中运行你的回调函数。
+
+所以对于 http server 来说，下面的做法是正确的：
+
+```go
+  WaitFor(func(closer func()) {
+    logz.Debug("entering looper's loop...")
+
+    server.WithOnShutdown(func(err error, ss net.Server) { closer() })
+    err := server.ListenAndServe(ctx, nil)
+    if err != nil {
+      logz.Fatal("server serve failed", "err", err)
+    }
+  })
+```
+
+假设你在其他地方启动了服务，并且通过 ctx cancel() 来管理那些服务的生存周期，那么 WaitFor 回调函数可以这么写：
+
+```go
+  WaitFor(func(closer func()) {
+    defer closer()
+    <-ctx.Done()
+  })
+```
+
+当全局的 cancellable ctx 的 `cancel()` 函数被调用时，你的其他服务将会侦听 ctx.Done() 信号并 Shutdown，而上面的 `WaitFor()` 回调函数体也会结束自己，并调用 closer() 来清理 `Catcher()` 自身。
+
 :end:
