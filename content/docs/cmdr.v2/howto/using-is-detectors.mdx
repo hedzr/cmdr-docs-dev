@@ -425,10 +425,47 @@ func runClient(ctx context.Context, ss net.Server, l stdnet.Listener) {
 ```go
   WaitFor(func(closer func()) {
     defer closer()
-    <-ctx.Done()
+    for {
+      select {
+      case <-ticker.C:
+        wakeupForTask();
+      case <-ctx.Done():
+        return
+      }
+    }
   })
 ```
 
 当全局的 cancellable ctx 的 `cancel()` 函数被调用时，你的其他服务将会侦听 ctx.Done() 信号并 Shutdown，而上面的 `WaitFor()` 回调函数体也会结束自己，并调用 closer() 来清理 `Catcher()` 自身。
+
+#### Howto terminate myself after a while
+
+有时候我们可能需要提示用户等待 10 秒钟（10s）然后自动结束等待并退出程序。
+这个需求可以用 `Catch()` 来实现：
+
+```go
+	ctx, cancel := context.WithCancel(context.Background())
+	catcher := is.Signals().Catch()
+	catcher.
+		WithPrompt("Press CTRL-C to quit...").
+		WithOnSignalCaught(func(sig os.Signal, wg *sync.WaitGroup) {
+			println()
+			// slog.Info("signal caught", "sig", sig)
+			cancel() // cancel user's loop, see Wait(...)
+		}).
+		WaitFor(func(closer func()) {
+			// slog.Debug("entering looper's loop...")
+			go func() {
+				// to terminate this app after a while automatically:
+				time.Sleep(10 * time.Second)
+				// closer will send a os.SigInt to cause `WithOnSignalCaught`
+        // calling `cancel()`
+				closer()
+			}()
+			<-ctx.Done() // waiting until any os signal caught
+		})
+```
+
+尽管这个方案看起来稍微有些笨重繁复，但事实上并非如此，它工作起来相当轻巧，没有任何互锁机制导致迟滞。
 
 :end:
