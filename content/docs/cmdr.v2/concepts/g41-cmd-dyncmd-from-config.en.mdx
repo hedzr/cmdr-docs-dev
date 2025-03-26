@@ -1,0 +1,294 @@
+---
+title: "Command: DynCommand from Config"
+description: loading alias commands from a config file
+---
+
+## Define alias commands in config file
+
+You can also define alias commands in config file, just like what `git` cli app to do.
+
+### Sample `cmdr-tests/examples/dyncmd-cfg`
+
+The example app `dyncmd-cfg` in [hedzr/cmdr-tests](https://github.com/hedzr/cmdr-tests) shows how to add alias commands
+
+<Tabs items={['main.go', 'cmd/all.go', 'cmd/jump.go', 'project layout']} default>
+<Tab value="main.go">
+
+```go title="./examples/dyncmd-cfg/main.go"
+package main
+
+import (
+	"context"
+	"os"
+
+	loaders "github.com/hedzr/cmdr-loaders"
+	"github.com/hedzr/cmdr/v2"
+	"github.com/hedzr/cmdr/v2/cli"
+	"github.com/hedzr/cmdr/v2/examples/cmd"
+	"github.com/hedzr/cmdr/v2/examples/devmode"
+	"github.com/hedzr/cmdr/v2/pkg/logz"
+)
+
+const (
+	appName = "dyncmd-cfg"
+	desc    = `dyncmd defined in config file`
+	version = cmdr.Version
+	author  = `The Example Authors`
+)
+
+func main() {
+	ctx := context.Background()
+
+	app := loaders.Create(appName, version, author, desc).
+		With(func(app cli.App) { logz.Debug("in dev mode?", "mode", devmode.InDevelopmentMode()) }).
+		WithAdders(cmd.Commands...).
+		Build()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	if err := app.Run(ctx); err != nil {
+		logz.ErrorContext(ctx, "Application Error:", "err", err) // stacktrace if in debug mode/build
+		os.Exit(app.SuggestRetCode())
+	} else if rc := app.SuggestRetCode(); rc != 0 {
+		os.Exit(rc)
+	}
+}
+```
+
+</Tab>
+
+<Tab value="cmd/all.go">
+
+```go title="./examples/cmd/all.go"
+package cmd
+
+import (
+	"github.com/hedzr/cmdr/v2/cli"
+)
+
+var Commands = []cli.CmdAdder{
+	jumpCmd{},
+	// wrongCmd{},
+}
+```
+
+</Tab>
+
+<Tab value="cmd/jump.go">
+
+```go title="./examples/cmd/all.go"
+package cmd
+
+import (
+	"context"
+
+	"github.com/hedzr/cmdr/v2"
+	"github.com/hedzr/cmdr/v2/cli"
+	"github.com/hedzr/cmdr/v2/examples/dyncmd"
+	"github.com/hedzr/cmdr/v2/pkg/dir"
+	logz "github.com/hedzr/logg/slog"
+)
+
+type jumpCmd struct{}
+
+func (jumpCmd) Add(app cli.App) {
+	app.Cmd("jump").
+		Description("jump command").
+		Examples(`jump example`). // {{.AppName}}, {{.AppVersion}}, {{.DadCommands}}, {{.Commands}}, ...
+		Deprecated(`v1.1.0`).
+		Group("Test").
+		// Group(cli.UnsortedGroup).
+		// Hidden(false).
+		OnEvaluateSubCommands(dyncmd.OnEvalJumpSubCommands).
+		OnEvaluateSubCommandsFromConfigPath().
+		// Both With(cb) and Build() to end a building sequence
+		With(func(b cli.CommandBuilder) {
+			b.Cmd("to").
+				Description("to command").
+				Examples(``).
+				Deprecated(`v0.1.1`).
+				OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+					// cmd.Set() == cmdr.Store(), cmd.Store() == cmdr.Store()
+					cmd.Set().Set("app.tiny3.working", dir.GetCurrentDir())
+					println()
+					println(cmd.Set().WithPrefix("app.tiny3").MustString("working"))
+
+					cs := cmdr.Store().WithPrefix("jump.to")
+					if cs.MustBool("full") {
+						println()
+						println(cmd.Set().Dump())
+					}
+					cs2 := cmd.Store()
+					if cs2.MustBool("full") != cs.MustBool("full") {
+						logz.Panic("a bug found")
+					}
+					app.SetSuggestRetCode(1) // ret code must be in 0-255
+					return                   // handling command action here
+				}).
+				With(func(b cli.CommandBuilder) {
+					b.Flg("full", "f").
+						Default(false).
+						Description("full command").
+						Build()
+				})
+		})
+}
+```
+
+</Tab>
+
+<Tab value="project layout">
+
+<Files>
+  <Folder name="examples" defaultOpen>
+    <Folder name="cmd" defaultOpen>
+      <File name="all.go" />
+      <File name="jump.go" />
+    </Folder>
+    <Folder name="dyncmd-cfg" defaultOpen>
+      <File name="main.go" />
+    </Folder>
+  </Folder>
+</Files>
+
+</Tab>
+
+</Tabs>
+
+The notable point is `OnEvaluateSubCommandsFromConfigPath()`, which will load alias command from a special section in the config files.
+
+If nothing specified, dottedPath `app.alias` would be applied. This means section `[alias]` in a config file will be read.
+
+The feature is inspired from `git` cli app and its `[alias]` section inside `$HOME/.gitconfig`.
+
+### Details
+
+In `alias` section, each key and value is mapped into a subcmd. The value string is the action of the subcmd, which is a shell script. The prefix of the value string has special purpose:
+
+- `>`: redirect to another command, with dottedPath form.
+- `!`: invoke a gui app or a program. For example, `"! say hello"` will play voice with text `hello` (only worked for macOS); `"! bash -c "ls /"` can invoke `ls` in bash env.
+- `(no prefix)`: invoke a shell script within standard shell env.
+
+#### Alias list for `dyncmd-cfg` app
+
+In the directory `./ci/etc/dyncmd-cfg`, there is the config files for `dyncmd-cfg`, with standard layout. The `[alias]` section is defined inside `dyncmd-cfg.toml`.
+
+<Tabs items={['dyncmd-cfg.toml', 'conf.d/01.logging.toml', 'conf.d/11.main.toml', 'Layout']} default>
+<Tab value="Layout">
+
+<Files>
+  <Folder name="ci" defaultOpen>
+    <Folder name="etc" defaultOpen>
+      <Folder name="dyncmd-cfg" defaultOpen>
+        <Folder name="conf.d" defaultOpen>
+          <File name="01.logging.toml" />
+          <File name="11.main.toml" />
+        </Folder>
+        <File name="dyncmd-cfg.toml" />
+      </Folder>
+    </Folder>
+  </Folder>
+</Files>
+
+</Tab>
+
+<Tab value="dyncmd-cfg.toml">
+
+```toml
+[alias]
+jc = "> jump to"
+ls = "! bash -c \"ls -laG\""
+l = "ls -laG"
+say = "say hello"
+
+# PREFIX MEANINGS:
+# '>':     leading a RedirectTo cmd, using space-sep'd or dot-sep'd path.
+#          for examples, "> jump.to" redirect ro 'juml/'to' command.
+# '!':     leading a program, for example: "say hello" in macOS will play voice 'hello'.
+#          mostly it's a gui program
+# nothing: run a shell command. for example: "ls -la" will list file
+```
+
+</Tab>
+<Tab value="conf.d/01.logging.toml">
+
+```toml
+[logging]
+file = "/var/lib/dyncmd-cfg.stdout.log"
+rotate = 7    # in days
+```
+
+</Tab>
+<Tab value="conf.d/11.main.toml">
+
+```toml
+[server]
+port = 3000
+```
+
+</Tab>
+
+</Tabs>
+
+The alias commands will be attached to `jump` command.
+
+### Run
+
+The result is,
+
+```bash
+$ go run ./examples/dyncmd-cfg jump
+dyncmd-cfg v2.1.1 ~ Copyright © 2025 by The Example Authors ~ All Rights Reserved.
+
+Usage:
+
+  $ dyncmd-cfg jump [Options...][files...]
+
+Description:
+
+  jump command
+
+Examples:
+
+  jump example
+
+Commands:
+  to                                          to command [Since: v0.1.1]
+  [Alias]
+    jc                                        jump: [alias]/jc
+    ls                                        jump: [alias]/ls
+
+Global Flags:
+  [Misc]
+    -h, --help,--info,--usage                 Show this help screen (-?) [Env: HELP] (Default: false)
+
+Type '-h'/'-?' or '--help' to get command help screen.
+More: '-D'/'--debug', '-V'/'--version', '-#'/'--build-info', '--no-color'...
+
+$ go run ./examples/tiny/concise jump jc
+
+dir: /Volumes/VolHack/work/godev/cmdr.v2/cmdr.tests
+exit status 1
+$
+```
+
+It shows everything is okay.
+
+### Implements
+
+The key method `OnEvaluateSubCommandsFromConfig("alias")` is used for enabling alias commands.
+
+```go
+OnEvaluateSubCommandsFromConfig().
+```
+
+### Learn More
+
+<Cards>
+  <Card title="Required" href="../howto/required-flag" />
+  <Card title="Toggle Group" href="../howto/toggle-group-of-flags" />
+  <Card title="Head Like" href="../howto/head-like-flag" />
+  <Card title="Valid Args" href="../howto/valid-args-flag" />
+  <Card title="External Tool" href="../howto/flag-with-external-flag" />
+</Cards>
