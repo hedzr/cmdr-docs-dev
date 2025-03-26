@@ -1,0 +1,80 @@
+---
+title: "Command: RedirectTo"
+description: Redirect To...
+---
+
+## Redirecting root command to a subcmd
+
+`.SetRedirectTo(subcmd)` provides a new target for the Root Command.
+
+`Redirecting root command to a subcmd`, can be used at this scene, makes an input commandline `app` worked as `app a b c`, when the `.SetRedirectTo("a.b.c")` setup.
+
+The well-known case is `pnpm`, a nodejs package manager, which can forward any unmatched commands like `pnpm dev` to `pnpm run ...`, that would be `pnpm run dev`.
+
+### Definitions
+
+The key interface is `*CmdS.SetRedirectTo(dottedCmdPath)`. So whatever we need to do is,
+
+```go title="redirect-to-subcmd/main.go"
+func main() {
+	app := cmdr.Create(appName, version, author, desc).With(func(app cli.App) {
+		// [!code highlight:7]
+		// redirect root commands into "wrong" subcmd for testing.
+		//
+		// For a dad command such as "server" command, it
+		// would translate `app start|stop` -> `app server start|stop`.
+		app.WithRootCommand(func(root *cli.RootCommand) {
+			root.SetRedirectTo("wrong")
+		})
+	}).WithAdders(cmd.Commands...).Build()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	if err := app.Run(ctx); err != nil {
+		logz.ErrorContext(ctx, "Application Error:", "err", err) // stacktrace if in debug mode/build
+		os.Exit(app.SuggestRetCode())
+	} else if rc := app.SuggestRetCode(); rc != 0 {
+		os.Exit(rc)
+	}
+}
+```
+
+The full codes are in [examples/redirect-to-subcmd](https://github.com/hedzr/cmdr/blob/master/examples/redirect-to-subcmd/).
+
+In this example, `WithAdders(...)` will attach two subcmds into app: `jump to` and `wrong`.
+
+And `With(func(app cli.App){...})` closure block would give you a challenge to operate `app` object in a streaming call.
+
+It is the right position to calling to `SetRedirectTo()`.
+
+As it ran, end-user's `app` will have the same effect with typing `app wrong` in command line.
+
+### Multiple Subcmds
+
+To rediect into a multi-level subcmd as target, you can using `dottedPath`. The `dottedPath` allows a single string to represent the multi-level subcmds. So `SetRedirectTo("jump.to")` could point to the target `jump`/`to` subcmd.
+
+### Run
+
+The result of example app is,
+
+```bash
+$ go run ./examples/redirect-to-subcmd
+the duration is: 0s
+22:57:12.597014+08:00| [ERR] Application Error:                   err="[io: read/write on closed pipe | something's wrong | permission denied]" ./examples/redirect-to-subcmd/main.go:38 main.main
+$
+```
+
+The returning `Application Error` is the response of the subcmd `wrong`.
+
+Note that the default action of root command is not work any more. So you must request the root help screen by typing `app -h` or `app --help` explicitly.
+
+### Learn More
+
+<Cards>
+  <Card title="Required" href="../howto/required-flag" />
+  <Card title="Toggle Group" href="../howto/toggle-group-of-flags" />
+  <Card title="Head Like" href="../howto/head-like-flag" />
+  <Card title="Valid Args" href="../howto/valid-args-flag" />
+  <Card title="External Tool" href="../howto/flag-with-external-flag" />
+</Cards>

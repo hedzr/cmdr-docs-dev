@@ -1,17 +1,17 @@
 ---
-title: 命令：预设参数
+title: "Command: Presetting Args"
 description: Preset Args
 ---
 
-## 预设参数
+## Injecting args to a command
 
-`.PresetCmdLines(args...)` 为命令提供附加的预设参数值。这些给定的预设参数将在自动附着于相应命令，而无需用户显式地输入它们。
+`.PresetCmdLines(args...)` can be used to provide presetting args for a command. These args will be injected into the tail of the command, which need not inputed by end-user.
 
-例如 `preset/cmd` 子命令带有预设参数 `-pv`，那么当用户输入 `app preset cmd` 时，就相当于提供了完整的命令行 `app preset cmd -p -v`。
+For instence, supposing a subcmd `preset/cmd` has preset args `-pv`，then the inputing `app preset cmd` would be treated as `app preset cmd -p -v`.
 
-### 定义
+### Definitions
 
-`examples/demo/` 展示了 `preset args` 的用法，详见 `cmd/preset.go`：
+The `examples/demo/` showes howto using `Preset Args`, in `cmd/preset.go`:
 
 <Tabs items={['demo/main.go', 'cmd/preset-cmdline.go', 'cmd/all.go']}>
 
@@ -108,9 +108,9 @@ var Commands = []cli.CmdAdder{
 </Tab>
 </Tabs>
 
-### 运行时
+### Run
 
-上面的示例程序的运行时效果如同这样：
+The result of the example app is,
 
 ```bash
 $ go run ./examples/demo preset cmd
@@ -145,11 +145,11 @@ ACTIONS:
 $
 ```
 
-`preset cmd` 子命令的 OnAction 函数执行 cmdr 内置的调试目的的响应函数，打印出命中信息。
+The `OnAction` handler of `preset cmd` subcmd invoked the cmdr builtin defaultAction, which will print the debugging information.
 
-其中，`Matched commands` 一节显示了命中的子命令，而 `Matched flags` 显示了命中的标志。在这里，`p` 和 `v` 标志都分别被成功地匹配了，它们并未由终端用户亲自输入，而是由预设参数表中自动附着于 `cmd` 子命令。
+In `Matched commands` section, the noteable things are all matched subcmds are listed here. And, the matched flags will be listed at `Matched flags` section. A fact shown, the flag `p` and `v` are both in the list even thought they are not inputted by end-user explicitly.
 
-### 额外的话题
+### Learn More
 
 <Cards>
   <Card title="Required" href="../howto/required-flag" />

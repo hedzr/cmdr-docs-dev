@@ -1,0 +1,126 @@
+---
+title: "Command: Invoke program"
+description: Invoking program
+---
+
+## Invoking external program and Shell command
+
+`.InvokeShell(shellCmdLine)` and `.UseShell(shellPath)` can be used for launching a Shell command (just like `ls -la`), the last one could specify which concrete shell (bash, or zsh?) will be used, or by using a default one.
+
+`.InvokeProc(program)` can be used for launching a external executable file.
+
+As in macOS, `.InvokeProc("say 'hello world'")` would execute `say` command and play voice with `hello world` text.
+
+A `program` means it should not be a shell command. If you're really needing that, trying with `bash -c echo "hello"`.
+
+We commonly launch a GUI app with it.
+
+### Difinitions
+
+The `examples/demo/` showes howto using `invokeXXX`, in `cmd/invoke.go`:
+
+<Tabs items={['demo/main.go', 'cmd/invoke.go', 'cmd/all.go']}>
+
+<Tab key="demo/main.go">
+
+```go title=demo/main.go
+package main
+
+import (
+	"context"
+	"os"
+
+	"github.com/hedzr/cmdr/v2"
+	"github.com/hedzr/cmdr/v2/cli"
+	"github.com/hedzr/cmdr/v2/examples/cmd"
+	logz "github.com/hedzr/logg/slog"
+)
+
+const (
+	appName = "demo-app"
+	desc    = ``
+	version = cmdr.Version
+	author  = ``
+)
+
+func main() {
+	app := cmdr.Create(appName, version, author, desc).
+    With(func(app cli.App) {
+	  }).
+		// [!code highlight:1]
+    WithAdders(cmd.Commands...).
+    Build()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	if err := app.Run(ctx); err != nil {
+		logz.ErrorContext(ctx, "Application Error:", "err", err) // stacktrace if in debug mode/build
+		os.Exit(app.SuggestRetCode())
+	} else if rc := app.SuggestRetCode(); rc != 0 {
+		os.Exit(rc)
+	}
+}
+```
+
+</Tab>
+
+<Tab key="cmd/invoke.go">
+
+```go title=cmd/invoke.go
+package cmd
+
+import (
+	"github.com/hedzr/cmdr/v2/cli"
+)
+
+type invokeCmd struct{}
+
+func (invokeCmd) Add(app cli.App) {
+	app.Cmd("invoke").
+		With(func(b cli.CommandBuilder) {
+			// [!code highlight:2]
+			b.Cmd("shell").InvokeShell(`ls -la`).UseShell("/bin/bash").OnAction(nil).Build()
+			b.Cmd("proc").InvokeProc(`say "hello, world!"`).OnAction(nil).Build()
+		})
+}
+```
+
+</Tab>
+<Tab key="cmd/all.go">
+
+```go title=cmd/all.go
+package cmd
+
+var Commands = []cli.Adder{
+	jumpCmd{},
+	wrongCmd{},
+	invokeCmd{},
+	presetCmd{},
+}
+```
+
+</Tab>
+</Tabs>
+
+### Run
+
+The result with the example app is,
+
+```bash
+$ go run ./examples/demo invoke shell
+... ls results ...
+$ go run ./examples/demo invoke proc
+(play void with say)
+$
+```
+
+### Learn More
+
+<Cards>
+  <Card title="Required" href="../howto/required-flag" />
+  <Card title="Toggle Group" href="../howto/toggle-group-of-flags" />
+  <Card title="Head Like" href="../howto/head-like-flag" />
+  <Card title="Valid Args" href="../howto/valid-args-flag" />
+  <Card title="External Tool" href="../howto/flag-with-external-flag" />
+</Cards>

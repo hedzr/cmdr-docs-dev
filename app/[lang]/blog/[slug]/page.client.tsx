@@ -93,7 +93,7 @@ export function FooterNoCache(props: {
 
   return (
     <div className="not-prose grid grid-cols-2 gap-4 pb-6">
-      {items?.previous.url ? (
+      {items?.previous?.url ? (
         <Link href={items.previous.url} className={cn(itemVariants())}>
           <div className={cn(itemLabel())}>
             <ChevronLeft className="-ms-1 size-4 shrink-0 rtl:rotate-180" />
@@ -102,7 +102,7 @@ export function FooterNoCache(props: {
           <p className="font-medium">{items.previous.name}</p>
         </Link>
       ) : null}
-      {items?.next.url ? (
+      {items?.next?.url ? (
         <Link
           href={items.next.url}
           className={cn(itemVariants({ className: "col-start-2 text-end" }))}
