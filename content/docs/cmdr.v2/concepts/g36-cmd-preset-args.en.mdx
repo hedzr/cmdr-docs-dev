@@ -1,0 +1,160 @@
+---
+title: "Command: Presetting Args"
+description: Preset Args
+---
+
+## Injecting args to a command
+
+`.PresetCmdLines(args...)` can be used to provide presetting args for a command. These args will be injected into the tail of the command, which need not inputed by end-user.
+
+For instence, supposing a subcmd `preset/cmd` has preset args `-pv`，then the inputing `app preset cmd` would be treated as `app preset cmd -p -v`.
+
+### Definitions
+
+The `examples/demo/` showes howto using `Preset Args`, in `cmd/preset.go`:
+
+<Tabs items={['demo/main.go', 'cmd/preset-cmdline.go', 'cmd/all.go']}>
+
+<Tab key="demo/main.go">
+
+```go title=demo/main.go
+package main
+
+import (
+	"context"
+	"os"
+
+	"github.com/hedzr/cmdr/v2"
+	"github.com/hedzr/cmdr/v2/cli"
+	"github.com/hedzr/cmdr/v2/examples/cmd"
+	logz "github.com/hedzr/logg/slog"
+)
+
+const (
+	appName = "demo-app"
+	desc    = ``
+	version = cmdr.Version
+	author  = ``
+)
+
+func main() {
+	app := cmdr.Create(appName, version, author, desc).
+    With(func(app cli.App) {
+	  }).
+		// [!code highlight:1]
+    WithAdders(cmd.Commands...).
+    Build()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	if err := app.Run(ctx); err != nil {
+		logz.ErrorContext(ctx, "Application Error:", "err", err) // stacktrace if in debug mode/build
+		os.Exit(app.SuggestRetCode())
+	} else if rc := app.SuggestRetCode(); rc != 0 {
+		os.Exit(rc)
+	}
+}
+```
+
+</Tab>
+
+<Tab key="cmd/preset-cmdline.go">
+
+```go title=cmd/preset-cmdline.go
+package cmd
+
+import (
+	"context"
+
+	"github.com/hedzr/cmdr/v2/cli"
+)
+
+type presetCmd struct{}
+
+func (presetCmd) Add(app cli.App) {
+	app.Cmd("preset", "p").
+		Description("preset command").
+		With(func(b cli.CommandBuilder) {
+			b.Flg("preset", "p").
+				Default(false).
+				Description("preset arg").
+				Build()
+			b.Cmd("cmd", "c").
+				// [!code highlight:1]
+				PresetCmdLines(`-pv`).
+				OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+					_, err = app.DoBuiltinAction(ctx, cli.ActionDefault)
+					return
+				}).Build()
+		})
+}
+```
+
+</Tab>
+<Tab key="cmd/all.go">
+
+```go title=cmd/all.go
+package cmd
+
+var Commands = []cli.CmdAdder{
+	jumpCmd{},
+	wrongCmd{},
+	invokeCmd{},
+	presetCmd{},
+}
+```
+
+</Tab>
+</Tabs>
+
+### Run
+
+The result of the example app is,
+
+```bash
+$ go run ./examples/demo preset cmd
+demo-app v2.1.0 ~ Copyright © 2025 by demo-app Authors ~ All Rights Reserved.
+
+Usage:
+
+  $ demo-app preset cmd [Options...][files...]
+
+Parent Flags (Cmd{'preset'}):
+  -p, --preset                                preset arg (Default: true)
+
+Global Flags:
+  [Misc]
+    -V, --version,--ver,--versions            Show app versions information (Default: false)
+    -h, --help,--info,--usage                 Show this help screen (-?) [Env: HELP] (Default: false)
+
+Type '-h'/'-?' or '--help' to get command help screen.
+More: '-D'/'--debug', '-V'/'--version', '-#'/'--build-info', '--no-color'...
+
+
+Matched commands:
+- 1. p | Cmd{'preset'}
+- 2. c | Cmd{'preset.cmd'}
+
+Matched flags:
+- 1. p (+1) Flg{'preset.preset'} /short/ | [owner: Cmd{'preset'}]
+- 2. v (+1) Flg{'.verbose'} /short/ | [owner: Cmd{''}]
+
+ACTIONS:
+
+$
+```
+
+The `OnAction` handler of `preset cmd` subcmd invoked the cmdr builtin defaultAction, which will print the debugging information.
+
+In `Matched commands` section, the noteable things are all matched subcmds are listed here. And, the matched flags will be listed at `Matched flags` section. A fact shown, the flag `p` and `v` are both in the list even thought they are not inputted by end-user explicitly.
+
+### Learn More
+
+<Cards>
+  <Card title="Required" href="../howto/required-flag" />
+  <Card title="Toggle Group" href="../howto/toggle-group-of-flags" />
+  <Card title="Head Like" href="../howto/head-like-flag" />
+  <Card title="Valid Args" href="../howto/valid-args-flag" />
+  <Card title="External Tool" href="../howto/flag-with-external-flag" />
+</Cards>
