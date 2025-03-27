@@ -44,7 +44,7 @@ export function Control({ url }: { url: string }): React.ReactElement {
   );
 }
 
-export const A = (props) => <a {...props} />;
+export const A = (props: any) => <a {...props} />;
 
 export function Anchor({ name }: { name: string }): React.ReactElement {
   return <a name={name}></a>;
