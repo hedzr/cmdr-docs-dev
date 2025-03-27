@@ -34,7 +34,13 @@ app:
 
 `cmd.Store()` 返回一个完整 Store 的子集，也就是键值 `app.cmd.jump.to` 所下辖的子树。所以 `cmd.Store().MustBool("full")` 就可以直接取得 `--full` 的状态。
 
-`cmd.Set()` 相当于调用 `app.Set()`，它获取整个 Store 对象。此时，你需要用 `cmd.Set().MustBool("app.cmd.jump.to.full")` 来取得 `--full` 的状态。
+`cmd.Set()` 相当于调用 `app.Set()`，它获取整个 Store 对象。此时，你需要用 `cmd.Set().MustBool("app.cmd.jump.to.full")` 来取得 `--full` 的状态。另一个方法是，
+
+```go
+set := cmd.Set().WithPrefix(cli.DottedPathToCommandOrFlag)
+println(set.MustBool("full"))
+assert.Equal(set, cmd.Store())
+```
 
 类似地，`app.Store()` 获得的是 "app.cmd" 子树，所以你也可以用 `app.Store().MustBool("jump.to.full")` 来问询。
 
@@ -215,3 +221,4 @@ cmdr 支持模糊界限的值输入方式，下面的命令行输入都能够被
   <Card title="Valid Args" href="../howto/valid-args-flag" />
   <Card title="External Tool" href="../howto/flag-with-external-flag" />
 </Cards>
+````

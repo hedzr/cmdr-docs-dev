@@ -30,19 +30,25 @@ In the most scenes, we would like use `Option` to represent a key-value pair ide
 
 We knew `Option Store` is a in-memory config manager for hierarchical key-value pairs dataset identified by `dottedPath`/`keyPath`. And, an `Option` can be associated with a `Flag`, or not. But there is always an `Option` binded to a `Flag`.
 
-对于 `app.cmd.debug` 这个选项来说，由于 `app.cmd` 是内部设定的命令行标志到 Store 选项的转换前缀，故顶级的命令行标志 `--debug` 与其是关联的。
+For the top level flag `--debug`, the store entry associated with it is `app.cmd.debug`, since `app.cmd` is a hard-coded prefix for command line options.
 
-而对于多级子命令的标志，例如 子命令 `cert / create` 的标志 `--cacert`，会对应着 `app.cmd.cert.create.cacert` 这个选项。
+For those flags of subcmds, such as `--cacert` under subcmd `cert / create`, the entry dotted path would be `app.cmd.cert.create.cacert`.
 
 #### `cmd.Store()` vs `cmd.Set()`
 
-除此而外，你也可以通过 `app.Store()/app.Set()` 读写你的数据。
+Programmatically, you can code with `app.Store()/app.Set()`.
 
-`cmd.Store()` 返回一个完整 Store 的子集，也就是键值 `app.cmd.jump.to` 所下辖的子树。所以 `cmd.Store().MustBool("full")` 就可以直接取得 `--full` 的状态。
+The `cmd.Store()` returns a subset of app's whole Store, which have a root key pointed to key path `app.cmd.jump.to`. That means, `cmd.Store().MustBool("full")` can read and write the state of a command line flag `--full`.
 
-`cmd.Set()` 相当于调用 `app.Set()`，它获取整个 Store 对象。此时，你需要用 `cmd.Set().MustBool("app.cmd.jump.to.full")` 来取得 `--full` 的状态。
+The `cmd.Set()` returns the app's whole Store, which equals to `app.Set()`，So you need a `cmd.Set().MustBool("app.cmd.jump.to.full")` to access the state of `--full`. Another way is,
 
-类似地，`app.Store()` 获得的是 "app.cmd" 子树，所以你也可以用 `app.Store().MustBool("jump.to.full")` 来问询。
+```go
+set := cmd.Set().WithPrefix(cli.DottedPathToCommandOrFlag)
+println(set.MustBool("full"))
+assert.Equal(set, cmd.Store())
+```
+
+The similar call to `app.Store()` will get a subtree pointed to "app.cmd", so `app.Store().MustBool("jump.to.full")` can query the same key above.
 
 当使用 `GetXXX`/`MustXXX` 来获取命令行标志所对应的选项值时，通常采用 `cmd.Store()`/`app.Store()` 以求简化调用语句。
 

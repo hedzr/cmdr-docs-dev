@@ -95,6 +95,7 @@ package cmd
 var Commands = []cli.Adder{
 	jumpCmd{},
 	wrongCmd{},
+	// [!code highlight:1]
 	invokeCmd{},
 	presetCmd{},
 }
@@ -111,7 +112,7 @@ The result with the example app is,
 $ go run ./examples/demo invoke shell
 ... ls results ...
 $ go run ./examples/demo invoke proc
-(play void with say)
+(play voice with say)
 $
 ```
 
