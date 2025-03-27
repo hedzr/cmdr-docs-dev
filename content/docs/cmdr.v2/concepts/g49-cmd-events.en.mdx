@@ -1,0 +1,38 @@
+---
+title: "Command: Event Handlers"
+description: OnXXX event handlers...
+---
+
+## Event Handlers Associated With Command (`*CmdS`)
+
+The standard event handlers are:
+
+- `.PreAction(...OnPreInvokeHandler)`
+- `.PostAction(...OnPostInvokeHandler)`
+- `.OnAction(...OnInvokeHandler)`
+- `.OnMatch(...OnCommandMatchedHandler)`
+
+They all fits for the lifecycle of a subcmd will be `Invoking` (`OnAction`), `Before Invoking` (`PreAction`) and `After Invoking` (`PostAction`).
+
+In addition, there are more event handlers for loading subcmds or flags at runtime:
+
+- `.OnEvalSubcommands(...)`
+- `.OnEvalSubcommandsOnce(...)`
+- `.OnEvalFlags(...)`
+- `.OnEvalFlagsOnce(...)`
+
+Besides that, a similar feature is loading alias subcmds from `alias` section in a config file:
+
+- `.OnEvaluateSubCommandsFromConfig("alias")`
+
+About these handlers and howto write with its, refer to the source code of [`jump/to` subcommand](https://github.com/hedzr/cmdr/tree/master/examples/cmd/jump.go), and [godoc of cmdr.v2](https://pkg.go.dev/github.com/hedzr/cmdr).
+
+### Learn More
+
+<Cards>
+  <Card title="Required" href="../howto/required-flag" />
+  <Card title="Toggle Group" href="../howto/toggle-group-of-flags" />
+  <Card title="Head Like" href="../howto/head-like-flag" />
+  <Card title="Valid Args" href="../howto/valid-args-flag" />
+  <Card title="External Tool" href="../howto/flag-with-external-flag" />
+</Cards>
