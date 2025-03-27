@@ -9,26 +9,26 @@ need rewrite this article with english
 
 :::
 
-## 标志（Flags）
+## Flags
 
-### 什么是标志（Flag）/选项（Option）
+### What is Flag, and Option?
 
-在 `cmdr` 中，`标志` 和 `选项` 这两个术语经常是混用的。但它们对于 `cmdr` 来说，确实有分别。
+Inside `cmdr.v2`, terms `Flag` and `Option` are used confusingly, and constantly. But, these two terms are different in fact.
 
-一个标志（Flag），指的是通过 `app.Flg()`/`builder.Flg()` 等接口函数定义的实体，这个实体被用于命令行参数的解释，对应着一个特定的命令行参数选项。
+A `Flag`, means that an object created via the interfaces like `app.Flg()`/`builder.Flg()`, which will be used for interpreting an cmdline option, and there is also a coresponding `Option` item in `Option Store` that is mapping to it.
 
-一个选项（Option），指的是储存在 `Option Store` 中的一个条目，例如 `“app.debug” => true`。它的 yaml 表示能够体现出层级关系：
+A `Option` item, means that a key-value pair in `Option Store`. For instance, `“app.debug” => true` is a kv pair entry. The hierarchical layout of its yaml representation is,
 
 ```yaml
 app:
   debug: true
 ```
 
-更多时候，当正在做实际开发时，我们可能会使用 `选项` 来表示一个与 `keyPath` 相关联的键值对条目，无论它是否一个命令行标志。
+In the most scenes, we would like use `Option` to represent a key-value pair identified by `keyPath`, whatever it is a `Flag` exactly, or not.
 
-### 和 `Option Store` 相集成
+### Integrated with `Option Store`
 
-一个选项可能和一个标志相关联，但也可能不。但一个标志一定会对应着一个选项。
+We knew `Option Store` is a in-memory config manager for hierarchical key-value pairs dataset identified by `dottedPath`/`keyPath`. And, an `Option` can be associated with a `Flag`, or not. But there is always an `Option` binded to a `Flag`.
 
 对于 `app.cmd.debug` 这个选项来说，由于 `app.cmd` 是内部设定的命令行标志到 Store 选项的转换前缀，故顶级的命令行标志 `--debug` 与其是关联的。
 

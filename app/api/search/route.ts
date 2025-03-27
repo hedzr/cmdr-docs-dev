@@ -50,7 +50,7 @@ export const { GET } = createI18nSearchAPI('advanced', {
     // the prop name should be its locale code in your i18n config, (e.g. `cn`)
     cn: {
       // options for the language
-      tokenizer: await createTokenizer({ stopWords: mandarinStopwords, }),
+      tokenizer: createTokenizer({stopWords: mandarinStopwords,}),
       search: {
         threshold: 0,
         tolerance: 0,
@@ -58,7 +58,7 @@ export const { GET } = createI18nSearchAPI('advanced', {
     },
     tw: {
       // options for the language
-      tokenizer: await createTokenizer(),
+      tokenizer: createTokenizer(),
       search: {
         threshold: 0,
         tolerance: 0,
