@@ -9,6 +9,7 @@ import { lang2display, lang2iso } from "@/lib/i18n";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Analytics } from "@vercel/analytics/react";
 import { prodMode } from "@/lib/utils";
+import NextTopLoader from "nextjs-toploader";
 // import { baseUrl } from "@/lib/metadata";
 // import getConfig from "next/config";
 
@@ -99,6 +100,7 @@ export default async function Layout({
       <body
         className={`flex flex-col min-h-screen ${arOneSans.variable} ${ibmPlexMono.variable} antialiased`}
       >
+        <NextTopLoader />
         <I18nProvider
           locale={lang}
           locales={lang2display}
