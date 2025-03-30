@@ -1,0 +1,8 @@
+{
+  "title": "evendeep(-go)",
+  "description": "deepcopy, deepdiff, and so on",
+  "icon": "MonitorCog",
+  "root": true,
+  "defaultOpen": true,
+  "pages": ["index", "..."]
+}

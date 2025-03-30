@@ -3,9 +3,8 @@
     "index",
 
     "cmdr.v2",
-    "cmdr.v1",
     "cmdr-cxx",
-    "Cmdr.Core",
+    "cmdr-dotnetcore",
     "cmdr-zig",
     "cmdr-rs",
 
@@ -16,6 +15,8 @@
     "errors.v3",
 
     "z...a",
+
+    "archived",
 
     "[On Github](https://github.com/hedzr/cmdr)",
     "!headless"
