@@ -1,0 +1,92 @@
+---
+title: "logg/slog(-go)"
+description: "Colored logger in golang"
+---
+
+## Intro to Store
+
+A golang logging library with log/slog style APIs, with colorful console output.
+
+## Features
+
+The abilities are:
+
+- fast enough: performance is not our unique aim, but quick enough.
+- colorful console output by default.
+- switch to logging format (eg. color, logfmt or json) dynamically.
+- interfaces and abilities similar with `log/slog`.
+- adapted into `log/slog` to enable color logging out of the box. note that some our verbs (such as Fatal, Panic) can't work at this time.
+- manage a cascade of child loggers and dump attrs of parent recursively optionally (need enable `LattrsR`).
+- super lightweight child loggers.
+- user-defined levels, writers, and value stringers.
+- privacy enough: hardening filepath(s), shortening package name(s) (by `Lprivacypath` and `Lprivacypathregexp`); and implementing `LogObjectMarshaller` or `LogArrayMarshaller` to safe guard the sensitive fields.
+- better multiline outputs.
+
+Since v0.8.0, we need go toolchain 1.23 and above.
+
+Since v0.7.3, a locking version of printOut added. It would give more safeties to splitted writer (if your writer had implemented `LevelSettable` interface to compliant with logg/slog's log level).
+
+![image-20231107091609707](/images/logg/image-20231107091609707.png)
+
+### Changes
+
+See also [CHANGELOG](CHANGELOG).
+
+> Since v1 (soon), the streaming calls changed their behaviour: `.WithXXX` will make a new instance as a child logger and apply the settings; `.SetXXX` will take the effects on the place.
+>
+> > NOTE: v0.7.x is pre-release version of v1.
+>
+> Since v0.5.7, `logg/slog` enables privacy hardening flags by default now.
+
+## Motivation
+
+As an opt-in copy of `log/slog`, we provide an out-of-the-box colored text outputting logger with more verbs (fatal, trace, verbose, ...).
+
+And an auto-optimized Verb: `Verbose(msg, args...)` would print logging contents only if build tag `verbose` defined.
+The point is it will be optimized completely in a default build.
+
+## Others
+
+### What meaning is the Multiline print?
+
+In colorful print mode, one of logging output line starts with timestamp and serverity, and ends with attributes and caller info. So the message is put at middle part of one line with limited width.
+
+A very long message will be wrapped to next line(s), right?
+
+Thinking about another case, a logging line has title and details, what form output is better.
+
+```go
+func TestLogLongLine(t *testing.T) {
+    l := New()
+    l.Info("/ERROR/ Started at "+time.Now().String()+", this is a multi-line test\nVersion: 2.0.1\nPackage: hedzr/hilog", "Aa", 1, "Bbb", "a string", "Cc", 3.732, "D", 2.71828+5.3571i)
+}
+```
+
+It prints:
+
+![image-20231106234956844](/images/logg/image-20231106234956844.png)
+
+As you seen, a message will be splitted to first line (as a title) and the rest lines (as a details text). So you can avoid write a long message. Instead, you write a title with some details to describe a logging line better clearly. By the way, its json or logfmt format is still a message field with key name "msg".
+
+### Error Objects
+
+When you're using [errors.v3](https://github.com/hedzr/errors) (`gopkg.in/hedzr/errors.v3`), the trace info will be embedded into all output formats:
+
+```go
+import "gopkg.in/hedzr/errors.v3"
+
+err := errors.New("fail sample")
+slog.Info("error occurred", "err", err)
+```
+
+The similar test codes get the output like this:
+
+![Screenshot 2024-11-18 at 07.58.11](/images/logg/20241118_1731888090.png)
+
+For others errors, we used `fmt.Sprintf("%+v", err)`, it's heavy but effective.
+
+We do not support the log/slog way with `slog.Any("error", err)` and `replaceAttr`.
+
+## LICENSE
+
+Apache 2.0

@@ -1,0 +1,45 @@
+---
+title: "trie-cxx"
+description: "Trie-tree in cxx-17/20 and higher"
+---
+
+## Intro to `trie-cxx`
+
+`trie-cxx` is a c++20 header-only library, which implements a extensible Trie-tree container.
+
+`trie-cxx` allows accessing the target node data via a dotted key path. This is almost a in-memory key-value store.
+
+## Features
+
+The released codes allowes the extras data attached to the Trie-tree nodes/leaves, such as data (with any type), comment, descriptions, and tags, etc..
+
+```cpp
+auto build_trie() -> trie::trie_t<trie::value_t> {
+	trie::trie_t<trie::value_t> tt;
+
+	tt.set("app.debug", true);
+	tt.set("app.verbose", true);
+	tt.set("app.dump", 3);
+	tt.set("app.logging.file", "~/.trie.log");
+	tt.set("app.server.start", 5);
+	tt.set("app.logging.rotate", (unsigned long) (6));
+	// tt.set("app.logging.words", std::vector<std::string>{"a", 1, false});
+	tt.set("app.logging.words", std::vector<std::string>{"a", "1", "false"});
+	tt.set("app.server.sites", 1);
+	float f = 2.718f;
+	tt.set("app.ref-types.float", std::move(f));
+	tt.set("app.ref-types.double", M_PI);
+	tt.set("app.ref-types.string", std::string("hello, trie."));
+	tt.set("app.ref-types.intvec", std::vector<int>{3, 5, 7, 9});
+
+	return tt;
+}
+```
+
+Here is an earlier pre-release for sharing the common codes and structures in my mind.
+It's certain an unstable encapsulations, which might be updated in the future.
+These codes are and will be released under Apache 2.0 for free. So referring to it or copying from it would be okay.
+
+## LICENSE
+
+Apache 2.0
