@@ -10,7 +10,7 @@
 
     "store",
     "evendeep",
-    "logg.slog",
+    "logg",
     "is",
     "errors.v3",
 
