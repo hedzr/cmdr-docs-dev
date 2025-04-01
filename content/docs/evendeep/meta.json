@@ -4,5 +4,5 @@
   "icon": "MonitorCog",
   "root": true,
   "defaultOpen": true,
-  "pages": ["index", "..."]
+  "pages": ["index", "---Guide---", "...guide", "..."]
 }
