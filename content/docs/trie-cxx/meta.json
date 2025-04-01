@@ -1,0 +1,7 @@
+{
+  "description": "Trie-tree in cxx-17/20",
+  "icon": "MonitorCog",
+  "root": true,
+  "defaultOpen": true,
+  "pages": ["index", "---Guide---", "...guide", "..."]
+}
