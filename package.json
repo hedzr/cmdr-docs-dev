@@ -12,7 +12,7 @@
   "engines": {
     "node": "^18.17.1 || ^20.10.0 || >=22.11.0"
   },
-  "packageManager": "pnpm@10.6.5",
+  "packageManager": "pnpm@10.7.1",
   "scripts": {
     "dev": "next dev --turbopack # https://nextjscn.org/docs/architecture/turbopack",
     "build": "pnpm build:pre && next build && pnpm build:post",
@@ -58,7 +58,7 @@
     "hast-util-to-jsx-runtime": "^2.3.6",
     "katex": "^0.16.21",
     "lucide-react": "^0.477.0",
-    "next": "15.2.3",
+    "next": "15.2.4",
     "next-mdx-remote": "^5.0.0",
     "next-themes": "^0.4.6",
     "nextjs-toploader": "^3.8.16",
