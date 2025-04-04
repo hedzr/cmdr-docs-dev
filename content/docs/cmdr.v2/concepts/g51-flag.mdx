@@ -48,20 +48,26 @@ assert.Equal(set, cmd.Store())
 
 `app.cmd` 前缀是为了在序列化 Option Store 为 YAML 或者其他外部格式时而特别建立的前缀，这样能够保证 Option Store 的序列化内容能够被恰当地包含到外部配置中心里（无论是 YAML，JSON，TOML，抑或是显式的微服务外部配置中心）。
 
+值得注意的是，当你真正进行序列化时，`app` 前缀将被自动摘除，因为实际上这个顶级前缀是为了在内存中统领子树的目的，而在外部持久化时去掉它可以节省存储空间。而在编程操作时，`app` 通常也是对使用者不可见的，这是因为 `cmd.Set()` 返回的实际上就是带有 `app` 的子树。
+
 对于那些不与命令行标志相挂钩的 Option Store 选项来说，它们通常被建立在 `app` 层级之下。
 
-一个 `Option Store` 在序列化为 YAML 之后能够很好地展示出其层级关系。例如下面的 Store，
+一个 `Option Store` 在序列化为 YAML 之后能够很好地展示出其层级关系。例如下面的配置文件将被用于载入到 Store 中，
 
 ```yaml
-app:
-  logging:
-    file: /var/log/app/stdout.log
-  server:
-    port: 3000
-    host: 0.0.0.0
-  cmd:
-    debug: false # 对应于 `--debug`
-    verbose: false # 对应于 `--verbose`
+# 隐含的公共前缀 `app` 在序列化到磁盘文件中时将被自动摘除。
+logging:
+  file: /var/log/app/stdout.log
+server:
+  port: 3000
+  host: 0.0.0.0
+  tls: {}
+  domains: []
+# 以下表项仅在内存中有效。这里列举它们只是为了让
+# 你能够对完整的 Store 树有完整的认识。
+cmd:
+  debug: false # 对应于 `--debug`
+  verbose: false # 对应于 `--verbose`
 ```
 
 它显示了你的 app 应该如何组织自己的配置设定，又如何揉合了命令行参数的选项值到 Store 之中。

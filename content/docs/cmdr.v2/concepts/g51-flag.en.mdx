@@ -48,29 +48,36 @@ println(set.MustBool("full"))
 assert.Equal(set, cmd.Store())
 ```
 
-The similar call to `app.Store()` will get a subtree pointed to "app.cmd", so `app.Store().MustBool("jump.to.full")` can query the same key above.
+The similar call to `app.Store()` will get a subtree pointed to `app.cmd`, which stores the values of all of command-line flags. So `app.Store().MustBool("jump.to.full")` can query the same key above.
 
-当使用 `GetXXX`/`MustXXX` 来获取命令行标志所对应的选项值时，通常采用 `cmd.Store()`/`app.Store()` 以求简化调用语句。
+> For a short and concise calling statement, it's useful by using `GetXXX`/`MustXXX` on the object of `cmd.Store()`/`app.Store()`.
 
-`app.cmd` 前缀是为了在序列化 Option Store 为 YAML 或者其他外部格式时而特别建立的前缀，这样能够保证 Option Store 的序列化内容能够被恰当地包含到外部配置中心里（无论是 YAML，JSON，TOML，抑或是显式的微服务外部配置中心）。
-
-对于那些不与命令行标志相挂钩的 Option Store 选项来说，它们通常被建立在 `app` 层级之下。
-
-一个 `Option Store` 在序列化为 YAML 之后能够很好地展示出其层级关系。例如下面的 Store，
+The prefix `app.cmd` is used for serializing the `Option Store`, such as YAML, TOML, etc.. The notable point is `app` will be stripped when you're really serializing it. So a key `app.some.path.debug` will be stored as `some.path.debug` in a YAML file:
 
 ```yaml
-app:
-  logging:
-    file: /var/log/app/stdout.log
-  server:
-    port: 3000
-    host: 0.0.0.0
-  cmd:
-    debug: false # 对应于 `--debug`
-    verbose: false # 对应于 `--verbose`
+some:
+  path:
+    debug: false
 ```
 
-它显示了你的 app 应该如何组织自己的配置设定，又如何揉合了命令行参数的选项值到 Store 之中。
+As a sample, here is a Store's YAML file content:
+
+```yaml
+# The common prefix `app` will be stripped in serializing to a file.
+logging:
+  file: /var/log/app/stdout.log
+server:
+  port: 3000
+  host: 0.0.0.0
+  tls: {}
+  domains: []
+# The following entries are visible only in memory.
+# We list them for showing the completely Store-tree
+# more clearly.
+cmd:
+  debug: false # 对应于 `--debug`
+  verbose: false # 对应于 `--verbose`
+```
 
 #### `keyPath`/`dottedPath`
 
