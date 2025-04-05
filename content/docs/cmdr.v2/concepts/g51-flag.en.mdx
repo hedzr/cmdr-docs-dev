@@ -48,57 +48,70 @@ println(set.MustBool("full"))
 assert.Equal(set, cmd.Store())
 ```
 
-The similar call to `app.Store()` will get a subtree pointed to "app.cmd", so `app.Store().MustBool("jump.to.full")` can query the same key above.
+The similar call to `app.Store()` will get a subtree pointed to `app.cmd`, which stores the values of all of command-line flags. So `app.Store().MustBool("jump.to.full")` can query the same key above.
 
-当使用 `GetXXX`/`MustXXX` 来获取命令行标志所对应的选项值时，通常采用 `cmd.Store()`/`app.Store()` 以求简化调用语句。
+> For a short and concise calling statement, it's useful by using `GetXXX`/`MustXXX` on the object of `cmd.Store()`/`app.Store()`.
 
-`app.cmd` 前缀是为了在序列化 Option Store 为 YAML 或者其他外部格式时而特别建立的前缀，这样能够保证 Option Store 的序列化内容能够被恰当地包含到外部配置中心里（无论是 YAML，JSON，TOML，抑或是显式的微服务外部配置中心）。
-
-对于那些不与命令行标志相挂钩的 Option Store 选项来说，它们通常被建立在 `app` 层级之下。
-
-一个 `Option Store` 在序列化为 YAML 之后能够很好地展示出其层级关系。例如下面的 Store，
+The prefix `app.cmd` is used for serializing the `Option Store`, such as YAML, TOML, etc.. The notable point is `app` will be stripped when you're really serializing it. So a key `app.some.path.debug` will be stored as `some.path.debug` in a YAML file:
 
 ```yaml
-app:
-  logging:
-    file: /var/log/app/stdout.log
-  server:
-    port: 3000
-    host: 0.0.0.0
-  cmd:
-    debug: false # 对应于 `--debug`
-    verbose: false # 对应于 `--verbose`
+some:
+  path:
+    debug: false
 ```
 
-它显示了你的 app 应该如何组织自己的配置设定，又如何揉合了命令行参数的选项值到 Store 之中。
+As a sample, here is a Store's YAML file content:
+
+```yaml
+# The common prefix `app` will be stripped in serializing to a file.
+logging:
+  file: /var/log/app/stdout.log
+server:
+  port: 3000
+  host: 0.0.0.0
+  tls: {}
+  domains: []
+# The following entries are visible only in memory.
+# We list them for showing the completely Store-tree
+# more clearly.
+cmd:
+  debug: false # 对应于 `--debug`
+  verbose: false # 对应于 `--verbose`
+```
 
 #### `keyPath`/`dottedPath`
 
-`keyPath`/`dottedPath`/`dottedKeyPath` 是 `Option Store` 中的专属概念，一个选项能够被通过 `前缀.子命令序列.标志长名称` 的方式被访问，这个格式就被称作 `keyPath`。
+`keyPath`/`dottedPath`/`dottedKeyPath` is a exclusive term specially for `Option Store`, which provides an anchor to any entries in the `Store` by the form `prefix.subcmds...flag`.
 
-例如 `app.cmd.cert.create.cacert` 中，`app.cmd` 是内置的命令行标志的选项前缀，`cert.create` 代表着 `cert` 命令及其 `create` 子命令，`cacert` 除了是标志的长格式名称之外，也表达出了从属于 `cert.create` 子命令的含义。
+For an intance, a dottedPath `app.cmd.cert.create.cacert` has `app.cmd` as a special prefix for command-line flags, and `cert.create` is subcommands `cert` and its child `create`, and `cacert` is the long title of a flag, which belongs to subcmds `cert.create`.
 
-### 长标志、短标志和别名
+The flag `cacert` can be specified by `--cacert` from command-line.
 
-长标志 `Long Flag` 是一个命令行标志的必选项。这是因为 cmdr 系统以长标志的名字为唯一标识。例如使用 keyPath 访问标志的对应值的时候，就会引用长标志名字作为 keyPath 的一部分。
+### Long Flag, Short and Alias
 
-在命令行输入时，长标志用两个横线字符 `--` 引导。
+The term `Long Flag` is required for a command-line flag. It is the unique identifier in `cmdr` system.
 
-短标志 `Short Flag`，可以附着于一个命令行标志。在命令行输入时，以单个横线字符 `-` 引导。所以你可以将其视为长标志的快捷方式。
+A `Long Flag` has prefix `--` in the command-line. For example, `--cacert` is a flag of subcmds `cert.create`:
 
-在 `cmdr.v2` 中，进一步扩充了短标志，你可以使用 `b.Flg(longTitle, shortTitle...).ExtraShorts(...)` 来为一个标志附着更多的短标志。
+```bash
+$ app cert create --cacert "./ca.cer"
+```
 
-此外，在 POSIX 标准中短标志通常是单个字符。例如 `-v` 对应为 `--verbose` 的短标志。
+The `Short Flag` can be attached to a command-line flag. It uses prefix `-` in the command-line. It is a shortcut to a flag.
 
-但在 `cmdr` 中，短标志并非只能提供单个字符，你同样可以提供多个字符。例如 `-ap` 短标志对应于 `--extra-files` 长标志，也是合法的。
+Under `cmdr.v2` system, multiple short flags can be attached with one flag by using call like `b.Flg(longTitle, shortTitle...).ExtraShorts(...)`.
 
-Golang 的命令行参数采用与 POSIX 不相合的惯例，它没有长短标志之分，而是只有短标志这种格式，所以典型的 Golang app 可能使用 `-port` 来指示端口号。
+Short flag is constantly a single char in POSIX standard. So we can use `-v` as the shortcut to `--verbose` flag.
 
-> `cmdr` 提供的是符合 POSIX 规范的命令行参数处理接口，所以有区分长短标志。然而我们充分尊重 Golang 开发者的怪癖，所以我们的短标志略有扩展，允许多个字符来表示。因此你完全可以使用 `cmdr` 创建出 Golang 传统风格的 CLI app。
+But in `cmdr` system (both v1 and v2), a short flag can be a string with any length. As a sample, `-ap` has short title `ap`, shortcut to `--extra-files`, this is legal too.
 
-在 `cmdr` 的构造接口中，`Flg(longTitle, shortTitle, ...)` 支持你提供更多的别名关联到一个命令行标志。这些额外的别名几乎等同于长标志，同样可以使用双重横线引导来引用它们。
+Golang `flags` uses a wired form different than POSIX standard, which has no short or long flag, all flags have the single hyphen char as its leading prefix. That is why in a golang app `-port` will be used for setting the listening port number rather than `--port`.
 
-所以，`b.Flg("version", "V", "ver")` 定义的版本号标志，以下的命令行都是合法的：
+> `cmdr` is a POSIX-compliant command-line argument parser. So we recommend using `-p` and `--port` to specify port number. But you can still make a golang flag like app by specifying a short flag with title name `port`, this is legal option.
+
+By using the builder interface, `Flg(longTitle, shortTitle, ...)` allows more alias titles associated with a flag. The alias titles are equavalent to long flag, with the leading double hyphen chars `--`.
+
+As a sample, `b.Flg("version", "V", "ver")` defines a version flag with both long, short and alias titles. So the following command-line inputs are avaliable:
 
 ```bash
 $ app --version
@@ -106,47 +119,45 @@ $ app -V
 $ app --ver
 ```
 
-总的来说，你应该有节制地规划标志的名称。过多的别名未必对终端用户是友善的。
+Totally you can always organize your command and flag system in a freestanding form. Keep it concise. Too much command depthes and too much more flags are not kindly enough to end-user.
 
-### 短标志的组合
+### Compat short flags
 
-对于布尔量的短标志来说，POSIX 要求它们能够被组合到一起。其含义是：
+Multiple short flags can be compated into one leading hyphen char `-`, this is POSIX-compliant. The compat form is equavalent to the split form:
 
 ```bash
--azro 等价于 -a -z -r -o，或者等价于 -a -zr -o
+-azro === -a -z -r -o === -a -zr -o
 ```
 
-### 默认值
+### Default Value
 
-你可以在定义一个标志的时候为其指定默认值。
+You can specify the default value to a flag, with different types.
 
-`b.Flg("count", "c").Default(3)` 令其默认取值为 3。
+`b.Flg("count", "c").Default(3)` defined its default value is `int(3)`.
 
-大多数简单值，包括整数、浮点数、虚数、字符串、布尔量，时间及周期，以及数组都可以被指定为标志的默认值。
+The primitive value, including integer, float, complex, boolean, or string, time, duration, slice can be specified as the default value of a flag.
 
-例如 `b.Flg("interval", "i").Default(3*time.Second)` 指定了一个 `3s` 的时间周期。此时，终端用户可以采用 Golang 能够转换的语法为其指定一个新值，例如：
+So `b.Flg("interval", "i").Default(3*time.Second)` defined a time duration value `3s`. End user can input the new value with Golang literal convension, for a example:：
 
 ```bash
 $ app -i 8m
 ```
 
-这里指定了一个 8 分钟的时间周期值，覆盖掉了程序中的预设值。
+It specifys a duration value with 8 minutes, which overrides the default value when you defined it.
 
-> 由于布尔量标志通常带有默认值 false，所以往往无需为其显式地做默认值设定。所以，`b.Flg("verbose", "v")` 隐含着这是一个布尔量标志。
+### Duplicated inputs
 
-### 覆盖或者叠加
+In general, duplicated inputs of a flag causes the old value to be overlapped by the new one.
 
-对于大多数默认值，如果多次在命令行中输入，那么后继的值将会覆盖更前的旧值。
+So `app -c 3 -c 4 -c 5` means the final value of `-c` is 5.
 
-例如 `app -c 3 -c 4 -c 5` 中，`-c` 标志最终获得值 5。
+The exception is slice value. The duplicated inputs of a flag with default slice value causes the new value to apppend to the old. And, the delimiter char `,` is used for splitting the items in one input string.
 
-然而对于提供数组作为默认值的标志，情况有所不同。多次输入的结果是所有输入值将被叠加到一起。此外，逗号 `,` 被自动用于切分用户提供的输入值。
+This means, as for a flag `b.Flg("add", "a").Default([]string{"a", "b"})`, the input `app -a z,y -a x -a u,v,w` will get the final value `[]string{"z","y","x","u","v","w"}`.
 
-也就是说，对于 `b.Flg("add", "a").Default([]string{"a", "b"})` 这个标志来说，`app -a z,y -a x -a u,v,w` 将会获得一个最终值为 `[]string{"z","y","x","u","v","w"}`。
+### Input in command-line
 
-### 在命令行中输入值
-
-cmdr 支持模糊界限的值输入方式，下面的命令行输入都能够被有效地识别：
+cmdr support stripping the quote chars for a flag:
 
 - `--host=localhost`
 - `--hostlocalhost`
@@ -157,7 +168,7 @@ cmdr 支持模糊界限的值输入方式，下面的命令行输入都能够被
 - `--host'localhost'`
 - `--host "localhost"`
 
-等等。
+and so on.
 
 其中，双引号和单引号在主流的 Shell 环境中被自动去除。但是如果它们没有被 Shell 所删除，则 cmdr 遵照上面的参考格式自动在求值前删除引号。
 
