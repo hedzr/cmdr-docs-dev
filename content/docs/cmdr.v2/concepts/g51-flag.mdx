@@ -157,6 +157,8 @@ $ app -i 8m
 
 ### 在命令行中输入值
 
+#### 自动去除引号
+
 cmdr 支持模糊界限的值输入方式，下面的命令行输入都能够被有效地识别：
 
 - `--host=localhost`
@@ -172,7 +174,13 @@ cmdr 支持模糊界限的值输入方式，下面的命令行输入都能够被
 
 其中，双引号和单引号在主流的 Shell 环境中被自动去除。但是如果它们没有被 Shell 所删除，则 cmdr 遵照上面的参考格式自动在求值前删除引号。
 
-如果为标志关联了数组值作为默认值，cmdr 将会把多次输入的值合并叠加到一起形成一个最终的数组值。
+> 值的转译基本遵照 golang 字面量风格。
+
+#### 多次输入被合并 - 对于数组默认值
+
+如果为标志关联了数组值作为默认值，cmdr 将会把多次输入的值合并叠加到一起形成一个最终的数组值。也就是说，`-f a -f b -f c` 将被转译为值 `[]string{"a", "b", "c"}`。此时逗号 `,` 也会被用于切分数组值，所以，`-f a,b -f c` 将会获得同样的最终值。
+
+#### 命中记录
 
 无论用户如何输入，cmdr 会为标志维护一个命中次数记录，以及命中时用户输入的标志名（是长还是短）。某些情况下你可以参考这些辅助信息来改变相关逻辑。
 
@@ -183,48 +191,52 @@ cmdr 支持模糊界限的值输入方式，下面的命令行输入都能够被
    hidden flags/commands 不会显示于帮助屏
 
 2. 输入了一次
+
    hidden flags/commands 将会显示于帮助屏
+
 3. 输入超过三次
+
    vendor-hidden flags/commands 将会显示于帮助屏
 
 你也可以再次解释命中次数。例如 `--verbose` 的命中次数被用作一个 1-9 级的等级值，对应于提示信息的多寡。
 
-> 对于一些 cmdr 内建提供的标志，应用程序经常会使用的 verbose, quiet, debug 等等，在 `hedzr/is` 的 `Env` 中同步管理了它们的命中状态，命中次数。
+> 对于一些 cmdr 内建提供的标志，应用程序经常会使用的 verbose, quiet, debug 等等，在 [`hedzr/is`](https://github.com/hedzr/is) 的 [`Env`](https://github.com/hedzr/is/blob/master/detects.go#L250) 中同步管理了它们的命中状态，命中次数。
 > 参考：
 >
-> - `is.VerboseModeEnabled()`, `is.GetVerboseLevel()`
+> - [`is.VerboseModeEnabled()`](https://github.com/hedzr/is/blob/master/detects.go#L220), [`is.GetVerboseLevel()`](https://github.com/hedzr/is/blob/master/detects.go#L221)
 > - `is.QuietModeEnabled()`, `is.GetQuietLevel()`
 > - `is.NoColorModeEnabled()`, `is.GetNoColorLevel()`
 > - `is.DebugMode()`, `is.GetDebugLevel()`
 > - `is.TraceMode()`, `is.GetTraceLevel()`
 
-### cmdr 的更多增强 [#enhances]
+### 短标志的风格
 
-1. cmdr 的短标志不会被限定在单个字母。
+cmdr 的短标志不会被限定在单个字母。
 
-   我们支持多个字母数字符号作为短标志。
+我们支持多个字母数字符号作为短标志。
 
-   换句话说，你可以令长短标志的界限模糊，从而提供同时兼容于 golang flag 风格和 getopt 风格的标志集合。
+换句话说，你可以令长短标志的界限模糊，从而提供同时兼容于 golang flag 风格和 getopt 风格的标志集合。
 
-   > Golang flag 风格：命令行参数总是单短横线引导的，如：`-host abc -port 9999`
-   >
-   > getopt 风格：允许单、双短横线引导，分别代表短、长标志，通常短标志使用单个字母或数字，如：`-d -t --retry 3`。
-   >
-   > cmdr 风格：在完全兼容 getopt 风格的基础上，通过解除单字母短标志限制，使得 cmdr cli app 也能支持 `-host abc` 这样的 golang flag 风格，甚至是 `-host abc --retry 3` 这样的混合风格（wget 采用这样的混合性风格）
+> Golang flag 风格：命令行参数总是单短横线引导的，如：`-host abc -port 9999`
+>
+> getopt 风格：允许单、双短横线引导，分别代表短、长标志，通常短标志使用单个字母或数字，如：`-d -t --retry 3`。
+>
+> cmdr 风格：在完全兼容 getopt 风格的基础上，通过解除单字母短标志限制，使得 cmdr cli app 也能支持 `-host abc` 这样的 golang flag 风格，甚至是 `-host abc --retry 3` 这样的混合风格（wget 采用这样的混合性风格）
 
-2. 在无歧义的情况下，cmdr甚至支持你组合任何短标志。
+### 混合标志标题与值
 
-   所以，`-dr3t` 能够被解释为 `--debug --retry 3 --timeout`。
+在无歧义的情况下，cmdr甚至支持你组合任何短标志，甚至包括混合组合标志和值到一起。
 
-   cmdr 采取特别的反向回溯算法来解决这个场景下的多级子命令的多级标志的智能匹配。
+所以，`-dr3t` 能够被解释为 `--debug --retry 3 --timeout`。
+
+cmdr 采取特别的反向回溯算法来解决这个场景下的多级子命令的多级标志的智能匹配。
 
 ### 额外的话题
 
 <Cards>
-  <Card title="Required" href="../howto/required-flag" />
-  <Card title="Toggle Group" href="../howto/toggle-group-of-flags" />
-  <Card title="Head Like" href="../howto/head-like-flag" />
-  <Card title="Valid Args" href="../howto/valid-args-flag" />
-  <Card title="External Tool" href="../howto/flag-with-external-flag" />
+  <Card title="Required" href="../g55-flag-required" />
+  <Card title="Toggle Group" href="../g56-flag-toggle-group" />
+  <Card title="Head Like" href="../g58-flag-head-like" />
+  <Card title="Valid Args" href="../g57-flag-valid-args" />
+  <Card title="External Tool" href="../g59-flag-external-editor" />
 </Cards>
-````

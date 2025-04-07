@@ -157,6 +157,8 @@ This means, as for a flag `b.Flg("add", "a").Default([]string{"a", "b"})`, the i
 
 ### Input in command-line
 
+#### Stripping quotes
+
 cmdr support stripping the quote chars for a flag:
 
 - `--host=localhost`
@@ -170,60 +172,72 @@ cmdr support stripping the quote chars for a flag:
 
 and so on.
 
-其中，双引号和单引号在主流的 Shell 环境中被自动去除。但是如果它们没有被 Shell 所删除，则 cmdr 遵照上面的参考格式自动在求值前删除引号。
+These quote chars will be removed by shell automatically. If not, `cmdr` will do it.
 
-如果为标志关联了数组值作为默认值，cmdr 将会把多次输入的值合并叠加到一起形成一个最终的数组值。
+#### Slice value
 
-无论用户如何输入，cmdr 会为标志维护一个命中次数记录，以及命中时用户输入的标志名（是长还是短）。某些情况下你可以参考这些辅助信息来改变相关逻辑。
+While a flag is associated with a default slice value, such as `[]string`, `cmdr` will merge the duplicated inputs as once slice. That means, `-f a -f b -f c` will be translated to the final value `[]string{"a", "b", "c"}`. Since the comma `,` character will be treated as delimiter for splitting a string into slice, so `-f a,b -f c` will get the same final value.
 
-作为一个范本，cmdr 的内建标志 `--verbose` 的命中次数被预设了如下逻辑：
+#### Hit info
 
-1. 用户没有输入
+`cmdr` maintains a hit info record, including the flag title string, short or long, untranslated raw value, and hit times. Sometimes you could change the bizlogic with these records.
 
-   hidden flags/commands 不会显示于帮助屏
+#### Default behavior of `--verbose`
 
-2. 输入了一次
-   hidden flags/commands 将会显示于帮助屏
-3. 输入超过三次
-   vendor-hidden flags/commands 将会显示于帮助屏
+The builtin flag `--verbose` has these behaviors:
 
-你也可以再次解释命中次数。例如 `--verbose` 的命中次数被用作一个 1-9 级的等级值，对应于提示信息的多寡。
+1. nothing input,
 
-> 对于一些 cmdr 内建提供的标志，应用程序经常会使用的 verbose, quiet, debug 等等，在 `hedzr/is` 的 `Env` 中同步管理了它们的命中状态，命中次数。
-> 参考：
+   The hidden flags/commands wouldn't be shown on help screen
+
+2. once (`-v`),
+
+   The hidden flags/commands could be shown
+
+3. triple times (`-v -v -v` or `-vvv`)
+
+   The vendor-hidden flags/commands will be shown onto help screen
+
+You can redefined the hit times or other hit info. As a case, you could treat the hit times of `--verbose` as a level in 0..9, and uses the level for how many tip messages can be visible in logging.
+
+> For the builtin flags, such as `verbose`, `quiet`, `debug`, the final state, hit-times (level) are organized into [`Env`](https://github.com/hedzr/is/blob/master/detects.go#L250) manager inside package [`hedzr/is`](https://github.com/hedzr/is),
 >
-> - `is.VerboseModeEnabled()`, `is.GetVerboseLevel()`
+> Refer these topics for the details:
+>
+> - [`is.VerboseModeEnabled()`](https://github.com/hedzr/is/blob/master/detects.go#L220), [`is.GetVerboseLevel()`](https://github.com/hedzr/is/blob/master/detects.go#L221)
 > - `is.QuietModeEnabled()`, `is.GetQuietLevel()`
 > - `is.NoColorModeEnabled()`, `is.GetNoColorLevel()`
 > - `is.DebugMode()`, `is.GetDebugLevel()`
 > - `is.TraceMode()`, `is.GetTraceLevel()`
 
-### cmdr 的更多增强 [#enhances]
+### Styles of short flag
 
-1. cmdr 的短标志不会被限定在单个字母。
+Short flags can have multiple characters rather than single one
 
-   我们支持多个字母数字符号作为短标志。
+We supports a phrase as a short flag title.
 
-   换句话说，你可以令长短标志的界限模糊，从而提供同时兼容于 golang flag 风格和 getopt 风格的标志集合。
+In another words, you can blur out the differences between short and long flag, so that the golang flag style and GNU getopt style could live at a same app together.
 
-   > Golang flag 风格：命令行参数总是单短横线引导的，如：`-host abc -port 9999`
-   >
-   > getopt 风格：允许单、双短横线引导，分别代表短、长标志，通常短标志使用单个字母或数字，如：`-d -t --retry 3`。
-   >
-   > cmdr 风格：在完全兼容 getopt 风格的基础上，通过解除单字母短标志限制，使得 cmdr cli app 也能支持 `-host abc` 这样的 golang flag 风格，甚至是 `-host abc --retry 3` 这样的混合风格（wget 采用这样的混合性风格）
+> Golang flag style: the flags are always leading by single hyphen character: `-host abc -port 9999`
+>
+> GNU getopt style: both the leading hyphen `-` and double hyphen `--` are avaliable for short and long flag. A short flag has single character or number as its title, mostly in POSIX. The sample: `-d -t --retry 3`。
+>
+> cmdr style: beyond getopt style, remote the limit about single char title for the short flag. So `-host abc` and `-host abc --retry 3` are legal.
 
-2. 在无歧义的情况下，cmdr甚至支持你组合任何短标志。
+### Mixing in flag title and value
 
-   所以，`-dr3t` 能够被解释为 `--debug --retry 3 --timeout`。
+Once no ambiguities, any combinations of short flags are ok, even mixing the flag title and raw value string in together:
 
-   cmdr 采取特别的反向回溯算法来解决这个场景下的多级子命令的多级标志的智能匹配。
+Therefore `-dr3t` would be interpted to `--debug --retry 3 --timeout`。
+
+> cmdr can backtrace and regress to the up level to solve the matches in parsing time.
 
 ## Learn More
 
 <Cards>
-  <Card title="Required" href="../howto/required-flag" />
-  <Card title="Toggle Group" href="../howto/toggle-group-of-flags" />
-  <Card title="Head Like" href="../howto/head-like-flag" />
-  <Card title="Valid Args" href="../howto/valid-args-flag" />
-  <Card title="External Tool" href="../howto/flag-with-external-flag" />
+  <Card title="Required" href="../g55-flag-required" />
+  <Card title="Toggle Group" href="../g56-flag-toggle-group" />
+  <Card title="Head Like" href="../g58-flag-head-like" />
+  <Card title="Valid Args" href="../g57-flag-valid-args" />
+  <Card title="External Tool" href="../g59-flag-external-editor" />
 </Cards>
