@@ -3,13 +3,13 @@ title: Builtin Commands & Flags
 description: provided by cmdr
 ---
 
-## 内建命令与支持
+## The builtin commands and flags
 
-截至 cmdr v2.1.1，我们提供如下的内建命令和标志。
+Up to cmdr v2.1.x, we provides these following builtin commands and flags.
 
-其中部分命令的具体实现暂未提上日程，如果你重度依赖这些功能，请使用 cmdr v1 并在 Discuss 留下 Requests。
+> Some of them are not planned to be implemented right away.
 
-当前我们的重心在于基于 Redesign Archi 的基础尽可能地保持核心代码的工作方式并尽快冻结 API。既然这些暂缓的功能并非 CLI app 的必需品，那么我们暂时押后是有理由的。
+Our misson is staying to freeze the core APIs currently. This work has almost been done in v2.1.
 
 ### Commands
 
@@ -23,17 +23,17 @@ description: provided by cmdr
 
 #### `help` Command
 
-`help` 命令类似于 `--help` 标志。
+`help` Command is very like `--help` flag, but it worked under a prompt mode, so you can query any commands with their help screen again and again, and launch one of them.
 
-> 我们有计划在这里制作一个问答子系统。[部分已实现]
+> We planned to make a Q&A subsystem here, and it's partial done now.
 
 #### `version` Command
 
-`version` 主要提供版本号以及构建信息。
+`version` Command lists the version number and built information mainly.
 
-在产品发布的构建脚本中，你应该遵循 [产品发布](../../build/) 所提到的要点，为可执行文件写入构建预设值，才能保证 version 输出的信息有效和有意义。
+In your build script, following [Production](../../build/) is appreciated. It will include: write the building metadata into the target executable file, and other relevant data. Then the `version` command's output will be meaningful.
 
-参阅 [`--version`](#version)
+See also [`--version`](#version).
 
 ```bash
 $ ./bin/blueprint --version
@@ -50,13 +50,13 @@ v2.1.1
 $
 ```
 
-两种形式提供的信息的详尽程度略有不同。
+The verbose level is varies in the two forms above.
 
-> 注意，`app version`/`app versions` 命令 和 `app --version` 标志的功能是等价的。
+> NOTE that `app version` or `app versions` command is equivalent to `app --version`.
 
 #### `sbom` Command
 
-以 YAML 格式打印标准的 Golang SBOM 信息。
+This command will print Golang SBOM information with YAML format.
 
 ```bash
 $ ./bin/blueprint sbom
@@ -113,49 +113,132 @@ SBOM:
     - debug-module: { path: "gopkg.in/yaml.v3", version: "v3.0.1", sum: "h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=", replace: (*debug.Module)(nil) }
 ```
 
-此信息可以被集成到供应链管理系统中。
+So user can integrated it into their ERM or Supplier Chain Management system.
 
 #### `generate` Command (NOT-YET)
 
-`gen` 命令的主要用途是生成 man 手册，以及生成自动完成脚本。
+The `gen` command is used for generating Linux manual and shell autocompletion script mainly.
 
 ### Flags
 
-- `--help`: 打印帮助屏
-- `--man`: 打印帮助屏，但是以 manpage 方式
-- `--version`: 打印版本号信息
-- `--build-info`: 打印构建信息
-- `--version-sim`: 临时修改呈现的版本号
+- `--help`: print help screen
+- `--man`: print help screen with manpage style
+- `--version`: print versions information
+- `--build-info`: print built information
+- `--version-sim`: set a temporary version to expose to container system (such as k8s)
 - `--strict-mode`: STRICT Mode & level
 - `--no-color`: No Color Mode & Level
 - `--quiet`: Quiet Mode & Level
 - `--verbose`: Verbose Mode & Level
 - `--debug`: Debug Mode & Level
-- `--config=FILE` 提供一个主配置文件，略过内建搜索方案
-- `~~tree`: 打印全部子命令（及其参数）
-- `~~debug`: 打印用于调试的信息
+- `--config=FILE` specify a main config file for loading, overpassing the internal searching logics
+- `~~tree`: print all commands (and flags) in tree mode
+- `~~debug`: print internal debugging information
 
-其中，`--man` 为当前命令生成 man.1 手册并调用系统命令 `man` 来阅读它。
+A notable thing is, `--man` will write a `man.1` file for the current command, and launch the `man.1` into `man` system.
 
-#### 简要阐释
+### Details
 
-`--version-sim` 可用于替换在构建时固化的版本号，向外报告一个定制的临时版本号。
-这个功能有时候有利于在预发布模式时模拟仿真多个版本号，有时候也可以用于做灰度测试或灰度发布。
+#### `--version-sim`
 
-四种模式：STRICT，NO-COLOR，QUIET 和 VERBOSE。
-它们被抽象定义在 `hedzr/is` 的 `Env` 对象中，因此你需要对 Env 进行操作。
+`--version-sim` can be used to simulate a temporary version different with the solidified one at building, which will be reported to the container mananger such as k8s.
 
-`~~tree` 以及 `~~tree -vvv` 已经多次介绍过，它能为你呈现当前的子命令体系。
+Sometimes the feature might be useful for the gray scale test, A/B test and so on.
 
-`~~debug ~~env ...` 主要用于打印调试目的的内部信息，包括内部 Store 的键值对。
+#### Modes and Levels
 
-`FORCE_DEFAULT_ACTION=1` 可以启用内建的 ActionDefault 命令，它也会打印用于调试目的的信息。
+There are four modes for running an app: STRICT, NO-COLOR, QUIET and VERBOSE.
+
+They are extracted and defined at [`is.Env()`](https://github.com/hedzr/is/blob/master/detects.go#L250) inside package [`hedzr/is`](https://github.com/hedzr/is).
+
+> Refer these topics for the details:
+>
+> - [`is.VerboseModeEnabled()`](https://github.com/hedzr/is/blob/master/detects.go#L220), [`is.GetVerboseLevel()`](https://github.com/hedzr/is/blob/master/detects.go#L221)
+> - `is.QuietModeEnabled()`, `is.GetQuietLevel()`
+> - `is.NoColorModeEnabled()`, `is.GetNoColorLevel()`
+> - `is.DebugMode()`, `is.GetDebugLevel()`
+> - `is.TraceMode()`, `is.GetTraceLevel()`
+
+#### `--tree`
+
+`~~tree` and `~~tree -vvv` was introduced earlier, which two forms will show the commands (and flags) hierarchical tree for you.
+
+#### `--debug`
+
+`~~debug ~~env ...` can be used to print the internal structures for a debugging purpose, specially including the k-v entries of `Option Store`.
+
+#### `FORCE_DEFAULT_ACTION` envvar
+
+`FORCE_DEFAULT_ACTION=1` can enable using the internal default action handler instead of yours. The default action handler will print the hit-info for debugging.
+
+`FORCE_DEFAULT_ACTION` is a temporary way to replace your handlers, even if in Production release.
+
+In development time, you can call to the default action handler programmatically, by passing `cmdr.Opt` to `app.Run(opts...)` with `cmdr.WithForceDefaultAction(true)`. A sample fragment is:
+
+```go
+func main() {
+	ctx := context.Background()
+
+	app := prepareApp(
+		cmdr.WithStore(store.New()), // use an option store explicitly, or a dummy store by default
+
+		// cmdr.WithExternalLoaders(
+		// 	local.NewConfigFileLoader(), // import "github.com/hedzr/cmdr-loaders/local" to get in advanced external loading features
+		// 	local.NewEnvVarLoader(),
+		// ),
+
+		cmdr.WithTasksBeforeRun(func(ctx context.Context, cmd cli.Cmd, runner cli.Runner, extras ...any) (err error) {
+			logz.DebugContext(ctx, "command running...", "cmd", cmd, "runner", runner, "extras", extras)
+			return
+		}), // cmdr.WithTasksBeforeParse(), cmdr.WithTasksBeforeRun(), cmdr.WithTasksAfterRun
+
+		// true for debug in developing time, it'll disable onAction on each Cmd.
+		// for productive mode, comment this line.
+		// The envvars FORCE_DEFAULT_ACTION & FORCE_RUN can override this.
+		cmdr.WithForceDefaultAction(true),
+
+		cmdr.WithSortInHelpScreen(true),       // default it's false
+		cmdr.WithDontGroupInHelpScreen(false), // default it's false
+
+		cmdr.WithAutoEnvBindings(true),
+	)
+
+	logz.Debug("in dev mode?", "mode", devmode.InDevelopmentMode())
+
+	// // simple run the parser of app and trigger the matched command's action
+	// _ = app.Run(
+	// 	cmdr.WithForceDefaultAction(false), // true for debug in developing time
+	// )
+
+	if err := app.Run(ctx); err != nil {
+		logz.ErrorContext(ctx, "Application Error:", "err", err) // stacktrace if in debug mode/build
+		os.Exit(app.SuggestRetCode())
+	}
+}
+```
+
+`FORCE_RUN=1` has the opposite purpose, it would be used for overpassing the `cmdr.WithForceDefaultAction(true)`.
+
+Inside your `OnAction(cb)` handler, you can call into the default action by:
+
+```go
+	app.OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+		println(`wget ran.`)
+		// _, err = cmd.App().DoBuiltinAction(ctx, cli.ActionShowHelpScreen)
+		_, err = cmd.App().DoBuiltinAction(ctx, cli.ActionDefault)
+		return
+	})
+```
 
 #### `version` [#version]
 
-`version` 主要提供版本号以及构建信息。
+`version` flag is equavalent to `version` command, to show the versions information.
 
-在产品发布的构建脚本中，你应该遵循 [产品发布](../../build/) 所提到的要点，为可执行文件写入构建预设值，才能保证 version 输出的信息有效和有意义。
+In your build script, following [Production](../../build/) is appreciated. It will include: write the building metadata into the target executable file, and other relevant data. Then the `version` command's output will be meaningful.
+
+See also [`version` command](#version-command).
+
+A possible output of `app --version` is:
 
 ```bash
 $ ./bin/blueprint --version
@@ -172,13 +255,13 @@ v2.1.1
 $
 ```
 
-两种形式提供的信息的详尽程度略有不同。
-
 #### `build-info`
 
-`--build-info`/`--built-info` 主要提供版本号以及构建信息。
+`--build-info`/`--built-info` prints the built information.
 
-在产品发布的构建脚本中，你应该遵循 [产品发布](../../build/) 所提到的要点，为可执行文件写入构建预设值，才能保证 version 输出的信息有效和有意义。
+In your build script, following [Production](../../build/) is appreciated. It will include: write the building metadata into the target executable file, and other relevant data. Then the `version` command's output will be meaningful.
+
+The output looks like this:
 
 ```bash
 $ ./bin/blueprint --built-info
@@ -193,8 +276,6 @@ $ ./bin/blueprint -#
     Built Timestamp: 2025-03-18T11:17:45Z
 $
 ```
-
-两种形式提供的信息的详尽程度略有不同。
 
 ## Tree
 
@@ -264,7 +345,7 @@ ACTIONS:
 $
 ```
 
-### 额外的话题
+### Learn More
 
 <Cards>
   <Card title="With Options" href="../g71-with-options" />
