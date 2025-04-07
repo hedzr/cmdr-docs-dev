@@ -1,24 +1,24 @@
 ---
-title: 标志：`Head -1` 风格
-description: Head like
+title: "Flag: `Head -1` style"
+description: Head like flag
 ---
 
-## `Head -1` 风格
+## `Head -1` Style
 
-GNU head 命令行工具有一个特别的方式输入一个行数计数值：`head -n`。
+GNU `head` utility has a special way to input a line number: `head -n`.
 
-在这里，`n` 是一个正整数值。
-例如 `head -3` 表示从标准输入中筛选前三行文本出来，其他行抛弃。
+Here the `n` can be a positive number.
+For example, `head -3` means the the top 3 lines from standard input or a file.
 
-cmdr 允许你使用相同的技术来接受用户输入。
+cmdr allows you define a flag has the same behavior.
 
-一般来说，一个标志的默认值应该是正整数值，然后用户输入 `-number` 时将会自动被转换为 `--flag number`。
+Generally the default value of a head-like flag must be a positive number. Then the end user typing `-number` can be converted to `--flag number` semantic meaning.
 
-> 由于命令行输入的语义限制，在整个应用程序中你只能为一个标志启用 `Head Like` 风格。
+> In a single app, only one head-like flag can be declared.
 
-### 定义
+### Define
 
-`.HeadLike(true)` 可以为标志设置 Head Like 风格。
+`.HeadLike(true)` can enable head-like style for a flag.
 
 <Tabs items={['main.go', 'head-like.go']}>
 
@@ -115,9 +115,9 @@ func AddHeadLikeFlagImpl(parent cli.CommandBuilder, dontHandlingParentCmd ...boo
 </Tab>
 </Tabs>
 
-### 运行时
+### Run
 
-上面的示例程序的运行时效果如同这样：
+The result of running the above example app is:
 
 ```bash
 $ go run ./examples/head-like -8
@@ -127,7 +127,7 @@ using lines:  123
 $
 ```
 
-### 额外的话题
+### Learn More
 
 <Cards>
   <Card title="Required" href="../g55-flag-required" />
