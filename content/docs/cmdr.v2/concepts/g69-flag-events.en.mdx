@@ -1,0 +1,32 @@
+---
+title: "Flag: Event Handlers"
+description: OnXXX event handlers...
+---
+
+## Event Handlers associated with a flag
+
+The standard events and its handlers are:
+
+- `.OnParseValue(...OnParseValueHandler)`
+- `.OnMatched(...OnMatchedHandler)`
+- `.OnChanging(...OnChangingHandler)`
+- `.OnChanged(...OnChangedHandler)`
+- `.OnSet(...OnSetHandler)`
+
+All of these handlers are specific for each phrases in cmdr runner working: a subcommand will be parsed (`OnParseValue`), parsed ok (`OnMatched`), a flag parsed (`OnMatched`) and the raw string are been parsed as its value (`OnChanging`), and the new value accepted (`OnChanged`), or a store entry value was been changed programmatically (`OnSet`).
+
+The differences of `OnSet` and `OnChanged` is, the first one will be called while `cmd.Store().Set("some.key", newval)` ran, it means a programmatic modification. And the last one will be called while `cmdr` is parsing the command-line arguments.
+
+cmdr-loaders works with `cmdr` main library, and assumes its loading action is `OnLoading(cb)` wrapped. So in the time the `OnSet` won't be triggered.
+
+After loaded, any modifications are recorded, that would be a changeset. The modifications will be written back to a `Alternative` config file at terminating app. The `Write-back` feature can be descibed at [Here](../g11-with-loaders#write-back).
+
+### Learn More
+
+<Cards>
+  <Card title="Required" href="../g55-flag-required" />
+  <Card title="Toggle Group" href="../g56-flag-toggle-group" />
+  <Card title="Head Like" href="../g58-flag-head-like" />
+  <Card title="Valid Args" href="../g57-flag-valid-args" />
+  <Card title="External Tool" href="../g59-flag-external-editor" />
+</Cards>
