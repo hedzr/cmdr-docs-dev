@@ -1,23 +1,23 @@
 ---
-title: 标志：可翻转组
+title: "Flag: Toggle Group"
 description: Toggleable Group/Toggle Group
 ---
 
-## 可翻转组
+## Togglable Group
 
-可以将一组标志归为一组，且令其取值被翻转。即，当一个标志被命中时，上一标志设定的值被覆盖。
+Treat a group of flags as a radio button group in GUI, so the last flags will be reset while the flag in same group is been parsed ok and set.
 
-一般来说，这组标志的默认值均为布尔量，有且仅有一个标志可以被预设为默认值 `true`。
+Generally, both these flags should have a boolean default value. And only one flag have `true` value. If the rule is not obeyed, cmdr keeps the last one (`true` value of the flags).
 
-这样的一个可翻转组相当于 UI 界面中的 Radio Group。
+### Define
 
-### 定义
+`.ToggleGroup(toggleGroupName)` can do that.
 
-`.ToggleGroup(toggleGroupName)` 可以设置标志为可翻转组的组成部分。
+`toggleGroupName` makes the flags into a same toggle group. It is also used as the group name.
 
-`toggleGroupName` 值相同的标志将被组织为同一组，此时它们的分组（Group）名也被同时设置。
+In phase invoking `OnAction`, the final value of the toggale group can be read by `cmd.Store().MustBool(toggleGroupName)`.
 
-在 `OnAction` 执行阶段，可以通过 `cmd.Store().MustBool(toggleGroupName)` 获得最终设定值。
+A sample here,
 
 <Tabs items={['main.go', 'toggle-group.go']}>
 
@@ -182,9 +182,9 @@ func AddToggleGroupFlags(c cli.CommandBuilder) { //nolint:revive
 </Tab>
 </Tabs>
 
-### 运行时
+### Run
 
-可翻转组在帮助屏中会有较为明显的显示，如同下面的例子。同时，用户输入也能被取得：
+In the help screen, the flags in a toggle group will be shown with a leading checkbox, just like the following output:
 
 ```bash
 $ go run ./examples/toggle-group tg2 --help
@@ -219,7 +219,9 @@ $ go run ./examples/toggle-group tg2 -b
 $
 ```
 
-### 额外的话题
+And the final value `banana` will be retrieved properly.
+
+### Learn More
 
 <Cards>
   <Card title="Required" href="../g55-flag-required" />

@@ -13,9 +13,9 @@ description: OnXXX event handlers...
 - `.OnChanged(...OnChangedHandler)`
 - `.OnSet(...OnSetHandler)`
 
-它们对应着一个子命令将要被解析（OnParseValue），解析成功（OnMatched），将要接受用户输入的新值（OnChanging），接受用户值（OnChanged），和接受编程修改值（OnSet）。
+它们分别对应着一个子命令将要被解析（`OnParseValue`），解析成功（`OnMatched`），或者一个标志解析成功（`OnMatched`），将要接受用户输入的新值（`OnChanging`），接受用户值（`OnChanged`），和接受编程修改值（`OnSet`）。
 
-OnSet 和 OnChanged 的区别是，前者会在 `cmd.Store().Set("some.key", newval)` 的过程中被触发，代表编程方式修改值，而后者通常代表着命令行中的一个标志被解析正确并赋值。
+`OnSet` 和 `OnChanged` 的区别是，前者会在 `cmd.Store().Set("some.key", newval)` 的过程中被触发，代表编程方式修改值，而后者通常代表着命令行中的一个标志被解析正确并赋值。
 
 cmdr-loaders 与 cmdr 的协作被集成管理，因此在 cmdr-loaders loading 外部源的过程中，OnSet 并不会被触发，这个过程被视为初始化加载过程。
 
@@ -24,9 +24,9 @@ cmdr-loaders 与 cmdr 的协作被集成管理，因此在 cmdr-loaders loading 
 ### 额外的话题
 
 <Cards>
-  <Card title="Required" href="../howto/required-flag" />
-  <Card title="Toggle Group" href="../howto/toggle-group-of-flags" />
-  <Card title="Head Like" href="../howto/head-like-flag" />
-  <Card title="Valid Args" href="../howto/valid-args-flag" />
-  <Card title="External Tool" href="../howto/flag-with-external-flag" />
+  <Card title="Required" href="../g55-flag-required" />
+  <Card title="Toggle Group" href="../g56-flag-toggle-group" />
+  <Card title="Head Like" href="../g58-flag-head-like" />
+  <Card title="Valid Args" href="../g57-flag-valid-args" />
+  <Card title="External Tool" href="../g59-flag-external-editor" />
 </Cards>

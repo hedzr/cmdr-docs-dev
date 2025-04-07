@@ -1,27 +1,27 @@
 ---
-title: 标志：调用外部工具获得输入
+title: "Flag: External Editor"
 description: Using external editor
 ---
 
-## 调用外部编辑器获取文字输入
+## Get text by launch an external editor
 
-git 命令行工具的 commit 支持 `-m msg` 方式来提供提交注释文字。同时，如果用户没有给出 msg 参数，那么 git 将会调用 Shell 的编辑器，通常是 vim 或者 nano（取决于环境变量 `EDITOR`指向谁）。
+`git` tool has a command `commit`, which flag `-m msg` supports lauching shell editor to get text input with `-m msg`. If user gived a command line `git commit -m` without `msg`, `git` will find shell program identified by `EDITOR` envvar (constantly it's `vim` or `nano`) and launch it, and waiting the user's input, and return the input text as message of `-m` after editor closed.
 
-cmdr 支持同样的交互方案。
+cmdr allows you define a flag with the same behavior.
 
-一个使用了 `ExternalEditor(envVarName)` 标注的标志将获得和 `git -m` 相同的交互表现。
+A flag with using `ExternalEditor(envVarName)` will get the interactive actions like `git -m`.
 
-> 提前指定的 envVarName 为要查询的 Shell 编辑器的预设环境变量名。
+> The `envVarName` is the envvar name.
 >
-> 例如，如果你的环境变量中有 `EDITOR=nano` 的设置，那么 `ExternalEditor("EDITOR")` 将会选用 nano 作为 Shell 全屏编辑器，并在操作系统临时文件夹中建立一个临时文件来接受用户编辑输入。当用户存盘退出 nano 时，这个临时文件中的文本内容将被赋予该标志。
+> While you have a definition `EDITOR=nano` in the OS environment, `ExternalEditor("EDITOR")` will launch `nano` and wait for the user's input, and return the input text as the flag's value finally.
 >
-> 有时候，你也可能使用 `envVarName` 为 `LESS`, `MAN` 等等来达到特定效果。
+> Sometimes, you may try launch a different editor/viewer via `envVarName` like `LESS`, or `MAN`, or else.
 
-一般来说，启用了 `ExternalEditor(envVarName)` 风格的标志必须具有字符串值的默认值。
+Totally the flag' default value must by a string.
 
-### 定义
+### Define
 
-`.ExternalEditor(envVarName)` 可以为标志设置 `External Editor` 风格。
+`.ExternalEditor(envVarName)` can enable `External Editor` feature for a flag.
 
 <Tabs items={['main.go', 'external-editor.go']}>
 
@@ -99,9 +99,9 @@ func AddExternalEditorFlag(c cli.CommandBuilder) { //nolint:revive
 </Tab>
 </Tabs>
 
-### 运行时
+### Run
 
-上面的示例程序的运行时效果如同这样：
+The above app can have the following result:
 
 ```bash
 $ go run ./examples/external-editor -m 123
@@ -113,7 +113,7 @@ Hello, World. dsada
 $
 ```
 
-### 额外的话题
+### Learn More
 
 <Cards>
   <Card title="Required" href="../g55-flag-required" />
