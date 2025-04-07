@@ -470,4 +470,13 @@ func runClient(ctx context.Context, ss net.Server, l stdnet.Listener) {
 
 当然，如果是单纯地需要一个简单地“Press any key to continue...”，可以使用 `is.PressAnyKeyToContinue(in io.Reader, msg ...string) (input string)` 或者 `is.PressEnterToContinue(in io.Reader, msg ...string) (input string)` 来达成目的。它们仅仅使用 `bufio.Fscanf()` 或者 `bufio.NewReader(in).ReadBytes('\n')`，一定比 `Catch()` 方案轻巧——除非你也同时需要对 `os.Signal` 进行捕俘。你应该提供 `os.Stdin` 作为其参数。
 
+### 额外的话题
+
+<Cards>
+  <Card title="Chapter: Using Store" href="../using-store/" />
+  <Card title="`hedzr/is` on Github" href="https://github.com/hedzr/is" />
+  <Card title="Manual of `hedzr/store`" href="/docs/store/" />
+  <Card title="`hedzr/store` on Github" href="https://github.com/hedzr/store" />
+</Cards>
+
 :end:
