@@ -3,19 +3,15 @@ title: Command
 description: What is Subcommand
 ---
 
-:::note
+## Sample app
 
-need rewrite this article with english
+### Without subcmd - Covered on wget [#rootcmd-only]
 
-:::
+Just like `grep`, `awk` or more classical Unix apps, they are not using subcommand to keep simple and small.
+But things goes complicated over time, this is a certainly truth.
+So you will see lots of flags in `wget` app. Some of these flags has command's behavior in fact.
 
-## 示例程序
-
-### 没有子命令的 CLI app - Covered on wget [#rootcmd-only]
-
-像 `wget` 这样的古典 Unix app，并不提供子命令。它可能带有大量的标志，其中一些标志带有命令性质，会请求 app 使用不同的工作逻辑。
-
-一个非完整的 wget 复刻品，在 cmdr 支持下可以这样编写：
+Anyway, here is a non-completely covered app for `wget`, written with `cmdr` way:
 
 ```go
 package main
@@ -101,9 +97,9 @@ Mandatory arguments to long options are mandatory for short options too.`) // .D
 }
 ```
 
-注意对于仅有根命令的 app，直接在 app 对象上应用 `OnAction` 来指定命令响应回调函数。
+There is an `OnAction` handler attached to app object, which will handle the `app` call from command-line without subcmds (but flags).
 
-如果你已经喜欢上了 CommandBuilder/FlagBuilder 方式来构造命令和标志，在 app 对象上还有一个 RootBuilder 可以为你开启相应的回调代码块：
+With `CommandBuilder`/`FlagBuilder` way, you can setup it by `RootBuilder`:
 
 ```go
 	app.RootBuilder(func(parent cli.CommandBuilder) {
@@ -112,15 +108,15 @@ Mandatory arguments to long options are mandatory for short options too.`) // .D
 	})
 ```
 
-这和 `app.Cmd("subcmd").With(func(b cli.CommandBuilder){ ... })` 相似，只不过 `parent` 代表的是 `app.RootCommand()`，而 `b` 代表的是新建的子命令 `subcmd`。
+It's similar with `app.Cmd("subcmd").With(func(b cli.CommandBuilder){ ... })`. Here `parent` means `app.RootCommand()` object, and `b` is for the new creating `subcmd`.
 
-运行时的帮助屏效果为：
+The app runs as:
 
 ![wget-cover](/images/cmdr/v2/guide/_assets/image-20250306095342942.png)
 
-### 带有多级子命令
+### With subcmd
 
-参见 [lots-of-subcommands](./g20-lots-of-subcommands)。
+See it at [lots-of-subcommands](./g20-lots-of-subcommands).
 
 ## Learn More
 
