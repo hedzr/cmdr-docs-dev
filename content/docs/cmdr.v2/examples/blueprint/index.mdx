@@ -1,6 +1,6 @@
 ---
-title: Blueprint
-icon: CircleHelp # uses lucide-react icons here
+title: "Blueprint"
+description: "good practise for an app written with cmdr"
 ---
 
 ## Blueprint
@@ -142,7 +142,9 @@ func soundex(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
 `cmdr-tests` 中的 `blueprint` 具有完整的应用程序基础能力。
 除了集成了 `Store` 提供的完整的配置数据管理功能之外，也包含了自动装载配置源的功能。
 
-此外，`blueprint` 在所有的方面都具备基本的支持。所以从这里开始你可以立即投入功能性开发。
+此外，`blueprint` 在所有的方面都具备基本的支持。
+
+所以从这里开始，你可以立即投入功能性开发。
 
 ### 如何开始
 
@@ -227,5 +229,51 @@ More: '-D'/'--debug', '-V'/'--version', '-#'/'--build-info', '--no-color'...
 
 $
 ```
+
+### 和 `devmode` 一起工作
+
+`blueprint` 集成了 `devmode.go` 来打包初始化用于开发模式的一系列状态环境：
+
+- debugMode, traceMode and levels of them
+- 状态同步的 logging 设置：是否允许 `logz.Debug()` 输出（以及 `logz.Trace()`）
+- 自动检测 `.devmode` 文件是否存在并切入 `DevMode`
+
+这是通过
+
+```go
+With(func(app cli.App) {
+  logz.Debug("in dev mode?", "mode", devmode.InDevelopmentMode())
+}).
+```
+
+来达成的。
+
+该调用在初始化时刻引用 devmode 包中的 init func 来完成环境检测和状态初始化。
+
+### 配置文件
+
+cmdr-loader 已经装配好了所有有关的基本工作，所以这样开始：
+
+1. 在工作目录下新建 `blueprint.toml` 填写如下内容
+   ```toml
+   [zoo.camel]
+   grouped = false
+   ```
+2. 运行 `./bin/blueprint ~~debug` 查看和找到 `app.zoo.canel.grouped` 表项以证实配置文件正确装载。
+3. 证实 `./ci/etc/blueprint/` 的配置项已经被加载。
+
+最后，在部署 app 时，将 `./ci/etc/blueprint/` 部署到 `/etc/blueprint/`，而将 `./blueprint.toml` 和 `bin/blueprint` 可执行文件放在一起。
+
+::: tip
+
+**windows**
+
+将 `./ci/etc/blueprint/` 部署到 `/etc/blueprint/` ?
+
+**macOS**
+
+将 `./ci/etc/blueprint/` 部署到 `/usr/local/etc/blueprint/` 或者 `/opt/homebrew/etc/blueprint` 或者 `$HOME/.config/blueprint` 都是可以的。
+
+:::
 
 :end:
