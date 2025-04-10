@@ -12,6 +12,8 @@ import { i18n } from '@/lib/i18n';
 import { createTokenizer } from '@orama/tokenizers/mandarin';
 import { stopwords as mandarinStopwords } from "@orama/stopwords/mandarin";
 
+////////////////////////////////////////////////////////
+
 // import { createTokenizerJP } from '@orama/tokenizers/japanese';
 // import { stopwords as japaneseStopwords } from "@orama/stopwords/japanese";
 
@@ -44,13 +46,49 @@ import { stopwords as mandarinStopwords } from "@orama/stopwords/mandarin";
 
 // console.log(results);
 
+////////////////////////////////////////////////////////
+
+// const db = create({
+//   schema: {
+//     name: "string",
+//   },
+//   components: {
+//     tokenizer: createTokenizer({
+//       stopWords: mandarinStopwords,
+//     }),
+//   },
+// });
+
+// insert(db, { name: "北京" }); // Beijing
+// insert(db, { name: "上海" }); // Shanghai
+// insert(db, { name: "广州" }); // Guangzhou
+// insert(db, { name: "深圳" }); // Shenzhen
+// insert(db, { name: "成都" }); // Chengdu
+// insert(db, { name: "杭州" }); // Hangzhou
+// insert(db, { name: "南京" }); // Nanjing
+// insert(db, { name: "北京大学" }); // Peking University
+// insert(db, { name: "上海交通大学" }); // Shanghai Jiao Tong University
+// insert(db, { name: "广州中医药大学" }); // Guangzhou University of Chinese Medicine
+
+// const results = search(db, {
+//   term: "广州",
+//   threshold: 0,
+// });
+
+// console.log(results);
+
+////////////////////////////////////////////////////////
+
 export const { GET } = createI18nSearchAPI('advanced', {
   i18n,
   localeMap: {
     // the prop name should be its locale code in your i18n config, (e.g. `cn`)
     cn: {
       // options for the language
-      tokenizer: createTokenizer({stopWords: mandarinStopwords,}),
+      tokenizer: createTokenizer({
+        stopWords: mandarinStopwords,
+        language: 'mandarin'
+      }),
       search: {
         threshold: 0,
         tolerance: 0,
@@ -75,14 +113,42 @@ export const { GET } = createI18nSearchAPI('advanced', {
     //     },
     // },
   },
-  indexes: source.getLanguages().flatMap((entry) =>
-    entry.pages.map((page) => ({
-      title: page.data.title,
-      description: page.data.description,
-      structuredData: page.data.structuredData,
-      id: page.url,
-      url: page.url,
-      locale: entry.language,
-    })),
+  // using `entry` instead of deconstrcuted `{language,pages}`:
+  // indexes: source.getLanguages().flatMap((entry) => {
+  //   entry.pages.map((page) => ({
+  //     title: page.data.title,
+  //     description: page.data.description,
+  //     structuredData: page.data.structuredData,
+  //     id: page.url,
+  //     url: page.url,
+  //     locale: entry.language,
+  //   })),
+  // },
+  indexes: source.getLanguages().flatMap(({ language, pages }) => {
+    // console.log('searching page entry', pages);
+
+    // for example:
+    //    pages {
+    //      language: 'en',
+    //      pages: [
+    //        {
+    //          file: [Object],
+    //          url: '/en/docs',
+    //          slugs: [],
+    //          data: [Object],
+    //          locale: 'en'
+    //        },
+
+    return pages.
+      filter((page) => !page.url.includes('/cmdr.v1/')). // excludes docs of cmdr.v1
+      map((page) => ({
+        title: page.data.title,
+        description: page.data.description,
+        structuredData: page.data.structuredData,
+        id: page.url,
+        url: page.url,
+        locale: language,
+      }));
+  }
   ),
 });

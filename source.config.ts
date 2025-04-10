@@ -156,6 +156,10 @@ export default defineConfig({
       lazy: true,
       experimentalJSEngine: true,
       // langs: ['ts', 'js', 'html', 'tsx', 'mdx'],
+      // langs: ['aml','ask'],
+      // defaultLanguage: 'shell',
+      // fallbackLanguage: 'tsx',
+      addLanguageClass: true,
       inline: 'tailing-curly-colon',
       themes: {
         light: 'catppuccin-latte',
