@@ -113,14 +113,42 @@ export const { GET } = createI18nSearchAPI('advanced', {
     //     },
     // },
   },
-  indexes: source.getLanguages().flatMap((entry) =>
-    entry.pages.map((page) => ({
-      title: page.data.title,
-      description: page.data.description,
-      structuredData: page.data.structuredData,
-      id: page.url,
-      url: page.url,
-      locale: entry.language,
-    })),
+  // using `entry` instead of deconstrcuted `{language,pages}`:
+  // indexes: source.getLanguages().flatMap((entry) => {
+  //   entry.pages.map((page) => ({
+  //     title: page.data.title,
+  //     description: page.data.description,
+  //     structuredData: page.data.structuredData,
+  //     id: page.url,
+  //     url: page.url,
+  //     locale: entry.language,
+  //   })),
+  // },
+  indexes: source.getLanguages().flatMap(({ language, pages }) => {
+    // console.log('searching page entry', pages);
+
+    // for example:
+    //    pages {
+    //      language: 'en',
+    //      pages: [
+    //        {
+    //          file: [Object],
+    //          url: '/en/docs',
+    //          slugs: [],
+    //          data: [Object],
+    //          locale: 'en'
+    //        },
+
+    return pages.
+      filter((page) => !page.url.includes('/cmdr.v1/')). // excludes docs of cmdr.v1
+      map((page) => ({
+        title: page.data.title,
+        description: page.data.description,
+        structuredData: page.data.structuredData,
+        id: page.url,
+        url: page.url,
+        locale: language,
+      }));
+  }
   ),
 });
