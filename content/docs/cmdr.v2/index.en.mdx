@@ -108,6 +108,8 @@ But here's a exception while you're using `hedzr/store` and `hedzr/cmdr-loaders`
 
 `cmdr.v2` try to make the dependencies more concise. This would provide a simple supplier chain to you.
 
+All of apps based on `cmdr.v2` have a builtin command `sbom` to print the supplier information chain with YAML-friendly format.
+
 ```mermaid
 graph BT
   hzis(hedzr/is)-->hzlogg(hedzr/logg/slog)
@@ -136,12 +138,12 @@ graph BT
     href="https://github.com/hedzr/store"
   />
   <Card
-    title="Learn more about `hedzr/logg`"
-    href="https://github.com/hedzr/logg"
-  />
-  <Card
     title="Learn more about `hedzr/evendeep`"
     href="https://github.com/hedzr/evendeep"
+  />
+  <Card
+    title="Learn more about `hedzr/logg`"
+    href="https://github.com/hedzr/logg"
   />
   <Card
     title="Learn more about `hedzr/is`"
