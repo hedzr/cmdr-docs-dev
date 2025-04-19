@@ -1,14 +1,18 @@
 ---
 title: 介绍 cmdr
-description: cmdr 是一个命令行参数处理框架，同时还提供应用程序设置集的集成能力
+description: cmdr 是一个命令行参数处理框架，同时也提供应用程序设置集的集成能力
 ---
 
 ## 了解 cmdr
 
-所以这里是 cmdr(-go) 的相关文档。
+所以这里是 `cmdr(-go)` 的相关文档。
 
 <Cards>
   <Card title="Cmdr(-go) v2 Documentation" href="./cmdr.v2/" />
+  <Card title="Store Documentation" href="./store/" />
+  <Card title="EvenDeep Documentation" href="./evendeep/" />
+  <Card title="Logg/slog Documentation" href="./logg/" />
+  <Card title="Is Documentation" href="./is/" />
   <Card title="Cmdr(-go) v1 Documentation" href="./cmdr.v1/" />
 </Cards>
 
@@ -100,12 +104,12 @@ The help screen looks like,
     href="https://github.com/hedzr/store"
   />
   <Card
-    title="Learn more about `hedzr/logg`"
-    href="https://github.com/hedzr/logg"
-  />
-  <Card
     title="Learn more about `hedzr/evendeep`"
     href="https://github.com/hedzr/evendeep"
+  />
+  <Card
+    title="Learn more about `hedzr/logg`"
+    href="https://github.com/hedzr/logg"
   />
   <Card
     title="Learn more about `hedzr/is`"
@@ -129,6 +133,8 @@ The help screen looks like,
 通常情况下 `cmdr.v2` 不依赖其他第三方库，但当你使用 `hedzr/Store` 和 `hedzr/cmdr-loader` 来加载外部配置文件时，则一些通用第三方库将会被加入到依赖表。典型的例子是 toml，yaml 等格式解析库。
 
 `cmdr.v2` 尽可能是依赖关系简明化，以便能向你提供清晰的供应链清单。
+
+所有的基于 `cmdr.v2` 的 app 都包含内建命令 `sbom` 来打印一个 YAML 格式的供应链数据集以供整合与审查。
 
 ```mermaid
 graph BT
