@@ -13,9 +13,9 @@ Our misson is staying to freeze the core APIs currently. This work has almost be
 
 ### Commands
 
-- `generate` (NOT-YET)
+- `generate`
   - `manual`
-  - `doc`
+  - `doc` (NOT-YET)
   - `shell`
 - `sbom`
 - `version`
@@ -118,6 +118,89 @@ So user can integrated it into their ERM or Supplier Chain Management system.
 #### `generate` Command (NOT-YET)
 
 The `gen` command is used for generating Linux manual and shell autocompletion script mainly.
+
+##### `generate doc` (NOT-YET)
+
+For cmdr.v1, this command can be used to generate markdown pages.
+
+But in cmdr v2, it's not implemented yet. No further plan.
+
+##### `generate man`
+
+This command can walk the command tree and build the responsed manpages.
+
+For example, it generates `./man1/app-jump-to.man` for the command `jump to`. For the app's root command, it generates `./man1/app.man` for you.
+
+All of the manpages should be deployed to the `man/man1/app/` on your target OS. For those GNU-like, Linux-like, or Unix-like systems, this means a directory specified by `MANPAGE` environment variable. To ensure whatever folder should be exact target directory, you could run `manpath` shell command to get the information:
+
+```bash
+$ manpath
+/usr/local/man:/usr/local/share/man:/usr/share/man
+```
+
+Or, another way is,
+
+```bash
+$ whereis man
+man: /usr/bin/man /usr/local/man /usr/share/man /usr/share/man/man1/man.1.gz /usr/share/man/man7/man.7.gz
+```
+
+By default, `app generate man` will make a new directory `./man1` and write all manpages in it. A sample result looks like:
+
+```bash
+$ go build -o ./bin/ ./examples/blueprint/
+$ ./bin/blueprint g m -a
+# generating manpages (output-dir: ./man1, all: true) ...
+#    writing to man1/blueprint.man...
+#    writing to man1/blueprint-soundex.man...
+#    writing to man1/blueprint-jump.man...
+#    writing to man1/blueprint-jump-to.man...
+#    writing to man1/blueprint-wrong.man...
+#    writing to man1/blueprint-invoke.man...
+#    writing to man1/blueprint-invoke-shell.man...
+#    writing to man1/blueprint-invoke-proc.man...
+#    writing to man1/blueprint-preset.man...
+#    writing to man1/blueprint-preset-cmd.man...
+#    writing to man1/blueprint-sbom.man...
+#    writing to man1/blueprint-generate.man...
+#    writing to man1/blueprint-generate-manual.man...
+#    writing to man1/blueprint-generate-doc.man...
+#    writing to man1/blueprint-generate-shell.man...
+#    writing to man1/blueprint-version.man...
+#    writing to man1/blueprint-help.man...
+#    DONE.
+$
+```
+
+See also:
+
+- [Linux 命令 man 全知全会](https://hedzr.com/devops/linux/linux-man-command/) (in Chinese Only)
+
+##### `generate shell`
+
+cmdr.v2 and v1 ships the generators of shell autocompletion scripts now (since v2.1.11).
+
+Generally you can always deploy the autocompletion script file automatically, especially for zsh environment:
+
+```bash
+$ ./bin/blueprint gen sh
+...
+# "/Users/hz/.oh-my-zsh/cache/completions/_blueprint" generated.
+# Re-login to enable the new zsh completion script.
+```
+
+But in another shells, it's necessary to move the generated autocompletion script file to the proper location manually.
+
+`app generate shell` will try detecting these shells, and complete the most of tasks for you:
+
+- zsh
+- bash
+- fish
+- elvish (NOT YET)
+- fig-shell (NOT YET)
+- powershell
+
+In theory, the autocompletion feature for your app will be enabled as well. But the well-tests is needed for those shells such as fish-shell, powershell and so on.
 
 ### Flags
 

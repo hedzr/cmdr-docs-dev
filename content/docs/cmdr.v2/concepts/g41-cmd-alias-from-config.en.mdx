@@ -1,19 +1,15 @@
 ---
-title: 命令：在配置文件中定义别名清单
+title: "Command: Aliases from Config"
 description: loading alias commands from a config file
 ---
 
-## DynCommand From Config
+## Define alias commands in config file
 
-cmdr 也允许你从配置树的特定位置载入数据并据此构造子命令。
+You can also define alias commands in config file, just like what `git` cli app to do.
 
-> 实际上，这是可以自行实现的。尽管 cmdr 内置了一套类似于 git alias 的功能，但你完全可以重新实现自定义的机制。
+### Sample `cmdr-tests/examples/dyncmd-cfg`
 
-### 实例：`cmdr-tests/examples/concise`
-
-[hedzr/cmdr-tests](https://github.com/hedzr/cmdr-tests) 的示例程序 `dyncmd-cfg` 在子命令 `jump` 上实现了动态加载外部脚本为子命令的功能。
-
-这并不影响你按照常规方案为 `jump` 增加固定的子命令 `to`：
+The example app `dyncmd-cfg` in [hedzr/cmdr-tests](https://github.com/hedzr/cmdr-tests) shows how to add alias commands.
 
 <Tabs items={['main.go', 'cmd/all.go', 'cmd/jump.go', 'project layout']} default>
 <Tab value="main.go">
@@ -160,23 +156,23 @@ func (jumpCmd) Add(app cli.App) {
 
 </Tabs>
 
-`OnEvaluateSubCommandsFromConfigPath()` 将会从给定的 Store dottedPath 处载入别名清单。
+The notable point is `OnEvaluateSubCommandsFromConfigPath()`, which will load alias command from a special section in the config files.
 
-如果省却了参数，它就会从 `app.alias` section 读取别名清单，对应于配置文件中的 `[alias]` 区块。这一特性基本等价于 git alias 方案。
+If nothing specified, dottedPath `app.alias` would be applied. This means section `[alias]` in a config file will be read.
 
-在别名清单中，每个键值对对应于一条子命令。值字符串代表着要执行的 Action：
+The feature is inspired from `git` cli app and its `[alias]` section inside `$HOME/.gitconfig`.
 
-- 前缀 `>` 代表着将要转发到另一个子命令
-- 前缀 `!` 代表着将要执行一个应用程序。`"! say hello"` 等效于语音播报“hello”（仅限于 macOS）；而 `"! bash -c "`
-- 没有任何前缀，代表要执行一条 Shell 命令（例如 echo ok）
+### Details
 
-执行一个应用程序，意味着你可以启动一个 GUI app。此时将不会分配控制台。
+In `alias` section, each key and value is mapped into a subcmd. The value string is the action of the subcmd, which is a shell script. The prefix of the value string has special purpose:
 
-执行一条 Shell 命令，隐含着分配控制台和在 Shell 中进行命令运行。
+- `>`: redirect to another command, with dottedPath form.
+- `!`: invoke a gui app or a program. For example, `"! say hello"` will play voice with text `hello` (only worked for macOS); `"! bash -c "ls /"` can invoke `ls` in bash env.
+- `(no prefix)`: invoke a shell script within standard shell env.
 
-#### 别名命令清单
+#### Alias list for `dyncmd-cfg` app
 
-cmdr-tests 在 `./ci/etc/dyncmd-cfg` 中附加了标准结构的 etc 配置文件表，其中 `[alias]` 一节定义了别名命令清单。
+In the directory `./ci/etc/dyncmd-cfg`, there is the config files for `dyncmd-cfg`, with standard layout. The `[alias]` section is defined inside `dyncmd-cfg.toml`.
 
 <Tabs items={['dyncmd-cfg.toml', 'conf.d/01.logging.toml', 'conf.d/11.main.toml', 'Layout']} default>
 <Tab value="Layout">
@@ -235,11 +231,11 @@ port = 3000
 
 </Tabs>
 
-它们将会被在运行时动态载入为 `jump` 的子命令。
+The alias commands will be attached to `jump` command.
 
-### 运行时
+### Run
 
-上面的示例程序的运行时效果如同这样：
+The result is,
 
 ```bash
 $ go run ./examples/dyncmd-cfg jump
@@ -277,22 +273,14 @@ exit status 1
 $
 ```
 
-从帮助屏中可以看到定义在 `./ci/etc/dyncmd-cfg/dyncmd-cfg.toml` 中 `[alias]` 段中的别名命令都被成功地加载了。
+It shows everything is okay.
 
-而运行 `jump jc` 将会重定向到新的子命令序列 `jump to`，
-运行 `jump ls` 则会执行 shell 命令行序列 `ls -laG`。
+### Implements
 
-### 实现方法
-
-从基本面上讲，cmdr 内置的 `OnEvaluateSubCommandsFromConfig("alias")`
-是在 pre 阶段的末尾进行配置树扫描，然后逐一构造子命令并添加到所属的父级命令之下。
+The key method `OnEvaluateSubCommandsFromConfig("alias")` is used for enabling alias commands.
 
 ```go
 OnEvaluateSubCommandsFromConfig().
 ```
-
-由于潜在的冲突的可能，所以 cmdr 为子命令定义一个 `alias-XXX` 的 Long Title，同时指定该子命令的 name 为 `XXX`。
-
-这一行为导致更少的冲突可能性，但不影响帮助屏显示与命令匹配。
 
 <include>../../headless/cmdr-guide-concepts-command.mdx</include>
