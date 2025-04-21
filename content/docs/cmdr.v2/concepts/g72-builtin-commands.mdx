@@ -13,9 +13,9 @@ description: provided by cmdr
 
 ### Commands
 
-- `generate` (NOT-YET)
+- `generate`
   - `manual`
-  - `doc`
+  - `doc` (NOT-YET)
   - `shell`
 - `sbom`
 - `version`
@@ -115,9 +115,90 @@ SBOM:
 
 此信息可以被集成到供应链管理系统中。
 
-#### `generate` Command (NOT-YET)
+#### `generate` Command
 
 `gen` 命令的主要用途是生成 man 手册，以及生成自动完成脚本。
+
+##### `generate doc` (NOT-YET)
+
+在 cmdr.v1，这个命令主要用于生成 markdown 页面。
+
+但在 cmdr.v2，它没有被实现。相应计划暂时不会提上日程。
+
+##### `generate man`
+
+为你的 app 的全部命令创建相应的 manpage 页面。例如对于 `jump to` 命令会生成名为 `app-jump-to.man` 的文件，此外，对于根命令来说，会生成 `app.man` 文件。
+
+这些文件通常应该被部署到 `man/man1/app/` 中，对于典型的 GNU-like 系统，Linux-like 系统，或者 Unix-like 系统来说，经常可能被部署到 MANPAGE 环境变量所指向的目录中。为了确认哪些文件夹被用于放置 manpages，你可以运行系统自带的命令 `manpath` 来获得信息：
+
+```bash
+$ manpath
+/usr/local/man:/usr/local/share/man:/usr/share/man
+```
+
+有的时候，也可以这样来确定：
+
+```bash
+$ whereis man
+man: /usr/bin/man /usr/local/man /usr/share/man /usr/share/man/man1/man.1.gz /usr/share/man/man7/man.7.gz
+```
+
+默认时，`generate man` 在当前文件夹中创建子目录 `man1` 来放置将要生成的 manpages，你可以稍后处理这些输出文件。一个实际运行的例子看起来像这样：
+
+```bash
+$ go build -o ./bin/ ./examples/blueprint/
+$ ./bin/blueprint g m -a
+# generating manpages (output-dir: ./man1, all: true) ...
+#    writing to man1/blueprint.man...
+#    writing to man1/blueprint-soundex.man...
+#    writing to man1/blueprint-jump.man...
+#    writing to man1/blueprint-jump-to.man...
+#    writing to man1/blueprint-wrong.man...
+#    writing to man1/blueprint-invoke.man...
+#    writing to man1/blueprint-invoke-shell.man...
+#    writing to man1/blueprint-invoke-proc.man...
+#    writing to man1/blueprint-preset.man...
+#    writing to man1/blueprint-preset-cmd.man...
+#    writing to man1/blueprint-sbom.man...
+#    writing to man1/blueprint-generate.man...
+#    writing to man1/blueprint-generate-manual.man...
+#    writing to man1/blueprint-generate-doc.man...
+#    writing to man1/blueprint-generate-shell.man...
+#    writing to man1/blueprint-version.man...
+#    writing to man1/blueprint-help.man...
+#    DONE.
+$
+```
+
+See also:
+
+- [Linux 命令 man 全知全会](https://hedzr.com/devops/linux/linux-man-command/)
+
+##### `generate shell`
+
+cmdr.v2 和 v1 现在（v2.1.11）完成了 Shell 自动完成脚本的生成。
+
+一般来说，你可以自动部署 `自动完成脚本` 到你的 zsh 环境：
+
+```bash
+$ ./bin/blueprint gen sh
+...
+# "/Users/hz/.oh-my-zsh/cache/completions/_blueprint" generated.
+# Re-login to enable the new zsh completion script.
+```
+
+但对于其他 Shell 环境来说，你可能需要手动部署生成的 `自动完成脚本` 文件到恰当的位置。
+
+`app generate shell` 会自动检测下列 shell 环境，并试图为你完成大多数任务：
+
+- zsh
+- bash
+- fish
+- elvish (NOT YET)
+- fig-shell (NOT YET)
+- powershell
+
+理论上，这些 shell 中的自动完成特性将被正确激活。但遗憾的是，我们没有对诸如 fish，powershell 等环境做充分的测试。
 
 ### Flags
 
