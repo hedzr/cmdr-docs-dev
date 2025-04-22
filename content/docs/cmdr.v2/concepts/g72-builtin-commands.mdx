@@ -170,6 +170,20 @@ $ ./bin/blueprint g m -a
 $
 ```
 
+:::tip
+
+对于终端用户来说，他们可以以 manpage 方式阅读和查看帮助屏:
+
+```bash
+app cmd --help --man
+```
+
+`--man` 的目的是让 cmdr 将帮助屏以 manpage 格式方式直接输出给 `man` 命令。
+
+> 尽管如此，在产品发布时部署全套的 man 1 pages 是开发者应尽的义务。因为只有这样，`man 1 app` 才能工作，同时用户也才能在 man 阅读系统中导航和查看更多的相关命令。
+
+:::
+
 See also:
 
 - [Linux 命令 man 全知全会](https://hedzr.com/devops/linux/linux-man-command/)
