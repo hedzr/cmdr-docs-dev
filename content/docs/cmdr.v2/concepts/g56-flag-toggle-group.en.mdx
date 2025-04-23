@@ -17,6 +17,8 @@ Generally, both these flags should have a boolean default value. And only one fl
 
 In phase invoking `OnAction`, the final value of the toggale group can be read by `cmd.Store().MustBool(toggleGroupName)`.
 
+Since v2.1.16, `Multiple Selections` for a `Toggle Group` is avaliable: the final selected items can be read by `cmd.Store().MustStringSlice(toggleGroupName+".selected")`.
+
 A sample here,
 
 <Tabs items={['main.go', 'toggle-group.go']}>
@@ -97,29 +99,29 @@ func AddToggleGroupCommand(parent cli.CommandBuilder) { //nolint:revive
 		Description("toggable group, with a default choice", "tg test new features,\nverbose long descriptions here.").
 		Group("Toggleable Group").
 		OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
-			fmt.Printf("*** Got fruit (toggle group): %v\n", cmd.Store().MustString("fruit"))
+			fmt.Printf("*** Got fruit (toggle group): %q\n", cmd.Store().MustString(toggleGroupName))
+			fmt.Printf("         multiple selections: %q\n", cmd.Store().MustStringSlice(toggleGroupName+".selected"))
 
+			println()
 			// fmt.Printf("> STDIN MODE: %v \n", cmd.Set().MustBool("mx-test.stdin"))
 			// fmt.Println()
-
-			_, _ = cmd, args
 			return
 		}).
 		With(func(cb cli.CommandBuilder) {
 			cb.Flg("apple", "").
 				Default(false).
 				Description("the test text.", "").
-				ToggleGroup("fruit").
+				ToggleGroup(toggleGroupName).
 				Build()
 			cb.Flg("banana", "").
 				Default(false).
 				Description("the test text.", "").
-				ToggleGroup("fruit").
+				ToggleGroup(toggleGroupName).
 				Build()
 			cb.Flg("orange", "").
 				Default(true).
 				Description("the test text.", "").
-				ToggleGroup("fruit").
+				ToggleGroup(toggleGroupName).
 				Build()
 		})
 
@@ -129,28 +131,29 @@ func AddToggleGroupCommand(parent cli.CommandBuilder) { //nolint:revive
 		Description("toggable group 2, without default choice", "tg2 test new features,\nverbose long descriptions here.").
 		Group("Toggleable Group").
 		OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
-			fmt.Printf("*** Got fruit (toggle group): %v\n", cmd.Store().MustString("fruit"))
-			_, _ = cmd, args
+			fmt.Printf("*** Got fruit (toggle group): %q\n", cmd.Store().MustString(toggleGroupName))
+			fmt.Printf("         multiple selections: %q\n", cmd.Store().MustStringSlice(toggleGroupName+".selected"))
 
-			fmt.Printf("> STDIN MODE: %v \n", cmd.Set().MustBool("mx-test.stdin"))
-			fmt.Println()
+			println()
+			// fmt.Printf("> STDIN MODE: %v \n", cmd.Set().MustBool("mx-test.stdin"))
+			// fmt.Println()
 			return
 		}).
 		With(func(cb cli.CommandBuilder) {
 			cb.Flg("apple", "a").
 				Default(true).
 				Description("the test text.", "").
-				ToggleGroup("fruit").
+				ToggleGroup(toggleGroupName).
 				Build()
 			cb.Flg("banana", "b").
 				Default(false).
 				Description("the test text.", "").
-				ToggleGroup("fruit").
+				ToggleGroup(toggleGroupName).
 				Build()
 			cb.Flg("orange", "o").
 				Default(false).
 				Description("the test text.", "").
-				ToggleGroup("fruit").
+				ToggleGroup(toggleGroupName).
 				Build()
 		})
 }
@@ -159,24 +162,26 @@ func AddToggleGroupFlags(c cli.CommandBuilder) { //nolint:revive
 	c.Flg("apple", "a").
 		Default(false).
 		Description("the test text.", "").
-		ToggleGroup("fruit").
+		ToggleGroup(toggleGroupName).
 		Group("Toggleable Group").
 		Build()
 
 	c.Flg("banana", "b").
 		Default(false).
 		Description("the test text.", "").
-		ToggleGroup("fruit").
+		ToggleGroup(toggleGroupName).
 		Group("Toggleable Group").
 		Build()
 
 	c.Flg("orange", "o").
 		Default(true).
 		Description("the test text.", "").
-		ToggleGroup("fruit").
+		ToggleGroup(toggleGroupName).
 		Group("Toggleable Group").
 		Build()
 }
+
+const toggleGroupName = "fruit"
 ```
 
 </Tab>
@@ -188,7 +193,7 @@ In the help screen, the flags in a toggle group will be shown with a leading che
 
 ```bash
 $ go run ./examples/toggle-group tg2 --help
-toggle-group v2.1.0 ~ Copyright © 2025 by The Example Authors ~ All Rights Reserved.
+toggle-group v2.1.16 ~ Copyright © 2025 by The Example Authors ~ All Rights Reserved.
 
 Usage:
 
@@ -212,9 +217,13 @@ Global Flags:
 Type '-h'/'-?' or '--help' to get command help screen.
 More: '-D'/'--debug', '-V'/'--version', '-#'/'--build-info', '--no-color'...
 
-$ go run ./examples/toggle-group tg2 -b
-*** Got fruit (toggle group): banana
-> STDIN MODE: false
+$ go run ./examples/toggle-group tg2 --banana --orange
+*** Got fruit (toggle group): "orange"
+         multiple selections: ["banana" "orange"]
+
+$ go run ./examples/toggle-group tg2 --banana
+*** Got fruit (toggle group): "banana"
+         multiple selections: ["banana"]
 
 $
 ```

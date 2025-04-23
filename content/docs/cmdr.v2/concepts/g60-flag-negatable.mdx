@@ -5,6 +5,8 @@ description: Negatable Flag with `--no-` prefix
 
 ## Negatable 自动否定
 
+### 常规方式
+
 ```go
 b.Flg("warning", "w").
 	Description("negatable flag: <code>--no-warning</code> is available", "").
@@ -25,9 +27,29 @@ cmdr 将会为 `--warning` 自动生成一个隐性的标志对象 `--no-warning
 
 通常来说，带有自动否定风格的标志必须具有 bool 默认值。
 
+### `-W` 风格
+
+```go
+parent.Flg("warnings", "W").
+  Description("gcc-style negatable flag: <code>-Wunused-variable</code> and -Wno-unused-variable", "").
+  Group("Negatable").
+  Negatable(true, "unused-variable", "unused-parameter", "unused-function", "unused-but-set-variable", "unused-private-field", "unused-label").
+  Default(false).
+  Build()
+```
+
+一个具有 `-W` 风格的自动否定标志，允许你指定一组条目作为其后缀。
+
+cmdr 将会为这些后缀自动建立一对正反对应的可翻转标志，例如 `--warnings.unused-variable`/`-Wunused-variable` 和 `--warnings.no-unused-variable`/`-Wno-unused-variable`。如是类推之。
+
+熟悉 gcc 开发的你将会对此毫无意外，这种 `-W` 风格几乎完全模仿 `gcc -Waddress -Wno-address` 标志风格。
+
+你所需要做的只是声明一个主条目，然后在 `.Negatable(true, ...)` 调用中插入需要拓展的子条目项。
+
 ### 定义
 
 `.Negatable(true).Default(false)` 可以为标志设置 Negatable 风格。
+`.Negatable(true, "a","b","c").Default(false)` 可以为标志设置 `-W` Style Negatable 风格。
 
 <Tabs items={['main.go', 'negatable.go']}>
 
@@ -57,17 +79,73 @@ const (
 func main() {
 	app := cmdr.Create(appName, version, author, desc).
 		With(func(app cli.App) { logz.Debug("in dev mode?", "mode", devmode.InDevelopmentMode()) }).
-		// [!code highlight]
 		WithBuilders(examples.AddNegatableFlag).
-		// WithAdders().
+		WithAdders().
 		// override the onAction defined in examples.AddNegatableFlag()
 		OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
 			// logz.PrintlnContext(ctx, cmd.Set().Dump())
 
-			v := cmd.Store().MustBool("warning")
-			w := cmd.Store().MustBool("no-warning")
-			println("warning flag: ", v)
-			println("no-warning flag: ", w)
+			// v := cmd.Store().MustBool("warning")
+			// w := cmd.Store().MustBool("no-warning")
+			// println("warning flag: ", v)
+			// println("no-warning flag: ", w)
+
+			// wf := cmd.FlagBy("warning")
+			// if wf != nil && wf.LeadingPlusSign() {
+			// 	println("warning flag with leading plus sign: +w FOUND.")
+			// }
+			// return
+
+			println("Dumping Store ----------\n", cmdr.Set().Dump())
+
+			cmd.App().DoBuiltinAction(ctx, cli.ActionDefault)
+
+			cs := cmd.Store()
+
+			v := cs.MustBool("warning")
+			w := cs.MustBool("no-warning")
+			println("warning toggle group: ", cs.MustString("warning"))
+			println("  warning flag: ", v)
+			println("  no-warning flag: ", w)
+
+			wf := cmd.FlagBy("warning")
+			if wf != nil && wf.LeadingPlusSign() {
+				println()
+				println("NOTABLE: a flag with leading plus sign: +w FOUND.")
+			} else {
+				logz.WarnContext(ctx, "cannot found flag 'warning'")
+			}
+
+			sw1 := cs.MustBool("warnings.unused-variable")
+			sw2 := cs.MustBool("warnings.unused-parameter")
+			sw3 := cs.MustBool("warnings.unused-function")
+			sw4 := cs.MustBool("warnings.unused-but-set-variable")
+			sw5 := cs.MustBool("warnings.unused-private-field")
+			sw6 := cs.MustBool("warnings.unused-label")
+			fmt.Printf(`
+
+--warnings, -W:
+    > TG: %q
+    > TG.selected: %q
+	unused-variable:		%v, (no-): %v
+	unused-parameter:		%v, (no-): %v
+	unused-function:		%v, (no-): %v
+	unused-but-set-variable:	%v, (no-): %v
+	unused-private-field:		%v, (no-): %v
+	unused-label:			%v, (no-): %v
+	selected items:			%v
+`,
+				cs.MustString("warnings"),
+				cs.MustStringSlice("warnings.selected"),
+				sw1, cs.MustBool("warnings.no-unused-variable"),
+				sw2, cs.MustBool("warnings.no-unused-parameter"),
+				sw3, cs.MustBool("warnings.no-unused-function"),
+				sw4, cs.MustBool("warnings.no-unused-but-set-variable"),
+				sw5, cs.MustBool("warnings.no-unused-private-field"),
+				sw6, cs.MustBool("warnings.no-unused-label"),
+				cs.MustStringSlice("warnings.selected"),
+			)
+
 			return
 		}).
 		Build()
@@ -100,12 +178,19 @@ import (
 func AddNegatableFlag(parent cli.CommandBuilder)           { AddNegatableFlagImpl(parent) }
 func AddNegatableFlagWithoutCmd(parent cli.CommandBuilder) { AddNegatableFlagImpl(parent, true) }
 
-func AddNegatableFlagImpl(parent cli.CommandBuilder, dontHandlingParentCmd ...bool) {
-	// [!code highlight:6]
+func AddNegatableFlagImpl(parent cli.CommandBuilder, dontHandlingParentCmd ...bool) { //nolint:revive
 	parent.Flg("warning", "w").
 		Description("negatable flag: <code>--no-warning</code> is available", "").
 		Group("Negatable").
+		LeadingPlusSign(true).
 		Negatable(true).
+		Default(false).
+		Build()
+
+	parent.Flg("warnings", "W").
+		Description("gcc-style negatable flag: <code>-Wunused-variable</code> and -Wno-unused-variable", "").
+		Group("Negatable").
+		Negatable(true, "unused-variable", "unused-parameter", "unused-function", "unused-but-set-variable", "unused-private-field", "unused-label").
 		Default(false).
 		Build()
 
@@ -117,13 +202,49 @@ func AddNegatableFlagImpl(parent cli.CommandBuilder, dontHandlingParentCmd ...bo
 	}
 	if !noHpc {
 		// give root command an action to handle it
-		parent.OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
-			v := cmd.Store().MustBool("warning")
-			w := cmd.Store().MustBool("no-warning")
+		action := func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+			println("Dumping Store\n", cmd.App().Store().Dump())
+
+			cs := cmd.Store()
+
+			v := cs.MustBool("warning")
+			w := cs.MustBool("no-warning")
 			println("warning flag: ", v)
 			println("no-warning flag: ", w)
+			wf := cmd.FlagBy("warning")
+			if wf != nil && wf.LeadingPlusSign() {
+				println("warning flag with leading plus sign: +w FOUND.")
+			}
+
+			sw1 := cs.MustBool("warnings.unused-variable")
+			sw2 := cs.MustBool("warnings.unused-parameter")
+			sw3 := cs.MustBool("warnings.unused-function")
+			sw4 := cs.MustBool("warnings.unused-but-set-variable")
+			sw5 := cs.MustBool("warnings.unused-private-field")
+			sw6 := cs.MustBool("warnings.unused-label")
+			fmt.Printf(`
+
+--warnings, -W:
+	unused-variable:			%v, (no-): %v
+	unused-parameter:			%v, (no-): %v
+	unused-function:			%v, (no-): %v
+	unused-but-set-variable:	%v, (no-): %v
+	unused-private-field:		%v, (no-): %v
+	unused-label:				%v, (no-): %v
+	selected items:				%v
+`,
+				sw1, cs.MustBool("warnings.no-unused-variable"),
+				sw2, cs.MustBool("warnings.no-unused-parameter"),
+				sw3, cs.MustBool("warnings.no-unused-function"),
+				sw4, cs.MustBool("warnings.no-unused-but-set-variable"),
+				sw5, cs.MustBool("warnings.no-unused-private-field"),
+				sw6, cs.MustBool("warnings.no-unused-label"),
+				cs.MustStringSlice("warnings.selected"),
+			)
 			return
-		})
+		}
+
+		parent.OnAction(action)
 	}
 
 	parent.Examples(`Try to use negatable flag,
@@ -145,11 +266,71 @@ func AddNegatableFlagImpl(parent cli.CommandBuilder, dontHandlingParentCmd ...bo
 
 ```bash
 $ go run ./examples/negatable --no-warning
-warning flag:  false
-no-warning flag:  true
+warning toggle group:  no-warning
+  warning flag:  false
+  no-warning flag:  true
+...
 $ go run ./examples/negatable --warning
-warning flag:  true
-no-warning flag:  false
+warning toggle group:  true
+  warning flag:  true
+  no-warning flag:  false
+...
+$
+$ go run ./examples/negatable +w -Wunused-variable -Wunused-function -h
+negatable v2.1.16 ~ Copyright © 2025 by negatable Authors ~ All Rights Reserved.
+
+Usage:
+
+  $ negatable  [Options...][files...]
+
+Description:
+
+  a sample to demo negatable flag.
+
+Examples:
+
+  Try to use negatable flag,
+
+    $ negatable --no-warning
+      cmd.Store().MustBool("no-warning") will be 'true'.
+    $ negatable --warning
+      cmd.Store().MustBool("warning") will be 'true'.
+
+Global Flags:
+
+  [Negatable]
+    -w, --warning                             [x] negatable flag: --no-warning is available (Default: true)
+    -W, --warnings                            [ ] gcc-style negatable flag: -Wunused-variable and -Wno-unused-variable (Default: false)
+  [Misc]
+    -h, --help,--info,--usage                 Show this help screen (-?) [Env: HELP] (Default: false)
+
+Type '-h'/'-?' or '--help' to get command help screen.
+More: '-D'/'--debug', '-V'/'--version', '-#'/'--build-info', '--no-color'...
+
+$
+$ go run ./examples/negatable +w -Wunused-variable -Wunused-function
+...
+--warnings, -W:
+    > TG: "false"
+    > TG.selected: ["warnings.unused-variable" "warnings.unused-function"]
+        unused-variable:                true, (no-): false
+        unused-parameter:               false, (no-): true
+        unused-function:                true, (no-): false
+        unused-but-set-variable:        false, (no-): true
+        unused-private-field:           false, (no-): true
+        unused-label:                   false, (no-): true
+$
+$ go run ./examples/negatable +w -Wunused-variable -Wno-unused-function --warnings.unused-label
+...
+--warnings, -W:
+    > TG: "false"
+    > TG.selected: ["warnings.unused-variable" "warnings.no-unused-function" "warnings.unused-label"]
+        unused-variable:                true, (no-): false
+        unused-parameter:               false, (no-): true
+        unused-function:                false, (no-): true
+        unused-but-set-variable:        false, (no-): true
+        unused-private-field:           false, (no-): true
+        unused-label:                   true, (no-): false
 $
 ```
 
