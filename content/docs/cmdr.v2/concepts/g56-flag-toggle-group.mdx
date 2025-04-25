@@ -34,7 +34,7 @@ import (
 
 	"github.com/hedzr/cmdr/v2"
 	"github.com/hedzr/cmdr/v2/cli"
-	"github.com/hedzr/cmdr/v2/examples"
+	"github.com/hedzr/cmdr/v2/examples/common"
 	logz "github.com/hedzr/logg/slog"
 )
 
@@ -49,7 +49,7 @@ func main() {
 	app := cmdr.Create(appName, version, author, desc).
 		With(func(app cli.App) {}).
 		// [!code highlight]
-		WithBuilders(examples.AddToggleGroupCommand).
+		WithBuilders(common.AddToggleGroupCommand).
 		WithAdders().
 		Build()
 
@@ -83,12 +83,12 @@ import (
 //
 // Sample code,
 //
-//	app.RootBuilder(examples.AddToggleGroupCommand)
+//	app.RootBuilder(common.AddToggleGroupCommand)
 //
 // Or,
 //
 //	app := cmdr.Create(appName, version, author, desc).
-//		WithBuilders(examples.AddToggleGroupCommand).
+//		WithBuilders(common.AddToggleGroupCommand).
 //		Build()
 //	app.Run(context.TODO())
 func AddToggleGroupCommand(parent cli.CommandBuilder) { //nolint:revive
