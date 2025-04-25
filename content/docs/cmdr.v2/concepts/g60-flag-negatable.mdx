@@ -29,6 +29,8 @@ cmdr 将会为 `--warning` 自动生成一个隐性的标志对象 `--no-warning
 
 ### `-W` 风格
 
+这一特性自 v2.1.16 开始加入。
+
 ```go
 parent.Flg("warnings", "W").
   Description("gcc-style negatable flag: <code>-Wunused-variable</code> and -Wno-unused-variable", "").
