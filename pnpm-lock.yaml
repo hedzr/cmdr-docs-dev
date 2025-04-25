@@ -80,6 +80,9 @@ importers:
       fumadocs-openapi:
         specifier: ^8.1.2
         version: 8.1.2(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)(ajv@8.17.1)(next@15.3.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.4)
+      fumadocs-typescript:
+        specifier: ^4.0.3
+        version: 4.0.3(typescript@5.8.3)
       fumadocs-ui:
         specifier: 15.2.11
         version: 15.2.11(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)(next@15.3.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.4)
@@ -2088,6 +2091,11 @@ packages:
     peerDependenciesMeta:
       '@scalar/api-client-react':
         optional: true
+
+  fumadocs-typescript@4.0.3:
+    resolution: {integrity: sha512-ZrKxYtjtuEe4Cim0c6fU6yrEJITAaPuOaztwN1ORMMrxVs7GV/sY2iafZChDBJPDZ+pHdPIZzkKqJOsIa0EdEA==, tarball: https://registry.npmmirror.com/fumadocs-typescript/-/fumadocs-typescript-4.0.3.tgz}
+    peerDependencies:
+      typescript: '*'
 
   fumadocs-ui@15.2.11:
     resolution: {integrity: sha512-0m9L0zPQHXyJocSS8vWhXCb/GvfD8IMdSUTIWLGirczN59TDMmJ3QgDIgAegO8IF/StxtUY5/REcq4mtQnxahg==, tarball: https://registry.npmmirror.com/fumadocs-ui/-/fumadocs-ui-15.2.11.tgz}
@@ -5215,6 +5223,21 @@ snapshots:
       - algoliasearch
       - supports-color
       - tailwindcss
+
+  fumadocs-typescript@4.0.3(typescript@5.8.3):
+    dependencies:
+      estree-util-value-to-estree: 3.3.3
+      fast-glob: 3.3.3
+      hast-util-to-estree: 3.1.3
+      hast-util-to-jsx-runtime: 2.3.6
+      remark: 15.0.1
+      remark-rehype: 11.1.2
+      shiki: 3.3.0
+      ts-morph: 25.0.1
+      typescript: 5.8.3
+      unist-util-visit: 5.0.0
+    transitivePeerDependencies:
+      - supports-color
 
   fumadocs-ui@15.2.11(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)(next@15.3.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.4):
     dependencies:

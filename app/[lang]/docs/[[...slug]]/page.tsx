@@ -1,13 +1,21 @@
 import { source } from "@/lib/source";
 import { prodMode } from "@/lib/utils";
 import { notFound } from "next/navigation";
+// import {
+//   DocsPage,
+//   DocsTitle,
+//   DocsDescription,
+//   DocsBody,
+//   DocsCategory,
+// } from "@/components/page";
 import {
   DocsPage,
   DocsTitle,
   DocsDescription,
   DocsBody,
-  DocsCategory,
-} from "@/components/page";
+  DocsPageProps,
+  withArticle,
+} from "fumadocs-ui/page";
 
 import { openapi } from "@/lib/source";
 import { metadataImage } from "@/lib/metadata";
@@ -34,6 +42,10 @@ import { ComponentProps, FC } from "react";
 import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
 
 import { Rate } from "@/components/rate";
+import { APIPage } from "fumadocs-openapi/ui";
+import { AutoTypeTable } from 'fumadocs-typescript/ui';
+import {getPageTreePeers} from "fumadocs-core/server";
+import {createGenerator} from "fumadocs-typescript";
 
 const get = (fm: any, v: string) => {
   return v in fm ? fm[v] : "";
@@ -117,7 +129,7 @@ export default async function Page(props: {
             // AutoTypeTable,
             Accordion,
             Accordions,
-            Wrapper,
+            // Wrapper,
             File,
             Folder,
             Files,
@@ -130,9 +142,22 @@ export default async function Page(props: {
             InlineTOC,
             // Code,
             // CodeWithTabs,
-            blockquote: Callout as unknown as FC<ComponentProps<"blockquote">>,
-            APIPage: openapi.APIPage,
-            DocsCategory: () => <DocsCategory page={page} from={source} />,
+            // blockquote: Callout as unknown as FC<ComponentProps<"blockquote">>,
+            // APIPage: openapi.APIPage,
+            // DocsCategory: () => <DocsCategory page={page} from={source} />,
+            AutoTypeTable: (props) => (
+              <AutoTypeTable generator={generator} {...props} />
+            ),
+            Wrapper,
+            blockquote: Callout as unknown as FC<ComponentProps<'blockquote'>>,
+            APIPage: (props) => <APIPage {...openapi.getAPIPageProps(props)} />,
+            DocsCategory: ({ url }) => {
+              return <DocsCategory url={url ?? page.url} locale={params.lang} />;
+            },
+            // UiOverview,
+
+            // ...(await import('@/content/docs/ui/components/tabs.client')),
+            // ...(await import('@/content/docs/ui/theme.client')),
           }}
         />
         {/*{page.data.index ? <DocsCategory page={page} from={source} /> : null}*/}
@@ -150,6 +175,20 @@ export default async function Page(props: {
       />
       <HandlingKeyboardLeftAndRight />
     </DocsPage>
+  );
+}
+
+const generator = createGenerator();
+
+function DocsCategory({ url, locale }: { url: string; locale: string }) {
+  return (
+    <Cards>
+      {getPageTreePeers(source.getPageTree(locale), url).map((peer) => (
+        <Card key={peer.url} title={peer.name?.toLocaleString()} href={peer.url}>
+          {peer.description}
+        </Card>
+      ))}
+    </Cards>
   );
 }
 
