@@ -21,6 +21,8 @@ description: the differences between ...
 
 但对于 `DynCommand` 来说，`cmd.App()` 有可能没有正确值，这取决于 litecmd.go 中如何实现一个相似的 `Cmd` 对象结构。
 
+> 在当前的 `liteCmdS` 实现中，没有维持正确的 root 信息，所以它的 `App()` 接口可能无法正确返回对象。
+
 在这种情况下，`cmd.Root().App()` 就是取得 app 实例的正确方式，而 `cmd.App()` 可能并未得到正确值。
 
 其原因在于，`cmd.Root()` 获得的 `RootCommand` 是 cmdr 内置对象，它完全遵守了协议，对 Root，Owner，App 等关联对象的连接是被 cmdr 所正确约束的。
