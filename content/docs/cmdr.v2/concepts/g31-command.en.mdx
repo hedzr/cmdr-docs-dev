@@ -118,4 +118,79 @@ The app runs as:
 
 See it at [lots-of-subcommands](./g20-lots-of-subcommands).
 
+### Colorful fields
+
+Before `Description` was been displaying, it will be formatted by color `Translator` in `is/term/color`.
+So it's colorful.
+
+The translating microcodes includes a tiny html tag expander. That is saying, these following codes works well:
+
+```go
+    // or:
+    //    is.Color().GetColorTranslator().Translate("<b>bold</b>")
+    fmt.Printf("%v", color.GetCPT().Translate(`
+        <code>code</code> | <kbd>CTRL</kbd>
+        <b>bold / strong / em</b>
+        <i>italic / cite</i>
+        <u>underline</u>
+        <mark>inverse mark</mark>
+        <del>strike / del </del>
+        <font color="green">green text</font>
+`, color.FgDefault))
+```
+
+The corresponding output on a colorful terminal simulator would be:
+
+![](/images/cmdr/v2/is-colorful.png)
+
+For more details please see readme of [`hedzr/is`](https://github.com/hedzr/is).
+
+Except for `Description` field, This features also works for these fields: `Header`, `Footer` and `Examples`, and so on.
+
+### Expanding envvar at displaying
+
+At displaying time, for instace help screen printing, the environment variables will be expanded for those large text fields:
+`Description` (single line or multiple lines), `Examples`, `Note`, and so on.
+
+The behavior includes two actions:
+
+1. The `$AppName` text will be expanded by `os.ExpandEnv()`,
+2. The `{ {.AppNmae}}` text will be expanded by a `text.Template` engine.
+
+In the first form, which variables could be expanded, were decided by your shell. Besides these, cmdr also injects some extra variables into the running env. It includes,
+
+```bash
+  CMDR_VERSION = v2.1.16
+  STORE_VERSION = v1.3.15
+  APP = blueprint
+  APPNAME = blueprint
+  APP_NAME = blueprint
+  APP_VER = v2.1.16
+  APP_VERSION = v2.1.16
+  EXE = /var/folders/zv/5r7hq8bs6qs3cx2z743t_3_h0000gn/T/go-build4111051262/b001/exe/blueprint
+  EXE_DIR = /var/folders/zv/5r7hq8bs6qs3cx2z743t_3_h0000gn/T/go-build4111051262/b001/exe
+  CONFIG_DIR = /Users/hz/.config/blueprint
+  CACHE_DIR = /Users/hz/.cache/blueprint
+  COMMON_SHARE_DIR = /usr/local/share/blueprint
+  LOCAL_SHARE_DIR = /Users/hz/.local/share/blueprint
+  DATA_DIR = /Users/hz/.local/share/blueprint
+  TEMP_DIR = /var/folders/zv/5r7hq8bs6qs3cx2z743t_3_h0000gn/T/blueprint
+```
+
+You could get an exact list of them by running `app ~~debug ~~env`.
+
+In the second form, the variables are specified by a `struct` definition:
+
+```go
+struct {
+  AppName     string
+  AppVersion  string
+  DadCommands string // for curr-cmd is `jump to`: "jump"
+  Commands    string // for curr-cmd is `jump to`: "jump to"
+  *parseCtx
+}
+```
+
+To see its source code, go and surf [`func (s *parseCtx) Translate(pattern string) (result string)`](https://github.com/hedzr/cmdr/blob/master/cli/worker/parse_ctx.go#L55).
+
 <include>../../headless/cmdr-guide-concepts-command.mdx</include>

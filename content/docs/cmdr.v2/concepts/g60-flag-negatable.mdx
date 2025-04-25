@@ -29,6 +29,8 @@ cmdr 将会为 `--warning` 自动生成一个隐性的标志对象 `--no-warning
 
 ### `-W` 风格
 
+这一特性自 v2.1.16 开始加入。
+
 ```go
 parent.Flg("warnings", "W").
   Description("gcc-style negatable flag: <code>-Wunused-variable</code> and -Wno-unused-variable", "").
@@ -64,7 +66,7 @@ import (
 
 	"github.com/hedzr/cmdr/v2"
 	"github.com/hedzr/cmdr/v2/cli"
-	"github.com/hedzr/cmdr/v2/examples"
+	"github.com/hedzr/cmdr/v2/examples/common"
 	"github.com/hedzr/cmdr/v2/examples/devmode"
 	// logz "github.com/hedzr/logg/slog"
 )
@@ -79,9 +81,9 @@ const (
 func main() {
 	app := cmdr.Create(appName, version, author, desc).
 		With(func(app cli.App) { logz.Debug("in dev mode?", "mode", devmode.InDevelopmentMode()) }).
-		WithBuilders(examples.AddNegatableFlag).
+		WithBuilders(common.AddNegatableFlag).
 		WithAdders().
-		// override the onAction defined in examples.AddNegatableFlag()
+		// override the onAction defined in common.AddNegatableFlag()
 		OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
 			// logz.PrintlnContext(ctx, cmd.Set().Dump())
 

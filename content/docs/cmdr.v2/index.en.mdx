@@ -7,6 +7,22 @@ description: cmdr is a POSIX-compliant command-line argument parser and app fram
 
 Welcome to the docs! Here is a manual about cmdr, which provides command-line argument parser to help your CLI app developing.
 
+### News about The Documentation and cmdr.v2
+
+#### About Documentation
+
+This documentation updated all of sample codes to v2.1.16.
+
+Since cmdr v2.1.16, all `examples/*.go` are removed into `examples/common/`. It caused because some cycle imports could destory the relations while we are sharing some testing codes.
+
+The notable point is the planned releasing of cmdr v2.1.16 is in working.
+
+#### About cmdr.v2
+
+See its CHANGELOG [Here](https://github.com/hedzr/cmdr/blob/master/CHANGELOG).
+
+## Overview
+
 Writing a tiny CLI app with cmdr is easy. Here it is,
 
 ```go title="./examples/tiny0/main.go"

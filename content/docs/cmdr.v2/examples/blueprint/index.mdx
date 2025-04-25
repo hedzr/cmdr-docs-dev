@@ -71,11 +71,11 @@ func prepareApp(commands ...cli.CmdAdder) cli.App {
 		// importing devmode package and run its init():
 		With(func(app cli.App) { logz.Debug("in dev mode?", "mode", devmode.InDevelopmentMode()) }).
 		WithBuilders(
-			// examples.AddHeadLikeFlagWithoutCmd, // add a `--line` option, feel free to remove it.
-			// examples.AddToggleGroupFlags,       //
-			// examples.AddTypedFlags,             //
-			// examples.AddKilobytesFlag,          //
-			// examples.AddValidArgsFlag,          //
+			// common.AddHeadLikeFlagWithoutCmd, // add a `--line` option, feel free to remove it.
+			// common.AddToggleGroupFlags,       //
+			// common.AddTypedFlags,             //
+			// common.AddKilobytesFlag,          //
+			// common.AddValidArgsFlag,          //
 		).
 		WithAdders(commands...).
 		Build()

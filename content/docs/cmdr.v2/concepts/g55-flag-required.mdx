@@ -29,7 +29,7 @@ import (
 
 	"github.com/hedzr/cmdr/v2"
 	"github.com/hedzr/cmdr/v2/cli"
-	"github.com/hedzr/cmdr/v2/examples"
+	"github.com/hedzr/cmdr/v2/examples/common"
 	"github.com/hedzr/is/term/color"
 	logz "github.com/hedzr/logg/slog"
 )
@@ -51,7 +51,7 @@ func main() {
 			})
 		}).
 		// [!code highlight]
-		WithBuilders(examples.AddRequiredFlag).
+		WithBuilders(common.AddRequiredFlag).
 		WithAdders().
 		Build()
 
@@ -92,12 +92,12 @@ import (
 //
 // Sample code,
 //
-//	app.RootBuilder(examples.AddRequiredFlag)
+//	app.RootBuilder(common.AddRequiredFlag)
 //
 // Or,
 //
 //	app := cmdr.Create(appName, version, author, desc).
-//		WithBuilders(examples.AddRequiredFlag).
+//		WithBuilders(common.AddRequiredFlag).
 //		Build()
 //	app.Run(context.TODO())
 func AddRequiredFlag(c cli.CommandBuilder) { //nolint:revive
