@@ -87,6 +87,17 @@ const config = {
   //   // ppr: 'incremental',
   // },
 
+  // experimental: {
+  //   turbo: {
+  //     rules: {
+  //       resolveAlias: {
+  //         underscore: "lodash",
+  //       },
+  //       resolveExtensions: [".mdx", ".tsx", ".ts", ".jsx", ".js", ".json"],
+  //     },
+  //   },
+  // },
+
   // disable static analysis
   // https://nextjs.org/docs/app/building-your-application/optimizing/memory-usage#disable-static-analysis
   eslint: {
@@ -183,6 +194,11 @@ const config = {
     return config;
   },
 };
+
+function fixtp(config) {
+  delete config["turbopack"];
+  return config;
+}
 
 // export default withMDX(config);
 export default withAnalyzer(
