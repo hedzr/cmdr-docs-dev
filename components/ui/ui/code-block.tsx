@@ -1,5 +1,5 @@
 import * as Base from 'fumadocs-ui/components/codeblock';
-import { highlight } from 'fumadocs-core/highlight';
+import { highlight } from 'fumadocs-core/server';
 
 export interface CodeBlockProps {
   code: string;
