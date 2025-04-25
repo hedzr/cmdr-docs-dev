@@ -116,6 +116,80 @@ Mandatory arguments to long options are mandatory for short options too.`) // .D
 
 参见 [lots-of-subcommands](./g20-lots-of-subcommands)。
 
+### 有颜色的描述文字
+
+在 `Description` 字段被显示之前，它会首先被 `is/term/color` 中的颜色预处理器格式化。
+所以它实际上是带有颜色属性的。
+
+这些格式化的特性包含一个微型 HTML Tag 解析器。这就是说，下面的代码能够正确工作：
+
+```go
+    // or:
+    //    is.Color().GetColorTranslator().Translate("<b>bold</b>")
+    fmt.Printf("%v", color.GetCPT().Translate(`
+        <code>code</code> | <kbd>CTRL</kbd>
+        <b>bold / strong / em</b>
+        <i>italic / cite</i>
+        <u>underline</u>
+        <mark>inverse mark</mark>
+        <del>strike / del </del>
+        <font color="green">green text</font>
+`, color.FgDefault))
+```
+
+相应的输出在一个支持颜色的终端仿真器上大致是这样的效果：
+
+![](/images/cmdr/v2/is-colorful.png)
+
+详情可以参考 [`hedzr/is`](https://github.com/hedzr/is) 的相关介绍。
+
+除了 `Description` 字段之外，`Header`, `Footer`, 以及 `Examples` 等等字段也包含颜色预格式化能力。
+
+### 展开环境变量
+
+在 `Description` (常规的单行描述，以及长格式的多行描述)，`Examples` 等字段显示之前，其中的环境变量将被自动展开。
+
+这包含两个层次：
+
+1. `$AppName` 格式 将被 `os.ExpandEnv()` 进行处理并展开。
+2. `{ {.AppNmae}}` 格式将被一个 `text.Template` 引擎进行展开。
+
+第一个格式所能展开的环境变量，取决于你的 Shell 环境。除此之外，cmdr 在运行时刻也附加额外的环境变量，基本上这包括了：
+
+```bash
+  CMDR_VERSION = v2.1.16
+  STORE_VERSION = v1.3.15
+  APP = blueprint
+  APPNAME = blueprint
+  APP_NAME = blueprint
+  APP_VER = v2.1.16
+  APP_VERSION = v2.1.16
+  EXE = /var/folders/zv/5r7hq8bs6qs3cx2z743t_3_h0000gn/T/go-build4111051262/b001/exe/blueprint
+  EXE_DIR = /var/folders/zv/5r7hq8bs6qs3cx2z743t_3_h0000gn/T/go-build4111051262/b001/exe
+  CONFIG_DIR = /Users/hz/.config/blueprint
+  CACHE_DIR = /Users/hz/.cache/blueprint
+  COMMON_SHARE_DIR = /usr/local/share/blueprint
+  LOCAL_SHARE_DIR = /Users/hz/.local/share/blueprint
+  DATA_DIR = /Users/hz/.local/share/blueprint
+  TEMP_DIR = /var/folders/zv/5r7hq8bs6qs3cx2z743t_3_h0000gn/T/blueprint
+```
+
+可用的环境变量列表可以通过执行命令 `app ~~debug ~~env` 来显示。
+
+第二个格式所能展开的变量，包含在如下的结构定义中：
+
+```go
+struct {
+  AppName     string
+  AppVersion  string
+  DadCommands string // for curr-cmd is `jump to`: "jump"
+  Commands    string // for curr-cmd is `jump to`: "jump to"
+  *parseCtx
+}
+```
+
+如需进一步信息，请查阅相应的源代码：[`func (s *parseCtx) Translate(pattern string) (result string)`](https://github.com/hedzr/cmdr/blob/master/cli/worker/parse_ctx.go#L55)。
+
 ## 额外的话题
 
 <include>../../headless/cmdr-guide-concepts-command.mdx</include>
