@@ -58,7 +58,7 @@ func main() {
 
 现在，运行 `app` 的效果就和 `app wrong` 相同。
 
-##### 可以有多种途径达到目的
+#### 可以有多种途径达到目的
 
 为了达到完成到 `RootCommand.SetRedirectTo` 的调用，可以有多种途径。例如下面这一种：
 
@@ -84,6 +84,48 @@ func prepareApp(commands ...cli.CmdAdder) cli.App {
 		Build()
 }
 ```
+
+#### 对于子命令（Since V2.1.19）
+
+对于子命令的重定向，你可以使用 `CommandBuilder.RedirectTo(dottedCmdPath)` 接口。下面是一个示例：
+
+```go
+package cmd
+
+import (
+	"github.com/hedzr/cmdr/v2/cli"
+	logz "github.com/hedzr/logg/slog"
+
+	"github.com/hedzr/cmdr-cli/cli/cmdr/internal/core"
+)
+
+type initCmd struct{}
+
+func (*initCmd) Add(app cli.App) {
+	coreTool := core.New()
+	logz.Verbose("initCmd")
+
+	app.Cmd("init", "i", "in").
+		Description("initial a cmdr-based app").
+		// Group("Test").
+		// TailPlaceHolders("[text1, text2, ...]").
+		Examples(`
+
+		$ {{.AppName}} init
+		  create a new cmdr cli app with default name 'myapp'
+		$ {{.AppName}} init myapp
+		  create a new cmdr cli app with your name
+		`).
+		RedirectTo("new").
+		OnAction(coreTool.New).
+		With(func(b cli.CommandBuilder) {
+		})
+}
+```
+
+这个示例来自 `cmdr-cli` 工具的 `init` 子命令源代码。
+
+同样地，使用 `dottedCmdPath` 可以重定向到多级子命令，例如 `jump.to`。
 
 ### 多级命令
 
@@ -115,7 +157,5 @@ $
 #### Subcmd
 
 ![image-20250601122307546](/images/cmdr/v2/g37-cmd-redirect-to/image-20250601122307546.png)
-
-
 
 <include>../../headless/cmdr-guide-concepts-command.mdx</include>
