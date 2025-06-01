@@ -30,3 +30,6 @@ yarn-error.log*
 next-env.d.ts
 
 *-todo.mdx
+
+*-alias
+*.alias

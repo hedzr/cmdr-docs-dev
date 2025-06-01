@@ -3,11 +3,13 @@ title: 命令：重定向
 description: Redirect To...
 ---
 
-## 重定向根命令到某个子命令
+## 重定向某命令到另一目的地
 
-`.SetRedirectTo(subcmd)` 为根命令提供一个重定向目的地。
+~~`.SetRedirectTo(subcmd)` 为根命令提供一个重定向目的地~~。
 
-`重定向根命令到子命令`，可以让命令行输入 `app` 等价于输入了 `app a b c`，这对于有的情形可能是有用的。
+从 v2.1.19 开始，`.SetRedirectTo(subcmd)` 不仅仅为根命令提供一个重定向目的地，也支持任何子命令的重定向。
+
+`重定向到另一命令` 作用于根命令时，可以让命令行输入 `app` 等价于输入了 `app a b c`，这对于有的情形可能是有用的。
 
 想象一下 `pnpm` 这样的包管理器命令，`pnpm dev` 实际上等价于 `pnpm run dev` 子命令，都是去运行 `package.json` 的 `scripts` 节里的 `dev` 条目所定义的命令行。
 
@@ -17,6 +19,8 @@ description: Redirect To...
 > 但这一设想尚未定型，也没有纳入计划表。
 
 ### 定义
+
+#### 对于根命令
 
 你需要调用到 RootCommand 的 `*CmdS.SetRedirectTo(dottedCmdPath)` 接口。达到这一目的的途径可能有多种，下面是一个示例，
 
@@ -54,6 +58,33 @@ func main() {
 
 现在，运行 `app` 的效果就和 `app wrong` 相同。
 
+##### 可以有多种途径达到目的
+
+为了达到完成到 `RootCommand.SetRedirectTo` 的调用，可以有多种途径。例如下面这一种：
+
+```go
+func prepareApp(commands ...cli.CmdAdder) cli.App {
+	return loaders.Create(
+		appName, version, author, desc,
+	).
+		// importing devmode package and run its init():
+		With(func(app cli.App) {
+			logz.Debug("in dev mode?", "mode", devmode.InDevelopmentMode())
+			app.RootBuilder(func(parent cli.CommandBuilder) {
+				parent.RedirectTo("new")
+			})
+			// app.WithRootCommand(func(root *cli.RootCommand) {
+			// 	root.SetRedirectTo("new")
+			// })
+		}).
+		WithBuilders(
+		// examples.AddHeadLikeFlagWithoutCmd, // add a `--line` option, feel free to remove it.
+		).
+		WithAdders(commands...).
+		Build()
+}
+```
+
 ### 多级命令
 
 如果想要重定向到多级子命令，可以使用 `dottedPath`。例如跳转到 `jump to` 子命令，可以使用 `SetRedirectTo("jump.to")` 来达成。
@@ -72,5 +103,19 @@ $
 返回的 Application Error 显示出根命令已经正确转向到了 “wrong” 子命令。
 
 此时根命令默认功能就不再是显示帮助屏了，为了显示帮助屏，你需要显式地 `-h`/`--help`。
+
+### 帮助屏中的效果
+
+以下截图取自 [`cmdr-cli`](httpsL//github.com/hedzr/cmdr-cli) 工具（即将发布）。
+
+#### Rootcmd
+
+![image-20250601120911889](/images/cmdr/v2/g37-cmd-redirect-to/image-20250601120911889.png)
+
+#### Subcmd
+
+![image-20250601122307546](/images/cmdr/v2/g37-cmd-redirect-to/image-20250601122307546.png)
+
+
 
 <include>../../headless/cmdr-guide-concepts-command.mdx</include>
