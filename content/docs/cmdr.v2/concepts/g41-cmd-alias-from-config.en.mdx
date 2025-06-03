@@ -109,12 +109,12 @@ func (jumpCmd) Add(app cli.App) {
 				Examples(``).
 				Deprecated(`v0.1.1`).
 				OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
-					// cmd.Set() == cmdr.Store(), cmd.Store() == cmdr.Store()
-					cmd.Set().Set("app.tiny3.working", dir.GetCurrentDir())
+					// cmd.Set() == cmdr.Set(), cmd.Store() == cmdr.Store(cmd.GetDottedPath())
+					_, _ = cmd.Set().Set("tiny3.working", dir.GetCurrentDir())
 					println()
-					println(cmd.Set().WithPrefix("app.tiny3").MustString("working"))
+					println("dir:", cmd.Set().WithPrefix("tiny3").MustString("working"))
 
-					cs := cmdr.Store().WithPrefix("jump.to")
+					cs := cmd.Set().WithPrefix(cli.CommandsStoreKey, "jump.to")
 					if cs.MustBool("full") {
 						println()
 						println(cmd.Set().Dump())
