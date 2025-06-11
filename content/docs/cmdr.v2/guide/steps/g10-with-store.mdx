@@ -315,6 +315,10 @@ import "github.com/hedzr/cmdr-loaders/local"
 
 另一个副作用是，在 Shell 执行 `app jump` 时，原本会自动显示帮助屏，但现在将会执行你所关联的 `OnAction` 代码了，所以你必须使用`app jump -h` 来查阅帮助屏。
 
+### `cmd.Store()` vs `cmd.Set()`
+
+<include>../../../headless/cmdr-guide-cmd-store-vs-cmd-set.mdx</include>
+
 ### `Build()` 和 `With(cb)`
 
 `app/b.Cmd("long","short",...)...Build()` 是一种 Builder Pattern，末尾的 `Build()` 调用用于提交前面的一系列构建动作，就像 tiny1 示例程序所做的那样。
