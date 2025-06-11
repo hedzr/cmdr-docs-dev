@@ -1,0 +1,58 @@
+---
+title: cmd.Store() vs cmd.Set()
+---
+
+#### `cmd.Store()` vs `cmd.Set()`
+
+Programmatically, you can code with `app.Store()/app.Set()`.
+
+The `cmd.Store()` returns a subset of app's whole Store, which have a root key pointed to key path `app.cmd.jump.to`. That means, `cmd.Store().MustBool("full")` can read and write the state of a command line flag `--full`.
+
+The `cmd.Set()` returns the app's whole Store, which equals to `app.Set()`，So you need a `cmd.Set().MustBool("app.cmd.jump.to.full")` to access the state of `--full`. Another way is,
+
+```go
+set := cmd.Set().WithPrefix(cli.DottedPathToCommandOrFlag)
+println(set.MustBool("full"))
+assert.Equal(set, cmd.Store())
+
+// for the subcmd cmd pointed to `jump.to`, you can use:
+cs := cmd.Store()
+assert.Equal(cs, cmd.Set().WithPrefix(cli.CommandsStoreKey, "jump.to"))
+assert.Equal(cs, cmd.Set(cli.CommandsStoreKey, "jump.to"))
+assert.Equal(cs, cmd.Set(cli.CommandsStoreKey, "jump", "to"))
+assert.Equal(cs, cmdr.Set().WithPrefix(cli.CommandsStoreKey, "jump.to"))
+assert.Equal(cs, cmdr.Store().WithPrefix("jump.to"))
+assert.Equal(cs, cmdr.Store("jump.to"))
+assert.Equal(cs, cmdr.Store("jump", "to"))
+```
+
+The similar call to `app.Store()` will get a subtree pointed to `app.cmd`, which stores the values of all of command-line flags. So `app.Store().MustBool("jump.to.full")` can query the same key above.
+
+> For a short and concise calling statement, it's useful by using `GetXXX`/`MustXXX` on the object of `cmd.Store()`/`app.Store()`.
+
+The prefix `app.cmd` is used for serializing the `Option Store`, such as YAML, TOML, etc.. The notable point is `app` will be stripped when you're really serializing it. So a key `app.some.path.debug` will be stored as `some.path.debug` in a YAML file:
+
+```yaml
+some:
+  path:
+    debug: false
+```
+
+As a sample, here is a Store's YAML file content:
+
+```yaml
+# The common prefix `app` will be stripped in serializing to a file.
+logging:
+  file: /var/log/app/stdout.log
+server:
+  port: 3000
+  host: 0.0.0.0
+  tls: {}
+  domains: []
+# The following entries are visible only in memory.
+# We list them for showing the completely Store-tree
+# more clearly.
+cmd:
+  debug: false # 对应于 `--debug`
+  verbose: false # 对应于 `--verbose`
+```

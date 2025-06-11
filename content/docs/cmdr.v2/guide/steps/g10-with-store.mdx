@@ -205,12 +205,12 @@ func (jumpCmd) Add(app cli.App) {
 				Examples(``).
 				Deprecated(`v0.1.1`).
 				OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
-					// cmd.Set() == cmdr.Store(), cmd.Store() == cmdr.Store()
-					cmd.Set().Set("tiny3.working", dir.GetCurrentDir())
+					// cmd.Set() == cmdr.Set(), cmd.Store() == cmdr.Store(cmd.GetDottedPath())
+					_, _ = cmd.Set().Set("tiny3.working", dir.GetCurrentDir())
 					println()
-					println(cmd.Set().WithPrefix("tiny3").MustString("working"))
+					println("dir:", cmd.Set().WithPrefix("tiny3").MustString("working"))
 
-					cs := cmdr.Store().WithPrefix("jump.to")
+					cs := cmd.Set().WithPrefix(cli.CommandsStoreKey, "jump.to")
 					if cs.MustBool("full") {
 						println()
 						println(cmd.Set().Dump())
@@ -263,21 +263,23 @@ func (jumpCmd) Add(app cli.App) {
 
 :::tip
 
-[`hedzr/cmdr-loaders`](https://github.com/hedzr/cmdr-loaders) 提供了一个对 `cmdr.Create()` 更进一步的包装接口 `loaders.Create()`，它将会自动加载恰当位置的外部配置文件或者配置源。
+[`hedzr/cmdr-loaders`](https://github.com/hedzr/cmdr-loaders/lite) 提供了一个对 `cmdr.Create()` 更进一步的包装接口 `loaders.Create()`，它将会自动加载恰当位置的外部配置文件或者配置源。这个工具包的目的是整合对 TOML 和 JSON 格式的配置文件进行自动加载，且符合 GNU 以及 Unix-like 习惯的文件布局。
 
-在此基础上，`loaders.PrepareApp()` 是进一步的包装，目的在于为示例程序提供默认的 Commands 和 Flags 定义。
+[`hedzr/cmdr-loaders`](https://github.com/hedzr/cmdr-loaders) 作用相同，除了增加了到更多配置文件格式（例如 YAML，HCL，等等）的支持，也带入了更多了到第三方库的依赖关系。
+
+在此基础上，`lite.PrepareApp()`/`loaders.PrepareApp()` 是进一步的包装，目的在于为示例程序提供默认的 Commands 和 Flags 定义。
 
 [`hedzr/cmdr-tests`](https://github.com/hedzr/cmdr-tests) 延续上述思路，再一次对其包装提供一个 `common.PrepareApp()`，这样就能为 examples 示例程序们的编写提供支持。
 
 它们的用途在于三点：
 
-1. 自动集成 store.Store，
+1. 自动集成 `store.Store`，
 2. 集成 loaders 以便加载环境变量和外部配置文件，
 3. 扁平化 app name，author 等基础信息。
 
 :::
 
-总的来说，对于常规开发，我们推荐你使用 `cmdr.Create()` 和 `loaders.Create()` 这两个接口。
+总的来说，对于常规开发，我们推荐你优先使用 `lite.Create()` 来简化初始代码，其次的选择是使用 `cmdr.Create()` 或者 `loaders.Create()`。
 
 如果你愿意逐步完成初始化设定工作，那么使用 `cmdr.New()` 也是合适的。
 
@@ -286,7 +288,7 @@ func (jumpCmd) Add(app cli.App) {
 如果你想自行集成，下面的片段是一个做法：
 
 ```go
-import "github.com/hedzr/cmdr-loaders/local"
+import "github.com/hedzr/cmdr-loaders/lite"
 
 	app = cmdr.New(
  		// [!code highlight:2]
@@ -296,11 +298,11 @@ import "github.com/hedzr/cmdr-loaders/local"
 		// [!code highlight:8]
 		// import "github.com/hedzr/cmdr-loaders/local" to get in advanced external loading features
 		cmdr.WithExternalLoaders(
-			local.NewConfigFileLoader(
-				local.WithAlternateWriteBack(false), // disable write-back the modified state into alternative config file
-				local.WithAlternateDotPrefix(false), // use '<app-name>.toml' instead of '.<app-name>.toml'
+			lite.NewConfigFileLoader(
+				lite.WithAlternateWriteBack(false), // disable write-back the modified state into alternative config file
+				lite.WithAlternateDotPrefix(false), // use '<app-name>.toml' instead of '.<app-name>.toml'
 			),
-			local.NewEnvVarLoader(),
+			lite.NewEnvVarLoader(),
 		),
 	).
 		Info("tiny-app", "0.3.1").
@@ -314,6 +316,10 @@ import "github.com/hedzr/cmdr-loaders/local"
 如果你真的这么做了，它也并不会产生什么逻辑错误或者运行错误，只是对于终端用户来说稍微不那么友好，因为他可能并不会意识到 `jump` 也可以被 _执行_。
 
 另一个副作用是，在 Shell 执行 `app jump` 时，原本会自动显示帮助屏，但现在将会执行你所关联的 `OnAction` 代码了，所以你必须使用`app jump -h` 来查阅帮助屏。
+
+### `cmd.Store()` vs `cmd.Set()`
+
+<include>../../../headless/cmdr-guide-cmd-store-vs-cmd-set.mdx</include>
 
 ### `Build()` 和 `With(cb)`
 
@@ -392,15 +398,7 @@ $
 
 在上面打印的 app 配置数据集树结构中，`app.cmd` 包含了 tiny2 的命令行选项集合的映射，以及这些选项的最终值。
 
-### `cmd.Store()` vs `cmd.Set()`
-
-除此而外，你也可以通过 `app.Store()/app.Set()` 读写你的数据。
-
-在 `OnAction` 回调函数中，`cmd.Store()` 返回一个完整 Store 的相对于当前命令的子集。对于 `jump to` 子命令，键值 `app.cmd.jump.to` 所下辖的子树将被返回。所以 `cmd.Store().MustBool("full")` 就可以直接取得 `--full` 的状态。
-
-`cmd.Set()` 相当于调用 `app.Set()`，它获取整个 Store 对象（的 `app` 子树）。此时，你需要用 `cmd.Set().MustBool("cmd.jump.to.full")` 来取得 `--full` 的状态。
-
-类似地，`app.Store()` 获得的是 "app.cmd" 子树，所以你也可以用 `app.Store().MustBool("jump.to.full")` 来问询。
+<include>../../headless/cmdr-guide-cmd-store-vs-cmd-set.mdx</include>
 
 ### `app` 子树
 
