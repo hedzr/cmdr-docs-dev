@@ -18,7 +18,7 @@ import (
 
 	"gopkg.in/hedzr/errors.v3"
 
-	"github.com/hedzr/cmdr-loaders/local"
+	"github.com/hedzr/cmdr-loaders/lite"
 	"github.com/hedzr/cmdr/v2"
 	"github.com/hedzr/cmdr/v2/cli"
 	"github.com/hedzr/cmdr/v2/pkg/dir"
@@ -35,11 +35,11 @@ func main() {
 		// [!code highlight:8]
 		// import "github.com/hedzr/cmdr-loaders/local" to get in advanced external loading features
 		cmdr.WithExternalLoaders(
-			local.NewConfigFileLoader(
-				local.WithAlternateWriteBack(false), // disable write-back the modified state into alternative config file
-				local.WithAlternateDotPrefix(false), // use '<app-name>.toml' instead of '.<app-name>.toml'
+			lite.NewConfigFileLoader(
+				lite.WithAlternateWriteBack(false), // disable write-back the modified state into alternative config file
+				lite.WithAlternateDotPrefix(false), // use '<app-name>.toml' instead of '.<app-name>.toml'
 			),
-			local.NewEnvVarLoader(),
+			lite.NewEnvVarLoader(),
 		),
 
 		cmdr.WithTasksBeforeRun(func(ctx context.Context, cmd cli.Cmd, runner cli.Runner, extras ...any) (err error) {
@@ -258,3 +258,26 @@ By default, only a `<app-name>.{toml,yaml,...}` in the current directory is `Alt
 
 > **NOTE**:  
 > The file in `<exeutable-dir>`, another `Alternative` setting source, doesn't allow write-back.
+
+### Error Trace
+
+The subcommand `wrong` gives a sample to show you how to return an error to top `main()` function.
+
+And in `DebugMode` (enabled by cmdline `--debug`, checked by `is.DebugMode()`), our `main()` will print the stacktrace of the error. Here is it:
+
+```bash
+$ go run ./examples/tiny3 wrong --debug
+...
+22:21:25.753233+08:00| c/[cmdr][1] [ERR] Application Error:                   err="[io: read/write on closed pipe | something's wrong | permission denied]" examples/blueprint/main.go:59 main.main
+       error: [io: read/write on closed pipe | something's wrong | permission denied]
+   file/line: examples/cmd/wrong.go:26
+    function: github.com/hedzr/cmdr/v2/examples/cmd.wrongCmd.Add.func1
+
+...stacktrace ignored here...
+
+$ go run ./examples/tiny3 wrong
+...
+22:21:25.753233+08:00| c/[cmdr][1] [ERR] Application Error:                   err="[io: read/write on closed pipe | something's wrong | permission denied]" examples/blueprint/main.go:59 main.main
+
+$
+```

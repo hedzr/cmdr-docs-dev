@@ -9,47 +9,82 @@ your app can manage its configuration dataset seamlessly and fluently.
 
 > In [tiny1](./g01-first-cli-app) example app, A DummyStore will be created by cmdr internally, which receives any accessing requests to app configuration dataset, and discard them.
 
-```go title="./examples/tiny2/main.go"
-package main
-
-import (
-	"context"
-	"os"
-
-	"github.com/hedzr/cmdr-tests/examples/common"
-	"github.com/hedzr/cmdr/v2/cli"
-	"github.com/hedzr/cmdr/v2/examples/cmd" // import jumpCmd
-	logz "github.com/hedzr/logg/slog"
-)
-
-const (
-	appName = "tiny2-app"
-	desc    = ``
-)
-
-func main() {
-	// [!code highlight:3]
-	app := chain(common.PrepareApp(
-		appName, desc,
-	)(cmd.Commands...)) // import jumpCmd
-
-	ctx := context.Background() // with cancel can be passed thru in your actions
-	if err := app.Run(ctx); err != nil {
-		logz.ErrorContext(ctx, "Application Error:", "err", err) // stacktrace if in debug mode/build
-		os.Exit(app.SuggestRetCode())
-	} else if rc := app.SuggestRetCode(); rc != 0 {
-		os.Exit(rc)
-	}
-}
-
-func chain(app cli.App) cli.App {
-	return app
-}
-```
-
 As above, we adds the integration to `Store` (hedzr/store), which provides a powerful in-memory hierarchical configuration store.
 
 The multilevel subcommands `jump` > `to` was been also added.
+
+:::tip
+
+[`hedzr/cmdr-loaders`](https://github.com/hedzr/cmdr-loaders/lite) provides a `cmdr.Create()`-like API (`lite.Create()`) with further support to TOML and JSON file formats. It will load those configuration files from standard locations compliant with GNU File strandard and Unix File specification, ....
+
+[`hedzr/cmdr-loaders`](https://github.com/hedzr/cmdr-loaders) is similar with it but has more codecs, such as for YAML, for HCL, and so on. This helper module would import more third-party packages into your project.
+
+On the above, `lite.PrepareApp()` or `loaders.PrepareApp()` provides more wrapper codes.
+
+All purposes of these helpers are:
+
+1. integrated with `store.Store`,
+2. integrated with default loaders so the OS env and disk files can be loaded automatically,
+3. flatten the basis of an app such as app name, author and others.
+
+:::
+
+In total, `lite.Create()` is first of our recommended list, else are `cmdr.Create()` or `loaders.Create()`.
+
+When a step by step initializing style is what you desire, please use `cmdr.New()`.
+
+### Howto integrate `Store` and `loaders` manually
+
+This is a sample code to show how to integrate `Store` and `loaders` manually, which is similar with `lite.Create()` or `loaders.Create()`.
+
+```go
+import "github.com/hedzr/cmdr-loaders/lite"
+
+	app = cmdr.New(
+ 		// [!code highlight:2]
+ 		// use an option store explicitly, or a dummy store by default
+ 		cmdr.WithStore(store.New()),
+
+		// [!code highlight:8]
+		// import "github.com/hedzr/cmdr-loaders/local" to get in advanced external loading features
+		cmdr.WithExternalLoaders(
+			lite.NewConfigFileLoader(
+				lite.WithAlternateWriteBack(false), // disable write-back the modified state into alternative config file
+				lite.WithAlternateDotPrefix(false), // use '<app-name>.toml' instead of '.<app-name>.toml'
+			),
+			lite.NewEnvVarLoader(),
+		),
+	).
+		Info("tiny-app", "0.3.1").
+		Author("The Example Authors") // .Description(``).Header(``).Footer(``)
+```
+
+### Associate your logics with `OnAction` handler
+
+The `OnAction` handler is a callback function that will be executed when the command is invoked. It is a good place to put your business logic.
+
+The normally usage is to attach it to the end of a command building sequence, like this:
+
+```go
+app.Cmd("jump", "j", "jumps").
+    Description("jump to a subcommand").
+    // OnAction(func(cmd cli.Command) error {
+    //     // Your business logic here
+    //     return nil
+    // }).
+    With(func(b cli.CommandBuilder) {
+        b.Cmd("to", "t", "target").
+            Description("jump to a target subcommand").
+            OnAction(func(cmd cli.Command) error {
+                // Your business logic here
+                return nil
+            })
+    })
+```
+
+We do not recommend to use `OnAction` on the `jump` command, because it is a multi-level subcommand. The end users won't realize that `jump` can be executed directly, as it is not the final command they are interested in.
+
+Instead, it is better to use `OnAction` on the `to` command, which is the final command that will be executed.
 
 ### `cmd.Store()` vs `cmd.Set()`
 
@@ -59,7 +94,7 @@ The multilevel subcommands `jump` > `to` was been also added.
 
 As a Builder Pattern, `Build()` will end a building sequence in `app/b.Cmd("long","short",...)...Build()`.
 
-But you can end the building sequence by `With(cb)` call, the form is `app/b.Cmd("long","short",...)...With(cb)`.
+But you can always end the building sequence by `With(cb)` call, the form is `app/b.Cmd("long","short",...)...With(cb)`.
 
 In `With(cb)` code block of `jump`, `to` subcommand was been created and attached to.
 
