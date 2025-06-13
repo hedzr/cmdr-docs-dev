@@ -312,6 +312,27 @@ $ go run ./examples/tiny3 wrong
 $
 ```
 
+> 如果抛出错误的地点没有将上下文堆栈信息封装进去，那么这里仍然不会打印堆栈信息。
+> 对于第三方库抛出的错误没有堆栈信息的情况，较好的解决方法是在你的错误返回语句处对其使用 `hedzr/errors` 封装一下。例如下面的代码片段处理了 go-git/v5 的错误，将其再封装了堆栈信息以供调试。
+>
+> ```go
+> import "gopkg.in/hedzr/errors.v3"
+>
+> 		if repo, err = git.PlainOpen(localDir); err != nil {
+>       err = errors.New().WithErrors(err)
+> 			return
+> 		}
+> ```
+>
+> `hedzr/errors.v3` 理论上兼容 go1.11 - latest 的全部版本，并提供统一和一致且兼容 go1.13 errors 的操作界面。通常你可以平滑地从 "errors" 官方包直接切换为 `hedzr/errors.v3`。
+>
+> 使用 `hedzr/errors.v3` 的收益在于：
+>
+> 1. `errors.New(format, args...)` 能够以多种方式格式化消息或添加上下文对象；
+> 2. 支持嵌套下级错误对象 / 错误容器 `var ec = errors.New(); ec.Attach(err)`
+> 3. 自动收集上下文堆栈信息
+> 4. 一些增强的特性
+
 ## 使用 Lite 版本
 
 如同文章开始的示例程序，通常我们建议你使用 [hedzr/cmdr-loaders](https://github.com/hedzr/cmdr-loaders) 的 Lite 版本来加载配置文件。
