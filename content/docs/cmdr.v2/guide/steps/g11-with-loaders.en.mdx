@@ -281,3 +281,24 @@ $ go run ./examples/tiny3 wrong
 
 $
 ```
+
+> While a source raised an error without stacktrace info, likewise, the above log will miss them.
+> A fast and better solution is wrapping the `err` with `hedzr/errors` library. For a instance, the following codes show you how to wrap the error returned by go-git/v5, which is a simple stringerror object.
+>
+> ```go
+> import "gopkg.in/hedzr/errors.v3"
+>
+> 		if repo, err = git.PlainOpen(localDir); err != nil {
+>       err = errors.New().WithErrors(err)
+> 			return
+> 		}
+> ```
+>
+> `hedzr/errors.v3` is compliant with both of go1.11 - latest in theory. You can migrate from go1.13 errors to it smoothly.
+>
+> The benefis of using `hedzr/errors.v3` are:
+>
+> 1. `errors.New(format, args...)` can format message or attach objects in various ways,
+> 2. nested errors / errors container `var ec = errors.New(); ec.Attach(err)`
+> 3. auto collecting stacktrace info
+> 4. more enhanced apis
