@@ -48,9 +48,7 @@ func main() {
 		WithAdders().
 		Build()
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
+	ctx := context.Background()
 	if err := app.Run(ctx); err != nil {
 		// [!code highlight:9]
 		if errors.Is(err, cli.ErrValidArgs) {
