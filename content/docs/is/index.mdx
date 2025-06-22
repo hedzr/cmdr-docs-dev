@@ -1,0 +1,664 @@
+---
+title: "hedzr/is (-go)"
+description: "`is` detectors and its basic supports in golang"
+---
+
+## 介绍
+
+[`hedzr.is`](https://github.com/hedzr/is) 是一个以环境检测函数为主的基础支持库。
+
+`is` provides numerous detectors for checking the states of environment (build, executive, ...).
+
+在 `is` 中提供了大量 Golang 运行环境检测工具，有的独立工作，有的需要配合 go build tags 协同工作。
+总的来说，它们可以帮助你更好地确定当前运行环境，让你的代码能够据此进行适配。
+
+<Cards>
+  <Card title="Integrated With `cmdr`" href="#integrated-with-cmdr" />
+</Cards>
+
+## Features
+
+- `is.State(which) bool`: the universal detector entry - via `RegisterStateGetter(state string, getter func() bool)` to add your own ones. _Since v0.5.11_
+- `is.Env()` holds a global struct for CLI app basic states, such as: verbose/quiet/debug/trace....
+  - `DebugMode`/`DebugLevel`, `TraceMode`/`TraceLevel`, `ColorMode`, ...
+- `is.InDebugging() bool`, `is.InTesting() bool`, and `is.InTracing() bool`, ....
+- `is.DebugBuild() bool`.
+- `is.K8sBuild() bool`, `is.DockerBuild() bool`, ....
+- `is.ColoredTty() bool`, ....
+- `is.Color()` to get an indexer for the functions in our term/color subpackage, ...
+- Terminal Colorizer, Detector, unescape tools.
+- stringtool: `RandomStringPure`, case-converters ...
+- basics: closable, closer, signals.
+  - easier `Press any key to exit...` prompt: `is.Signals().Catch()`
+- exec: Run, RunWithOutput, Sudo, ...
+- go1.23.7+ required since v0.7.0
+- ~~go 1.22.7+ required~~
+
+To using environment detecting utilities better and smoother, some terminal (and stringtool, basics) tools are bundled together.
+
+Since v0.6.0, `is.InDebugging()` checks if the running process' parent is `dlv`.
+The old `DebugMode` and `DebugBuild` are still work:
+
+- `InDebugging`: checks this process is being debugged by `dlv`.
+- `DebugBuild`: `-tags=delve` is set at building.
+- `DebugMode`: `--debug` is specified at command line.
+
+Since v0.8.27, `basics.Signals().Catcher().WaitFor()` wants `ctx` param passed in.
+
+## 分类
+
+### 基础环境
+
+- `InDebugging`: checks this process is being debugged by `dlv`.
+- `DebugBuild`: `-tags=delve` is set at building.
+- `DebugMode`: `--debug` is specified at command line.
+- `is.InTracing` / InTestingT
+- `is.InTesting` / InTestingT
+- `is.InDevelopingTime`
+- `is.InVscodeTerminal`
+- `is.InK8s`
+- `is.InIstio`
+- `is.InDocker` / InDockerEnvSimple
+
+- Build (need `-tags=xx`)
+
+  - `is.K8sBuild`: need `-tags=k8s` present
+  - `is.IstioBuild`: need `-tags=istio` present
+  - `is.DockerBuild`: need `-tags=docker` present
+  - `is.VerboseBuild`: need `-tags=verbose` present
+  - `is.DebugBuild`: need `-tags=delve` present
+  - `buildtags.IsBuildTagExists`
+
+### States / Env
+
+- VerboseModeEnabled
+- GetVerboseLevel / SetVerboseMode / SetVerboseLevel
+- QuietModeEnabled
+- GetQuietLevel / SetQuietMode / SetQuietLevel
+- NoColorMode
+- GetNoColorLevel / SetNoColorMode / SetNoColorLevel
+- DebugMode
+- GetDebugLevel / SetDebugMode / SetDebugLevel
+- Tracing
+- TraceMode
+- GetTraceLevel / SetTraceMode / SetTraceLevel
+
+### Terminal / Tty
+
+- is.Terminal(file)
+- is.TerminalFd(fd)
+- is.Tty(wr)
+- is.ColoredTty(wr)
+- is.AnsiEscaped(s) (~~IsTtyEscaped(s)~~)
+- StripEscapes(s)
+- ReadPassword
+- GetTtySize
+- is.GetTtySizeByName(filename) (cols,rows,err)
+- is.GetTtySizeByFile(file) (cols,rows,err)
+- is.GetTtySizeByFd(fd) (cols,rows,err)
+- StartupByDoubleClick() bool
+
+### Basics
+
+- closers
+  - `Peripheral`, `Closable`, Closer
+  - RegisterClosable
+  - RegisterClosers
+  - RegisterCloseFns
+- `is.Signals().Catcher()`
+- is.FileExists(filepath)
+- is.ToBool, StringToBool
+
+### utilities
+
+- `dir` subpackage
+- `exec` subpackage
+- `term/color` subpackage
+  - escaping tools: GetCPT()/GetCPTC()/GetCPTNC()
+  - Highlight, Dimf, Text, Dim, ToDim, ToHighlight, ToColor, ...
+
+## Usages
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "log/slog"
+    "os"
+    "sync"
+    "time"
+
+    "github.com/hedzr/is"
+    "github.com/hedzr/is/basics"
+    "github.com/hedzr/is/term/color"
+)
+
+func main() {
+    // defer basics.Close() // uncomment if not using Catcher.WaitFor and/or cmdr.v2
+
+    is.RegisterStateGetter("custom", func() bool { return is.InVscodeTerminal() })
+
+    println(is.InTesting())
+    println(is.State("in-testing"))
+    println(is.State("custom")) // detects a state with custom detector
+    println(is.Env().GetDebugLevel())
+    if is.InDebugMode() {
+        slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{AddSource: true, Level: slog.LevelDebug})))
+    }
+
+    // or:
+    //    is.Color().GetColorTranslator().Translate("<b>bold</b>")
+    fmt.Printf("%v", color.GetCPT().Translate(`<code>code</code> | <kbd>CTRL</kbd>
+        <b>bold / strong / em</b>
+        <i>italic / cite</i>
+        <u>underline</u>
+        <mark>inverse mark</mark>
+        <del>strike / del </del>
+        <font color="green">green text</font>
+`, color.FgDefault))
+
+    var cancelled int32
+    ctx, cancel := context.WithCancel(context.Background())
+    defer cancel()
+
+    catcher := is.Signals().Catch()
+    catcher.
+        WithPrompt("Press CTRL-C to quit...").
+        // WithOnLoopFunc(dbStarter, cacheStarter, mqStarter).
+        WithPeripherals(&dbMgr{}).
+        WithOnSignalCaught(func(ctx context.Context, sig os.Signal, wg *sync.WaitGroup) {
+            println()
+            slog.Info("signal caught", "sig", sig)
+            cancel() // cancel user's loop, see Wait(...)
+        }).
+        WaitFor(ctx, func(ctx context.Context, closer func()) {
+            slog.Debug("entering looper's loop...")
+            defer close() // notify catcher we want to shutdown
+            // to terminate this app after a while automatically:
+            time.Sleep(10 * time.Second)
+
+            if atomic.CompareAndSwapInt32(&cancelled, 0, 1) {
+                is.PressAnyKeyToContinue(os.Stdin)
+            }
+        })
+}
+```
+
+Result is similar with:
+
+![image-20240113071930661](/images/cmdr/image-20240113071930661.png)
+
+NOTE that `is.Signals().Catch()` will produce a prompt and enter a infinite loop to wait for user's keystroke pressed.
+
+### Build Tags
+
+Some functions want special buildtags presented. These are including:
+
+- `verbose`: See VerboseBuild, ...
+- `delve`: See DebugBuild, ...
+- `k8s`: See K8sBuild
+- `istio`: See IstioBuild
+- `docker`: See DockerBuild
+- ...
+- `buildtags.IsBuildTagExists(tag) bool`
+
+### Colorizes
+
+The test codes:
+
+```go
+import "github.com/hedzr/is/term/color"
+
+func TestGetCPT(t *testing.T) {
+  t.Logf("%v", color.GetCPT().Translate(`<code>code</code> | <kbd>CTRL</kbd>
+    <b>bold / strong / em</b>
+    <i>italic / cite</i>
+    <u>underline</u>
+    <mark>inverse mark</mark>
+    <del>strike / del </del>
+    <font color="green">green text</font>
+    `, color.FgDefault))
+}
+```
+
+Result:
+
+![image-20231107100150520](/images/cmdr/image-20231107100150520.png)
+
+And more:
+
+```go
+func TestStripLeftTabs(t *testing.T) {
+t.Logf("%v", color.StripLeftTabs(`
+
+        <code>code</code>
+    NC Cool
+     But it's tight.
+      Hold On!
+    Hurry Up.
+    `))
+}
+
+func TestStripHTMLTags(t *testing.T) {
+t.Logf("%v", color.StripHTMLTags(`
+
+        <code>code</code>
+    NC Cool
+     But it's tight.
+      Hold On!
+    Hurry Up.
+    `))
+}
+```
+
+### `Cursor`
+
+从 v0.8+ 开始，一个新的 `color.Cursor` 对象可以被 `color.New()` 创建，并支持用流式调用方式来完成彩色化文字。
+
+较为完整的示例如下：
+
+Since v0.8+, A new `color.Cursor` object can be initialized by `color.New()`, which support format the colorful text with streaming calls, for console/tty.
+
+The examples are:
+
+```go
+
+func ExampleNew() {
+	// start a color text builder
+	var c = color.New()
+
+	// specially for running on remote ci server
+	if states.Env().IsNoColorMode() {
+		states.Env().SetNoColorMode(true)
+	}
+
+	// paint and get the result (with ansi-color-seq ready)
+	var result = c.Println().
+		Color16(color.FgRed).
+		Printf("hello, %s.", "world").Println().
+		SavePos().
+		Println("x").
+		Color16(color.FgGreen).Printf("hello, %s.\n", "world").
+		Color256(160).Printf("[160] hello, %s.\n", "world").
+		Color256(161).Printf("[161] hello, %s.\n", "world").
+		Color256(162).Printf("[162] hello, %s.\n", "world").
+		Color256(163).Printf("[163] hello, %s.\n", "world").
+		Color256(164).Printf("[164] hello, %s.\n", "world").
+		Color256(165).Printf("[165] hello, %s.\n", "world").
+		Up(3).Echo(" ERASED ").
+		RGB(211, 211, 33).Printf("[16m] hello, %s.", "world").
+		Println().
+		RestorePos().
+		Println("z").
+		Down(8).
+		Println("DONE").
+		Build()
+
+		// and render the result
+	fmt.Println(result)
+
+	// For most of ttys, the output looks like:
+	//
+	// [31mhello, world.[0m
+	// [sx
+	// [32mhello, world.
+	// [38;5;160m[160] hello, world.
+	// [38;5;161m[161] hello, world.
+	// [38;5;162m[162] hello, world.
+	// [38;5;163m[163] hello, world.
+	// [38;5;164m[164] hello, world.
+	// [38;5;165m[165] hello, world.
+	// [0m[3A ERASED [38;2;211;211;33m[16m] hello, world.
+	// [uz
+	// [8BDONE
+}
+
+func ExampleCursor_Color16() {
+	// another colorful builfer
+	var c = color.New()
+	fmt.Println(c.Color16(color.FgRed).
+		Printf("hello, %s.", "world").Println().Build())
+	// Output: [31mhello, world.[0m
+}
+
+func ExampleCursor_Color() {
+	// another colorful builfer
+	var c = color.New()
+	fmt.Println(c.Color(color.FgRed, "hello, %s.", "world").Build())
+	// Output: [31mhello, world.[0m
+}
+
+func ExampleCursor_Bg() {
+	// another colorful builfer
+	var c = color.New()
+	fmt.Println(c.Bg(color.BgRed, "hello, %s.", "world").Build())
+	// Output: [41mhello, world.[0m
+}
+
+func ExampleCursor_Effect() {
+	// another colorful builfer
+	var c = color.New()
+	fmt.Println(c.Effect(color.BgDim, "hello, %s.", "world").Build())
+	// Output: [2mhello, world.[0m
+}
+
+func ExampleCursor_Color256() {
+	// another colorful builfer
+	var c = color.New()
+	fmt.Print(c.
+		Color256(163).Printf("[163] hello, %s.\n", "world").
+		Color256(164).Printf("[164] hello, %s.\n", "world").
+		Color256(165).Printf("[165] hello, %s.\n", "world").
+		Build())
+	// Output:
+	// [38;5;163m[163] hello, world.
+	// [38;5;164m[164] hello, world.
+	// [38;5;165m[165] hello, world.
+}
+
+func ExampleCursor_RGB() {
+	// another colorful builfer
+	var c = color.New()
+	fmt.Print(c.
+		RGB(211, 211, 33).Printf("[16m] hello, %s.\n", "world").
+		BgRGB(211, 211, 33).Printf("[16m] hello, %s.\n", "world").
+		Build())
+	// Output:
+	// [38;2;211;211;33m[16m] hello, world.
+	// [48;2;211;211;33m[16m] hello, world.
+}
+
+func ExampleCursor_EDim() {
+	// another colorful builfer
+	var c = color.New()
+	fmt.Print(c. // Color16(color.FgRed).
+			EDim("[DIM] hello, %s.\n", "world").String())
+	// Output:
+	// [2m[DIM] hello, world.
+	// [0m
+}
+
+func ExampleCursor_Black() {
+	// another colorful builfer
+	var c = color.New()
+	fmt.Print(c. // Color16(color.FgRed).
+			Black("[BLACK] hello, %s.\n", "world").String())
+	// Output:
+	// [30m[BLACK] hello, world.
+	// [0m
+}
+
+func ExampleCursor_BgBlack() {
+	// another colorful builfer
+	var c = color.New()
+	fmt.Print(c. // Color16(color.FgRed).
+			BgBlack("[BGBLACK] hello, %s.\n", "world").String())
+	// Output:
+	// [40m[BGBLACK] hello, world.
+	// [0m
+}
+
+func ExampleCursor_Translate() {
+	// another colorful builfer
+	var c = color.New()
+	fmt.Print(c. // Color16(color.FgRed).
+			Translate(`<code>code</code> | <kbd>CTRL</kbd>
+		<b>bold / strong / em</b>
+		<i>italic / cite</i>
+		<u>underline</u>
+		<mark>inverse mark</mark>
+		<del>strike / del </del>
+		<font color="green">green text</font>
+		`).String())
+	// Output:
+	// [51;1mcode[0m[39m | [51;1mCTRL[0m[39m
+	//		[1mbold / strong / em[0m[39m
+	//		[3mitalic / cite[0m[39m
+	//		[4munderline[0m[39m
+	//		[7minverse mark[0m[39m
+	//		[9mstrike / del [0m[39m
+	//		[32mgreen text[0m[39m
+}
+
+func ExampleCursor_StripLeftTabsColorful() {
+	// another colorful builfer
+	var c = color.New()
+	fmt.Print(c. // Color16(color.FgRed).
+			StripLeftTabsColorful(`
+		<code>code</code> | <kbd>CTRL</kbd>
+		<b>bold / strong / em</b>
+		<i>italic / cite</i>
+		<u>underline</u>
+		<mark>inverse mark</mark>
+		<del>strike / del </del>
+		<font color="green">green text</font>
+		`).String())
+	// Output:
+	// [51;1mcode[0m[0m | [51;1mCTRL[0m[0m
+	// [1mbold / strong / em[0m[0m
+	// [3mitalic / cite[0m[0m
+	// [4munderline[0m[0m
+	// [7minverse mark[0m[0m
+	// [9mstrike / del [0m[0m
+	// [32mgreen text[0m[0m
+}
+```
+
+## 与 `cmdr` 相集成 [#integrated-with-cmdr]
+
+### `Closers`
+
+`is` 提供一个子包 `closers` 来抽象你的基础设施。
+
+```go
+type Peripheral interface {
+  Close()
+}
+```
+
+一个基础设施意味着一个需要在应用程序结束前实施其关闭操作的对象，可以是外部资源如数据库连接等，也可以是一个文件句柄。
+
+在你的 app 中，可以使用 `RegisterPeripheral` 注册一个基础设施，并提供 defer 调用以便关闭所有这些对象。
+
+```go
+func main() {
+  defer is.Closers().Close()
+
+  // ...RegisterPeripheral yours
+}
+```
+
+The `Closers()` collects all closable objects and allow shutting down them at once.
+
+```go
+package main
+
+import (
+    "os"
+
+    "github.com/hedzr/is/basics"
+)
+
+type redisHub struct{}
+
+func (s *redisHub) Close() {
+    // close the connections to redis servers
+    println("redis connections closed")
+}
+
+func main() {
+    defer basics.Close()
+
+    tmpFile, _ := os.CreateTemp(os.TempDir(), "1*.log")
+    basics.RegisterClosers(tmpFile)
+
+    basics.RegisterCloseFn(func() {
+        // do some shutdown operations here
+        println("close single functor")
+    })
+
+    basics.RegisterPeripheral(&redisHub{})
+}
+```
+
+#### with `cmdr`
+
+`cmdr` 在它的工作流程中会自动执行相似的调用以便关闭已经注册的基础设施，因此 `is` + `cmdr` 可以更无缝地协同工作。
+
+具体实施可以参考：
+
+<Cards>
+  <Card title="Auto-close closers" href="../auto-close-closers" />
+</Cards>
+
+### `Signals`
+
+`Signals()` could catch OS signals and entering a infinite loop.
+
+`is.Signals()` 能够拦截 POSIX 信号并回调你的响应函数。
+
+For example, a tcp server could be:
+
+```go
+package main
+
+import (
+    "context"
+    "os"
+    "sync"
+
+    "github.com/hedzr/go-socketlib/net"
+    "github.com/hedzr/is"
+    logz "github.com/hedzr/logg/slog"
+)
+
+func main() {
+    ctx, cancel := context.WithCancel(context.Background())
+    defer cancel()
+
+    logger := logz.New("new-dns")
+    server := net.NewServer(":7099",
+        net.WithServerOnListening(func(ss net.Server, l stdnet.Listener) {
+            go runClient(ctx, ss, l)
+        }),
+        net.WithServerLogger(logger.WithSkip(1)),
+    )
+    defer server.Close()
+
+    // make a catcher so that it can catch ths signals,
+    catcher := is.Signals().Catch()
+    catcher.
+        // WithVerboseFn(func(msg string, args ...any) {
+        //     logz.WithSkip(2).Verbose(fmt.Sprintf("[verbose] %s", fmt.Sprintf(msg, args...)))
+        // }).
+        WithOnSignalCaught(func(ctx context.Context, sig os.Signal, wg *sync.WaitGroup) {
+            println()
+            // logz.Debug("signal caught", "sig", sig)
+            if err := server.Shutdown(); err != nil {
+                logz.Error("server shutdown error", "err", err)
+            }
+            cancel()
+        }).
+        WaitFor(ctx, func(ctx context.Context, closer func()) {
+            logz.Debug("entering looper's loop...")
+
+            server.WithOnShutdown(func(err error, ss net.Server) { closer() })
+            err := server.ListenAndServe(ctx, nil)
+            if err != nil {
+                logz.Fatal("server serve failed", "err", err)
+            }
+        })
+}
+
+func runClient(ctx context.Context, ss net.Server, l stdnet.Listener) {
+    c := net.NewClient()
+
+    if err := c.Dial("tcp", ":7099"); err != nil {
+        logz.Fatal("connecting to server failed", "err", err, "server-endpoint", ":7099")
+    }
+    logz.Info("[client] connected", "server.addr", c.RemoteAddr())
+    c.RunDemo(ctx)
+}
+```
+
+#### `WaitFor()`
+
+在 `WaitFor()` 回调函数体内，你可以启动你的服务。它们不必在 go routine 中被启动，而是可以直接放在 `WaitFor()` 回调函数体内。这是因为 `Catcher()` 将在一个 go routine 中运行你的回调函数。
+
+所以对于 http server 来说，下面的做法是正确的：
+
+```go
+  WaitFor(ctx, func(ctx context.Context, closer func()) {
+    logz.Debug("entering looper's loop...")
+
+    server.WithOnShutdown(func(err error, ss net.Server) { closer() })
+    err := server.ListenAndServe(ctx, nil)
+    if err != nil {
+      logz.Fatal("server serve failed", "err", err)
+    }
+  })
+```
+
+假设你在其他地方启动了服务，并且通过 ctx cancel() 来管理那些服务的生存周期，那么 WaitFor 回调函数可以这么写：
+
+```go
+  WaitFor(ctx, func(ctx context.Context, closer func()) {
+    defer closer()
+    for {
+      select {
+      case <-ticker.C:
+        wakeupForTask();
+      case <-ctx.Done():
+        return
+      }
+    }
+  })
+```
+
+当全局的 cancellable ctx 的 `cancel()` 函数被调用时，你的其他服务将会侦听 ctx.Done() 信号并 Shutdown，而上面的 `WaitFor()` 回调函数体也会结束自己，并调用 closer() 来清理 `Catcher()` 自身。
+
+#### Howto terminate myself after a while
+
+有时候我们可能需要提示用户等待 10 秒钟（10s）然后自动结束等待并退出程序。
+这个需求可以用 `Catch()` 来实现：
+
+```go
+	ctx, cancel := context.WithCancel(context.Background())
+  defer cancel()
+	catcher := is.Signals().Catch()
+	catcher.
+		WithPrompt("Press CTRL-C to quit...").
+		WithOnSignalCaught(func(ctx context.Contextsig os.Signal, wg *sync.WaitGroup) {
+			println()
+			// slog.Info("signal caught", "sig", sig)
+			cancel() // cancel user's loop, see Wait(...)
+		}).
+		WaitFor(ctx, func(ctx context.Context, closer func()) {
+			// slog.Debug("entering looper's loop...")
+			go func() {
+				// to terminate this app after a while automatically:
+				time.Sleep(10 * time.Second)
+				// closer will send a os.SigInt to cause `WithOnSignalCaught`
+        // calling `cancel()`
+				closer()
+			}()
+			<-ctx.Done() // waiting until any os signal caught
+		})
+```
+
+尽管这个方案看起来稍微有些笨重繁复，但事实上并非如此，它工作起来相当轻巧，没有任何互锁机制导致迟滞。
+
+当然，如果是单纯地需要一个简单地“Press any key to continue...”，可以使用 `is.PressAnyKeyToContinue(in io.Reader, msg ...string) (input string)` 或者 `is.PressEnterToContinue(in io.Reader, msg ...string) (input string)` 来达成目的。它们仅仅使用 `bufio.Fscanf()` 或者 `bufio.NewReader(in).ReadBytes('\n')`，一定比 `Catch()` 方案轻巧——除非你也同时需要对 `os.Signal` 进行捕俘。你应该提供 `os.Stdin` 作为其参数。
+
+### 额外的话题
+
+<Cards>
+  <Card title="Chapter: Using Store" href="../using-store/" />
+  <Card title="`hedzr/is` on Github" href="https://github.com/hedzr/is" />
+  <Card title="Manual of `hedzr/store`" href="/docs/store/" />
+  <Card title="`hedzr/store` on Github" href="https://github.com/hedzr/store" />
+</Cards>
+
+:end:
