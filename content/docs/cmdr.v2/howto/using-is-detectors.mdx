@@ -43,6 +43,8 @@ The old `DebugMode` and `DebugBuild` are still work:
 - `DebugBuild`: `-tags=delve` is set at building.
 - `DebugMode`: `--debug` is specified at command line.
 
+Since v0.8.27, `basics.Signals().Catcher().WaitFor()` wants `ctx` param passed in.
+
 ## 分类
 
 ### 基础环境
@@ -134,7 +136,7 @@ import (
 )
 
 func main() {
-    defer basics.Close()
+    // defer basics.Close() // uncomment if not using Catcher.WaitFor and/or cmdr.v2
 
     is.RegisterStateGetter("custom", func() bool { return is.InVscodeTerminal() })
 
@@ -157,44 +159,30 @@ func main() {
         <font color="green">green text</font>
 `, color.FgDefault))
 
+    var cancelled int32
     ctx, cancel := context.WithCancel(context.Background())
+    defer cancel()
+
     catcher := is.Signals().Catch()
     catcher.
         WithPrompt("Press CTRL-C to quit...").
-        WithOnLoop(dbStarter, cacheStarter, mqStarter).
-        WithOnSignalCaught(func(sig os.Signal, wg *sync.WaitGroup) {
+        // WithOnLoopFunc(dbStarter, cacheStarter, mqStarter).
+        WithPeripherals(&dbMgr{}).
+        WithOnSignalCaught(func(ctx context.Context, sig os.Signal, wg *sync.WaitGroup) {
             println()
             slog.Info("signal caught", "sig", sig)
             cancel() // cancel user's loop, see Wait(...)
         }).
-        Wait(func(stopChan chan<- os.Signal, wgDone *sync.WaitGroup) {
+        WaitFor(ctx, func(ctx context.Context, closer func()) {
             slog.Debug("entering looper's loop...")
-            go func() {
-                // to terminate this app after a while automatically:
-                time.Sleep(10 * time.Second)
-                stopChan <- os.Interrupt
-            }()
-            <-ctx.Done()  // waiting until any os signal caught
-            wgDone.Done() // and complete myself
+            defer close() // notify catcher we want to shutdown
+            // to terminate this app after a while automatically:
+            time.Sleep(10 * time.Second)
+
+            if atomic.CompareAndSwapInt32(&cancelled, 0, 1) {
+                is.PressAnyKeyToContinue(os.Stdin)
+            }
         })
-}
-
-func dbStarter(stopChan chan<- os.Signal, wgDone *sync.WaitGroup) {
-    // initializing database connections...
-    // ...
-    wgDone.Done()
-}
-
-func cacheStarter(stopChan chan<- os.Signal, wgDone *sync.WaitGroup) {
-    // initializing redis cache connections...
-    // ...
-    wgDone.Done()
-}
-
-func mqStarter(stopChan chan<- os.Signal, wgDone *sync.WaitGroup) {
-    // initializing message queue connections...
-    // ...
-    wgDone.Done()
 }
 ```
 
@@ -565,7 +553,7 @@ func main() {
         // WithVerboseFn(func(msg string, args ...any) {
         //     logz.WithSkip(2).Verbose(fmt.Sprintf("[verbose] %s", fmt.Sprintf(msg, args...)))
         // }).
-        WithOnSignalCaught(func(sig os.Signal, wg *sync.WaitGroup) {
+        WithOnSignalCaught(func(ctx context.Context, sig os.Signal, wg *sync.WaitGroup) {
             println()
             // logz.Debug("signal caught", "sig", sig)
             if err := server.Shutdown(); err != nil {
@@ -573,7 +561,7 @@ func main() {
             }
             cancel()
         }).
-        WaitFor(func(closer func()) {
+        WaitFor(ctx, func(ctx context.Context, closer func()) {
             logz.Debug("entering looper's loop...")
 
             server.WithOnShutdown(func(err error, ss net.Server) { closer() })
@@ -602,7 +590,7 @@ func runClient(ctx context.Context, ss net.Server, l stdnet.Listener) {
 所以对于 http server 来说，下面的做法是正确的：
 
 ```go
-  WaitFor(func(closer func()) {
+  WaitFor(ctx, func(ctx context.Context, closer func()) {
     logz.Debug("entering looper's loop...")
 
     server.WithOnShutdown(func(err error, ss net.Server) { closer() })
@@ -616,7 +604,7 @@ func runClient(ctx context.Context, ss net.Server, l stdnet.Listener) {
 假设你在其他地方启动了服务，并且通过 ctx cancel() 来管理那些服务的生存周期，那么 WaitFor 回调函数可以这么写：
 
 ```go
-  WaitFor(func(closer func()) {
+  WaitFor(ctx, func(ctx context.Context, closer func()) {
     defer closer()
     for {
       select {
@@ -638,15 +626,16 @@ func runClient(ctx context.Context, ss net.Server, l stdnet.Listener) {
 
 ```go
 	ctx, cancel := context.WithCancel(context.Background())
+  defer cancel()
 	catcher := is.Signals().Catch()
 	catcher.
 		WithPrompt("Press CTRL-C to quit...").
-		WithOnSignalCaught(func(sig os.Signal, wg *sync.WaitGroup) {
+		WithOnSignalCaught(func(ctx context.Contextsig os.Signal, wg *sync.WaitGroup) {
 			println()
 			// slog.Info("signal caught", "sig", sig)
 			cancel() // cancel user's loop, see Wait(...)
 		}).
-		WaitFor(func(closer func()) {
+		WaitFor(ctx, func(ctx context.Context, closer func()) {
 			// slog.Debug("entering looper's loop...")
 			go func() {
 				// to terminate this app after a while automatically:
