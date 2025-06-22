@@ -301,18 +301,18 @@ func ExampleNew() {
 
 	// For most of ttys, the output looks like:
 	//
-	// [31mhello, world.[0m
-	// [sx
-	// [32mhello, world.
-	// [38;5;160m[160] hello, world.
-	// [38;5;161m[161] hello, world.
-	// [38;5;162m[162] hello, world.
-	// [38;5;163m[163] hello, world.
-	// [38;5;164m[164] hello, world.
-	// [38;5;165m[165] hello, world.
-	// [0m[3A ERASED [38;2;211;211;33m[16m] hello, world.
-	// [uz
-	// [8BDONE
+	// \033[31mhello, world.\033[0m
+	// \033[sx
+	// \033[32mhello, world.
+	// \033[38;5;160m[160] hello, world.
+	// \033[38;5;161m[161] hello, world.
+	// \033[38;5;162m[162] hello, world.
+	// \033[38;5;163m[163] hello, world.
+	// \033[38;5;164m[164] hello, world.
+	// \033[38;5;165m[165] hello, world.
+	// \033[0m\033[3A ERASED \033[38;2;211;211;33m[16m] hello, world.
+	// \033[uz
+	// \033[8BDONE
 }
 
 func ExampleCursor_Color16() {
@@ -320,28 +320,28 @@ func ExampleCursor_Color16() {
 	var c = color.New()
 	fmt.Println(c.Color16(color.FgRed).
 		Printf("hello, %s.", "world").Println().Build())
-	// Output: [31mhello, world.[0m
+	// Output: \033[31mhello, world.\033[0m
 }
 
 func ExampleCursor_Color() {
 	// another colorful builfer
 	var c = color.New()
 	fmt.Println(c.Color(color.FgRed, "hello, %s.", "world").Build())
-	// Output: [31mhello, world.[0m
+	// Output: \033[31mhello, world.\033[0m
 }
 
 func ExampleCursor_Bg() {
 	// another colorful builfer
 	var c = color.New()
 	fmt.Println(c.Bg(color.BgRed, "hello, %s.", "world").Build())
-	// Output: [41mhello, world.[0m
+	// Output: \033[41mhello, world.\033[0m
 }
 
 func ExampleCursor_Effect() {
 	// another colorful builfer
 	var c = color.New()
 	fmt.Println(c.Effect(color.BgDim, "hello, %s.", "world").Build())
-	// Output: [2mhello, world.[0m
+	// Output: \033[2mhello, world.\033[0m
 }
 
 func ExampleCursor_Color256() {
@@ -353,9 +353,9 @@ func ExampleCursor_Color256() {
 		Color256(165).Printf("[165] hello, %s.\n", "world").
 		Build())
 	// Output:
-	// [38;5;163m[163] hello, world.
-	// [38;5;164m[164] hello, world.
-	// [38;5;165m[165] hello, world.
+	// \033[38;5;163m[163] hello, world.
+	// \033[38;5;164m[164] hello, world.
+	// \033[38;5;165m[165] hello, world.
 }
 
 func ExampleCursor_RGB() {
@@ -366,8 +366,8 @@ func ExampleCursor_RGB() {
 		BgRGB(211, 211, 33).Printf("[16m] hello, %s.\n", "world").
 		Build())
 	// Output:
-	// [38;2;211;211;33m[16m] hello, world.
-	// [48;2;211;211;33m[16m] hello, world.
+	// \033[38;2;211;211;33m[16m] hello, world.
+	// \033[48;2;211;211;33m[16m] hello, world.
 }
 
 func ExampleCursor_EDim() {
@@ -376,8 +376,8 @@ func ExampleCursor_EDim() {
 	fmt.Print(c. // Color16(color.FgRed).
 			EDim("[DIM] hello, %s.\n", "world").String())
 	// Output:
-	// [2m[DIM] hello, world.
-	// [0m
+	// \033[2m[DIM] hello, world.
+	// \033[0m
 }
 
 func ExampleCursor_Black() {
@@ -386,8 +386,8 @@ func ExampleCursor_Black() {
 	fmt.Print(c. // Color16(color.FgRed).
 			Black("[BLACK] hello, %s.\n", "world").String())
 	// Output:
-	// [30m[BLACK] hello, world.
-	// [0m
+	// \033[30m[BLACK] hello, world.
+	// \033[0m
 }
 
 func ExampleCursor_BgBlack() {
@@ -396,8 +396,8 @@ func ExampleCursor_BgBlack() {
 	fmt.Print(c. // Color16(color.FgRed).
 			BgBlack("[BGBLACK] hello, %s.\n", "world").String())
 	// Output:
-	// [40m[BGBLACK] hello, world.
-	// [0m
+	// \033[40m[BGBLACK] hello, world.
+	// \033[0m
 }
 
 func ExampleCursor_Translate() {
@@ -413,13 +413,13 @@ func ExampleCursor_Translate() {
 		<font color="green">green text</font>
 		`).String())
 	// Output:
-	// [51;1mcode[0m[39m | [51;1mCTRL[0m[39m
-	//		[1mbold / strong / em[0m[39m
-	//		[3mitalic / cite[0m[39m
-	//		[4munderline[0m[39m
-	//		[7minverse mark[0m[39m
-	//		[9mstrike / del [0m[39m
-	//		[32mgreen text[0m[39m
+	// \033[51;1mcode\033[0m\033[39m | \033[51;1mCTRL\033[0m\033[39m
+	//		\033[1mbold / strong / em\033[0m\033[39m
+	//		\033[3mitalic / cite\033[0m\033[39m
+	//		\033[4munderline\033[0m\033[39m
+	//		\033[7minverse mark\033[0m\033[39m
+	//		\033[9mstrike / del \033[0m\033[39m
+	//		\033[32mgreen text\033[0m\033[39m
 }
 
 func ExampleCursor_StripLeftTabsColorful() {
@@ -436,13 +436,13 @@ func ExampleCursor_StripLeftTabsColorful() {
 		<font color="green">green text</font>
 		`).String())
 	// Output:
-	// [51;1mcode[0m[0m | [51;1mCTRL[0m[0m
-	// [1mbold / strong / em[0m[0m
-	// [3mitalic / cite[0m[0m
-	// [4munderline[0m[0m
-	// [7minverse mark[0m[0m
-	// [9mstrike / del [0m[0m
-	// [32mgreen text[0m[0m
+	// \033[51;1mcode\033[0m\033[0m | \033[51;1mCTRL\033[0m\033[0m
+	// \033[1mbold / strong / em\033[0m\033[0m
+	// \033[3mitalic / cite\033[0m\033[0m
+	// \033[4munderline\033[0m\033[0m
+	// \033[7minverse mark\033[0m\033[0m
+	// \033[9mstrike / del \033[0m\033[0m
+	// \033[32mgreen text\033[0m\033[0m
 }
 ```
 
