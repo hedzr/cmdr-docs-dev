@@ -4,6 +4,7 @@ import { baseOptions } from "../../layout.config";
 
 import { baseUrl, createMetadata, site } from "@/lib/metadata";
 import { previewMode } from "@/lib/utils";
+import { redirect } from "next/navigation";
 
 const preview = previewMode ? " [Preview]" : "";
 
@@ -15,8 +16,8 @@ export const metadata = createMetadata({
   description: site.desc,
   // "a command-line arguments parser and app framework with hierarchical settings supporting",
   metadataBase: baseUrl,
-
   // metadataBase: new URL('https://acme.com'),
+
   alternates: {
     canonical: "/",
     languages: {
@@ -35,5 +36,6 @@ export const metadata = createMetadata({
 });
 
 export default function Layout({ children }: { children: ReactNode }) {
+  redirect("/docs");
   return <HomeLayout {...baseOptions}>{children}</HomeLayout>;
 }
