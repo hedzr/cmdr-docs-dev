@@ -7,6 +7,26 @@ description: "good practise for an app written with cmdr"
 
 `blueprint` app 展示了我们推荐的一种项目组织方法。源代码可以在 `hedzr/cmdr-tests` 的 [这里](https://github.com/hedzr/cmdr-tests/tree/master/examples/blueprint/) 找到。
 
+:::note
+
+**“重复的代码”**?
+
+除了在 [hedzr/cmdr-tests](https://github.com/hedzr/cmdr-tests/tree/master/examples/blueprint/) 中有一个 `blueprint` 示例程序之外，在 [hedzr/cmdr 的 examples](https://github.com/hedzr/cmdr/tree/master/examples/blueprint/) 中同样有一个 blueprint 示例程序，该示例缺乏 [hedzr/cmdr-loaders](https://github.com/hedzr/cmdr-loaders) repo 所提供的外部文件、源的加载能力。
+
+在 [hedzr/cmdr-go-starter](https://github.com/hedzr/cmdr-go-starter) 中的代码模版同样是 `blueprint`，这里更为正式，更适合工程实作，因为它为项目代码提供了周边相关的文件，具有完整的代码规范。
+
+在未来，`blueprint` 将会被放入 hedzr/cmdr-templates repo 中，作为一个默认模版向你提供。
+
+**真实世界**
+
+[cmdr-cli](https://github.com/hedzr/cmdr-cli) (暂未释出) 工具是完全标准化的独立 app，其中也包含大量到 cmdr 库的代码，这里也是一个参考。
+
+**样本代码**
+
+hedzr/cmdr-tests 中，以及 hedzr/cmdr 的 examples/ 中都包含各种示例代码供你参考。
+
+:::
+
 <Tabs items={["Project Layout", "main.go", "cmd/all.go", "cmd/soundex.go"]}>
 
 <Tab value="Project Layout">
@@ -48,9 +68,7 @@ const (
 )
 
 func main() {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	app := prepareApp(cmd.Commands...) // define your own commands implementations with cmd/*.go
+	ctx := context.Background()	app := prepareApp(cmd.Commands...) // define your own commands implementations with cmd/*.go
 	if err := app.Run(ctx); err != nil {
 		logz.ErrorContext(ctx, "Application Error:", "err", err) // stacktrace if in debug mode/build
 		os.Exit(app.SuggestRetCode())
@@ -259,12 +277,12 @@ cmdr-loader 已经装配好了所有有关的基本工作，所以这样开始�
    [zoo.camel]
    grouped = false
    ```
-2. 运行 `./bin/blueprint ~~debug` 查看和找到 `app.zoo.canel.grouped` 表项以证实配置文件正确装载。
+2. 运行 `./bin/blueprint ~~debug` 查看和找到 `app.zoo.camel.grouped` 表项以证实配置文件正确装载。
 3. 证实 `./ci/etc/blueprint/` 的配置项已经被加载。
 
 最后，在部署 app 时，将 `./ci/etc/blueprint/` 部署到 `/etc/blueprint/`，而将 `./blueprint.toml` 和 `bin/blueprint` 可执行文件放在一起。
 
-::: tip
+:::tip
 
 **windows**
 

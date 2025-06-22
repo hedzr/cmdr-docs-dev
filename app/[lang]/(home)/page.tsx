@@ -14,6 +14,35 @@ export default function HomePage() {
         </Link>{" "}
         and see the documentation.
       </p>
+      Golang:
+      <ul>
+        <li>
+          cmdr.v2 (Golang): <Link href="/docs/cmdr.v2" />
+        </li>
+        <li>
+          store: <Link href="/docs/store" />
+        </li>
+        <li>
+          evendeep (deepcopy): <Link href="/docs/evendeep" />
+        </li>
+        <li>
+          logg/slog: <Link href="/docs/logg" />
+        </li>
+        <li>
+          is: <Link href="/docs/store" />
+        </li>
+        <li>...</li>
+      </ul>
+      C++:
+      <ul>
+        <li>
+          cmdr-cxx: <Link href="/docs/cmdr-cxx" />
+        </li>
+        <li>
+          trie-cxx: <Link href="/docs/trie-cxx" />
+        </li>
+        <li>...</li>
+      </ul>
     </main>
   );
 }
