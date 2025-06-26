@@ -106,6 +106,22 @@ Both of them are searching for the child directly. But if you want the descendan
 
 As the methods of `*cli.CmdS`, they aren't exposed on `interface Cmd` currently. So it might need a `Type Assertion` before you can access them.
 
+### Using `Create()`
+
+`Create()` and `blueprint` example gives you a best-practise in engineering, which has a better structure and layout to compliant with engineering management.
+
+See also:
+
+- `blueprint` in docs: [examples/blueprint](/docs/cmdr.v2/examples/blueprint/)
+
+### Using struct-value and Tag
+
+`Create().BuildFrom(structValue, opts...)` can rapidly make the whole command hierarchy with the passing struct-value.
+
+See also:
+
+- [From struct-value and Tag (in docs)](/en/docs/cmdr.v2/guide/steps/g13-build-from-struct/)
+
 ## Design
 
 `cmdr.v2` takes these dependencies:
