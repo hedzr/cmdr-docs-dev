@@ -112,6 +112,22 @@ The help screen looks like,
 
 它们在 `*cli.CmdS` 上提供，但目前没有在 `interface Cmd` 上提供，所以可能你需要一个 Type Assertion 进行转换。
 
+### 使用 `Create()`
+
+`Create()` 和 `blueprint` example 给出了工程实践中的推荐风格，它们能够令大型命令体系结构更容易被管理。
+
+参见：
+
+- `blueprint` in docs: [examples/blueprint](/docs/cmdr.v2/examples/blueprint/)
+
+### 使用结构和 Tag 快速建立命令层次
+
+`Create().BuildFrom(structValue, opts...)` 能够通过给出的 struct-value 来构造子命令和 Flag。
+
+这种方法能够快速搭建命令层次结构，参见：
+
+- [从结构与 Tag 构建命令体系 (in docs)](/docs/cmdr.v2/guide/steps/g13-build-from-struct/)
+
 ## Learn More
 
 <Cards>

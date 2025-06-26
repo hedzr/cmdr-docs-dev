@@ -130,10 +130,14 @@ const (
 )
 ```
 
-作为资源型对象的 dbConn 实例，由于它实现了 `Open(context.Context) error`，因此 `cmdr.WithPeripherals()` 完成两件事：
+作为资源型对象的 dbConn 实例，由于它实现了 `Open(context.Context) error`（即 `basics.Openable`，参见 `hedzr/is.basics`），因此 `cmdr.WithPeripherals()` 完成两件事：
 
 1. 将其登记到 `is.Closers()` 之中，实现自动释放资源和关闭对象
 2. 将其登记到 pre-run 清单中（通过 `WithTasksSetupPeripherals()`），在子命令将要运行之前自动调用 `Open()`
+
+这样一来，dbConn 就能在子命令运行之前被恰当地初始化，然后在子命令完成并退出到 OS 之前自动释放其占用的资源。
+
+其中有两点值得注意，其一是即使子命令不如预期地退出，cmdr 仍能通过 recovery 机制获得释放 dbConn 以及其它已登记的 closers 的机会；其二是，如果用户输入命令行 `app --help` 等参数调用到 cmdr 内置选项而并不真正调用子命令时，dbConn 不必被无意义地初始化。
 
 ### 说明
 
