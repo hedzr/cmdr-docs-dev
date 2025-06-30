@@ -20,7 +20,7 @@ excerpt: >-
 
 ## Sample
 
-1Mermaid
+### 1, Mermaid
 
 ```mermaid
 graph TD;
@@ -30,10 +30,10 @@ graph TD;
     C-->D;
 ```
 
-2Mermaid
+### 2, Mermaid
 
 ```mermaid
-graph TD;
+graph LR;
 subgraph AA [Consumers]
 A[Mobile app];
 B[Web app];
@@ -53,12 +53,141 @@ Z --> F;
 Z --> G;
 ```
 
-3Mermaid
+### 3, Mermaid
 
 ```mermaid
-graph LR
-A[docker] -->|Commands| B(checkpoint)
-B --> D[create]
-B --> E[ls]
-B --> F[rm]
+graph LR;
+A[docker] -->|Commands| B(checkpoint);
+B --> D[create];
+B --> E[ls];
+B --> F[rm];
+```
+
+### Query Info
+
+Mermaid-(js) version is:
+
+```mermaid
+  info
+```
+
+## more
+
+### sequence diagram
+
+```mermaid
+sequenceDiagram
+    Tech writer -->> Developer: Hi, can you check that I've described everything correctly?
+    Developer -->> Junior developer: Hi, can you, please, help our TW with the task?
+    Developer --x Tech writer: Sure, I've asked Garold to take care of this, it will help him to understand the logic better.
+    Junior developer -->> Developer: No problem!
+
+    Developer --> Tech writer: Adding you both to a group chat  ...
+    Note right of Developer: Adding to the chat.
+
+    Tech writer --> Junior developer: Hi, Garold!
+```
+
+### state diagram
+
+```mermaid
+stateDiagram-v2
+    [*] --> Draft
+    RR: Ready for review
+    NU: Need updates
+    AC: Apply changes
+    LGTM: All good
+    RP: Ready to publish
+    Draft --> RR
+    RR --> Review
+    Review --> NU
+    NU --> AC
+    AC --> Review
+    Review --> LGTM
+    LGTM --> RP
+    RP --> [*]
+```
+
+### git graph
+
+```mermaid
+gitGraph
+    commit
+    commit
+    branch DOC-123-update-the-doc-A
+    checkout DOC-123-update-the-doc-A
+    commit id: "write the procedure"
+    commit id: "update screenshots"
+    checkout main
+    merge DOC-123-update-the-doc-A
+    commit
+    commit
+```
+
+### flowchart
+
+```mermaid
+flowchart TD
+    A[Christmas] -->|Get money| B(Go shopping)
+    B --> C{Let me think}
+    C -->|One| D[Laptop]
+    C -->|Two| E[iPhone]
+    C -->|Three| F[fa:fa-car Car]
+
+```
+
+## geojson & topjson
+
+[创建 GeoJSON 和 TopoJSON 地图](https://docs.github.com/zh/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams#creating-geojson-and-topojson-maps) 不被支持。
+
+````markdown
+```geojson
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": 1,
+      "properties": {
+        "ID": 0
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -90,
+              35
+            ],
+            [
+              -90,
+              30
+            ],
+            [
+              -85,
+              30
+            ],
+            [
+              -85,
+              35
+            ],
+            [
+              -90,
+              35
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}
+```
+````
+
+## Links
+
+- [Backstage](/docs/cmdr.v2/concepts/g80-backstage/)
+
+```
+
 ```
