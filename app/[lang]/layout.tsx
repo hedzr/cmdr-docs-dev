@@ -66,6 +66,12 @@ function wrapAnalyticsOrNot(): ReactNode {
       <SpeedInsights />
       <Analytics />
       <GoogleAnalytics gaId="G-301DLP27SS" />
+      <script
+        defer
+        src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon='{"token": "7681cbee52cc43e39060f9e3fda7a815"}'
+        strategy="afterInteractive"
+      ></script>
     </Suspense>
   ) : (
     <></>
