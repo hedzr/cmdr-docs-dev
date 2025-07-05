@@ -1,0 +1,95 @@
+---
+title: 解析结果
+description: the matched states of cmdr ...
+---
+
+## Matched States
+
+通过 `cmdr.MatchedStates()` 可以获得命令行参数的解析结果，这是在 `cmdr.Run()` 执行之后得到的。
+
+常规的工作模式里，`Run` 将会解析命令行参数，确认匹配的子命令，然后调用子命令的 `Action` 回调函数来完成子命令的相关操作。
+
+此时，Matched States 就是可用的。
+
+通常情况下，你应该无需使用到 Matched States 来做点什么。这是因为在 Action 函数中，所有的必须知道的信息都可以通过传入的 `cmd cli.Cmd` 来获取到。
+
+例如 `cmd.Root()` 可以得到顶级 RootCommand 对象，`cmd.App()` 可以获取到关联的 App 对象，而 `cmd.Store()` 可以获得关联到 cmd 上下文到配置集子树，等等。
+
+实际上在一个子命令的 Action 中，你知道这些内容已经足以完成相关操作了。
+
+而 Matched States 的目的则在于向你提供完整全面的解析结果集合，总有一些特殊的工作可能会依赖于检查这个集合来做事情。
+
+Matched States 包含如下的一组顶级函数，例如 `cmdr.Parsed() bool` 返回了解析结果集合是否有效的状态，等等。
+
+```go
+// Parsed identify cmdr.v2 ended the command-line arguments
+// parsing task.
+func Parsed() bool                   { return App().ParsedState() != nil }            // is parsed ok?
+func ParsedLastCmd() cli.Cmd         { return App().ParsedState().LastCmd() }         // the parsed last command
+func ParsedCommands() []cli.Cmd      { return App().ParsedState().MatchedCommands() } // the parsed commands
+func ParsedPositionalArgs() []string { return App().ParsedState().PositionalArgs() }  // the rest positional args
+func ParsedState() cli.ParsedState   { return App().ParsedState() }                   // return the parsed state
+```
+
+其中，`ParsedState` 是提供详细解析结果的完整接口：
+
+```go
+
+type ParsedState interface {
+	LastCmd() Cmd                        // the last matched subcmd
+	MatchedCommands() []Cmd              // all matched subcmds
+	MatchedFlags() map[*Flag]*MatchState //all matched flags
+	PositionalArgs() []string            // positional args if remained
+
+	CommandMatchedState(c Cmd) (ms *MatchState) // MatchState assiciated to a cmd object
+	FlagMatchedState(f *Flag) (ms *MatchState)  // MatchState assiciated to a flag object
+
+	// tests
+
+	NoCandidateChildCommands() bool
+	HasCmd(longTitle string, validator func(cc Cmd, state *MatchState) bool) (found bool)
+	HasFlag(longTitle string, validator func(ff *Flag, state *MatchState) bool) (found bool)
+
+	// colorful
+
+	// Translate is a helper function, which can interpret the
+	// placeholders and translate them to the real value.
+	// Translate is used for formatting command/flag's description
+	// or examples string.
+	//
+	// The avaliable placeholders could be: `{{.AppNmae}}`,
+	// `{{.AppVersion}}`, `{{.DadCommands}}`, `{{.Commands}}` ...
+	Translate(pattern string) (result string)
+
+	// helpers
+
+	DadCommandsText() string
+	CommandsText() string
+}
+```
+
+进一步地，针对每条匹配到的子命令，以及标志（Flag），相应的 MatchState 结构体的定义如下：
+
+```go
+type MatchState struct {
+	DblTilde bool   // '~~xxx'?
+	Plus     bool   // '+xxx'?
+	Short    bool   // '-xxx' or '--xxx'?
+	HitStr   string // the title input by end-user
+	HitTimes int    // how many times input by end-user. eg `-vvv` means 3rd times of `-v`
+	Value    any    // final value of a matched flag
+}
+```
+
+想必无需额外的文字描述了，这些定义应该是充分自我描述的。
+
+### 额外的话题
+
+<Cards>
+  <Card title="With Options" href="../g71-with-options" />
+  <Card title="Package Level Functions" href="../g70-package-level-functions" />
+</Cards>
+
+## Links
+
+- [Mermaid](/docs/internal-tests/tests/mermaid/)
