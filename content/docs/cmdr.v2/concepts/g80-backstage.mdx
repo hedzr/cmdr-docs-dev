@@ -1,0 +1,67 @@
+---
+title: Backstage
+description: the backstage of cmdr ...
+---
+
+## 运行方式
+
+### Main Loop
+
+```mermaid
+stateDiagram-v2
+
+  [*] --> A
+  A: Build RootCmd
+  R: cmdr.Run
+  OUT: Exit
+  note right of OUT
+    collect and report app error, and exit
+  end note
+
+  A --> R
+  R --> OUT
+  OUT --> [*]
+
+```
+
+### cmdr `Run` Workflow
+
+```mermaid
+stateDiagram
+
+  %% cmdr internal workflow
+
+  direction LR
+  [*] --> Rpre
+  Rpre: Preprocess
+  Rparse: Parse cmdline args
+  Rexec: Excute action
+  Rpost: Postprocess
+  Rpre --> Rparse
+  Rparse --> Rexec
+  Rexec --> Rpost
+  Rpost --> [*]
+
+  state Rpre {
+    Link --> Collect
+    Collect --> Load
+    Load --> PostLink
+
+    Link: link crossrefs
+    Collect: collect envvars
+    Load: load minimal-json, load Store
+    PostLink: post-link crossrefs
+  }
+
+```
+
+### 额外的话题
+
+<Cards>
+  <Card title="With Options" href="../g71-with-options" />
+  <Card title="Package Level Functions" href="../g70-package-level-functions" />
+</Cards>
+
+## Links
+
+- [Mermaid](/docs/internal-tests/tests/mermaid/)
