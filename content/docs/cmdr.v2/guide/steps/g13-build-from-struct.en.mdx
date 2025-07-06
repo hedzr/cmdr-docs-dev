@@ -463,15 +463,27 @@ import (
 	logz "github.com/hedzr/logg/slog"
 )
 
-var lastMultiCmd *multiCmd
-
 type multiCmd struct {
-    // [!code highlight:1]
 	root root
 }
 
+func set(app cli.App, s *multiCmd) {
+	app.Store().Set("multi-cmd", s)
+}
+
+func get(app cli.App) (s *multiCmd) {
+	if ptr, found := app.Store().Get("multi-cmd"); found && ptr != nil {
+		if ss, ok := ptr.(*multiCmd); ok {
+			s = ss
+		}
+	}
+	return
+}
+
 func (s *multiCmd) Add(app cli.App) {
-	lastMultiCmd = s
+	set(app, s)
+
+	// just for debugging, removing this 'if' branch is safe.
 	if is.DebuggerAttached() {
 		logz.SetLevel(logz.TraceLevel)
 		// app.WithOpts(cli.WithArgs(os.Args[0], "~~tree"))
@@ -484,11 +496,11 @@ func (s *multiCmd) Add(app cli.App) {
 		fmt.Printf("    >> A.Fa3 (positional): %p\n", &s.root.A.Fa3)
 	}
 
+	// add 'multi' subcmd, and add more subcmds and flags from `root` struct
 	app.Cmd("multi", "mu", "").
 		Description("multi-level test and imported form struct").
 		// Group("Test").
 		TailPlaceHolders("[text1, text2, ...]").
-    // [!code highlight:1]
 		FromStruct(&s.root).
 		OnAction(s.Action).
 		With(func(b cli.CommandBuilder) {
@@ -497,7 +509,6 @@ func (s *multiCmd) Add(app cli.App) {
 }
 
 func (s *multiCmd) postAction(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
-  // [!code highlight:7]
 	logz.Println(fmt.Sprintf("multiCmd.root: .ptr = %p, .val = %+v\n    multiCmd.A.ptr = %p\n    multiCmd.A.D.ptr = %p\n    multiCmd.A.D.E.ptr = %p",
 		&s.root, s.root,
 		&s.root.A,
@@ -511,7 +522,7 @@ func (s *multiCmd) postAction(ctx context.Context, cmd cli.Cmd, args []string) (
 
 func (s *multiCmd) Action(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
 	logz.Println(".   - multiCmd.Action() invoked.", "cmd", cmd, "args", args)
-	_, err = cmd.App().DoBuiltinAction(ctx, cli.ActionDefault, stringArrayToAnyArray(args)...)
+	_, err = cmd.App().DoBuiltinAction(ctx, cli.ActionDefault, anyArrayToAnyArray(args)...)
 	fmt.Printf("root: %+v\n", s.root)
 	_ = s.postAction(ctx, cmd, args)
 	return
@@ -531,7 +542,6 @@ type A struct {
 	D
 	Fa1 int
 	Fa2 string
-  // [!code highlight:1]
 	Fa3 []string `cmdr:"positional"`
 }
 type B struct {
@@ -572,11 +582,10 @@ func (A) F1With(fb cli.FlagBuilder) {
 
 // Action method will be called if end-user type subcmd for it (like `app a d e --f3`).
 func (s E) Action(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
-  // [!code highlight:9]
 	logz.Info(".   - E.Action() invoked.", "cmd", cmd, "args", args)
-	_, err = cmd.App().DoBuiltinAction(ctx, cli.ActionDefault, stringArrayToAnyArray(args)...)
+	_, err = cmd.App().DoBuiltinAction(ctx, cli.ActionDefault, anyArrayToAnyArray(args)...)
 	fmt.Printf("E: %+v\n", s)
-	if lastMultiCmd != nil {
+	if lastMultiCmd := get(cmd.App()); lastMultiCmd != nil {
 		fmt.Printf("D: %+v\n", lastMultiCmd.root.A.D)
 		fmt.Printf("A: %+v\n", lastMultiCmd.root.A)
 		fmt.Printf("A.Fa3 (positional): %p\n", &lastMultiCmd.root.A.Fa3)
@@ -588,11 +597,10 @@ func (s E) Action(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
 // Action method will be called if end-user type subcmd for it (like `app a d f --f5=7`).
 func (s F) Action(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
 	(&s).Inc()
-  // [!code highlight:6]
 	logz.Info(".   - F.Action() invoked.", "cmd", cmd, "args", args, "F5", s.F5)
-	_, err = cmd.App().DoBuiltinAction(ctx, cli.ActionDefault, stringArrayToAnyArray(args)...)
+	_, err = cmd.App().DoBuiltinAction(ctx, cli.ActionDefault, anyArrayToAnyArray(args)...)
 	fmt.Printf("F: %+v\n", s)
-	if lastMultiCmd != nil {
+	if lastMultiCmd := get(cmd.App()); lastMultiCmd != nil {
 		fmt.Printf("D: %+v\n", lastMultiCmd.root.A.D)
 		fmt.Printf("A: %+v\n", lastMultiCmd.root.A)
 		_ = lastMultiCmd.postAction(ctx, cmd, args)
@@ -604,7 +612,8 @@ func (s *F) Inc() {
 	s.F5++
 }
 
-func stringArrayToAnyArray(args []string) (ret []any) {
+func anyArrayToAnyArray[T any](args []T) (ret []any) {
+	ret = make([]any, 0, len(args))
 	for _, it := range args {
 		ret = append(ret, it)
 	}
@@ -616,9 +625,7 @@ func stringArrayToAnyArray(args []string) (ret []any) {
 
 </Tabs>
 
-> 代码块中的高亮行是显著有别于上一节例子的部分。
-
-其运行效果类似于：
+The result is,
 
 ```bash
 # go run ./cli/cmdr mu a --fa2=yes,man! -v -f2=ok -- jesus
