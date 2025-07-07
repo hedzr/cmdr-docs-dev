@@ -6,7 +6,8 @@ export default createI18nMiddleware(i18n);
 export const config = {
   // Matcher ignoring `/_next/` and `/api/`
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|images|assets).*)',
+    '/((?!api|_next|.well-known|favicon.ico|images|assets).*)',
+    // '//',
     // '/.*\.(ico|jpe?g|png|webp|webm|gif|tiff?|bmp|hvec|mpe?g|mp4|mkv)',
   ],
 };

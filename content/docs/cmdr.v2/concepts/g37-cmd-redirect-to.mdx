@@ -13,10 +13,24 @@ description: Redirect To...
 
 想象一下 `pnpm` 这样的包管理器命令，`pnpm dev` 实际上等价于 `pnpm run dev` 子命令，都是去运行 `package.json` 的 `scripts` 节里的 `dev` 条目所定义的命令行。
 
-> **TODO**  
-> cmdr.v2 有设想为 RedirectTo 加上 fallback: bool 的子特性。
+> **GAVEUP**  
+> ~~cmdr.v2 有设想为 RedirectTo 加上 fallback: bool 的子特性。~~
 >
-> 但这一设想尚未定型，也没有纳入计划表。
+> ~~但这一设想尚未定型，也没有纳入计划表。~~
+
+> Since v2.1.40  
+> `recursive` 参数的作用在于进行子命令的递归转发。在非递归模式下，仅指定了 `redirectTo` 的命令自身会被转发到目的地；但在递归模式下，`redirectTo` 命令及其所有子命令都会被转发。  
+> 以 `(root)` -> `server` 的转发为例，在非递归模式下，用户输入的 `app` 相当于 `app server` 命令；但仅在递归模式下，`app run` 会被尝试转发为 `app server run`。
+>
+> 使能 `recursive` 参数的方法是 `SetRedirectTo("server", true)`，第二个参数的用途即如此。
+
+:::note
+
+- 命令转发功能容易引发未能预料的问题，请谨慎使用。
+- 使用大量的转发功能事实上代表着你的命令系统的设计存在结构性问题。
+- 循环转发子命令可能导致死锁问题，尽管我们将会尝试自动避开他们。
+
+:::
 
 ### 定义
 
@@ -55,12 +69,6 @@ func main() {
 在这里，`app.WithRootCommand(...)` 可以用于操作 `SetRedirectTo` 接口函数。
 
 现在，运行 `app` 的效果就和 `app wrong` 相同。
-
-> Since v2.1.40  
-> `recursive` 参数的作用在于进行子命令的递归转发。在非递归模式下，仅指定了 redirectTo 的命令自身会被转发到目的地；但在递归模式下，redirectTo 命令及其所有子命令都会被转发。  
-> 以 `(root)` -> `server` 的转发为例，在非递归模式下，`app` 相当于 `app server` 命令；但仅在递归模式下，`app run` 会被尝试转发为 `app server run`。
->
-> 使能 `recursive` 参数的方法是 `SetRedirectTo("server", true)`，第二个参数的用途即如此。
 
 #### 可以有多种途径达到目的
 
