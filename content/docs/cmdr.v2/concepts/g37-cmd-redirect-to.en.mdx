@@ -13,6 +13,12 @@ description: Redirect To...
 
 The well-known case is `pnpm`, a nodejs package manager, which can forward any unmatched commands like `pnpm dev` to `pnpm run ...`, that would be `pnpm run dev`.
 
+> Since v2.1.40  
+> `recursive` parameter can enable the redirecting action recursively. In recursive mode, subcmds will be forwarded to target command to try to match it.  
+> For instance, there is a redirect-to rule `(root)` -> `server`, typing `app` is equal to input `app server` command in non-recursive mode; and if it's in recursive mode, typing `app run` can be interpretted as `app server run` if possible.
+>
+> To enable `recursive` mode, calling `SetRedirectTo("server", true)` with second parameter `true`.
+
 ### Definitions
 
 The key interface is `*CmdS.SetRedirectTo(dottedCmdPath)`. So whatever we need to do is,
