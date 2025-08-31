@@ -31,8 +31,9 @@ description: "`is` detectors and its basic supports in golang"
 - basics: closable, closer, signals.
   - easier `Press any key to exit...` prompt: `is.Signals().Catch()`
 - exec: Run, RunWithOutput, Sudo, ...
-- go1.23.7+ required since v0.7.0
-- ~~go 1.22.7+ required~~
+- ~~go1.23.7+ required since v0.7.0~~
+- ~~go 1.24.0+ required~~
+- go1.24.5 required since v0.8.55
 
 To using environment detecting utilities better and smoother, some terminal (and stringtool, basics) tools are bundled together.
 
@@ -61,7 +62,6 @@ Since v0.8.27, `basics.Signals().Catcher().WaitFor()` wants `ctx` param passed i
 - `is.InDocker` / InDockerEnvSimple
 
 - Build (need `-tags=xx`)
-
   - `is.K8sBuild`: need `-tags=k8s` present
   - `is.IstioBuild`: need `-tags=istio` present
   - `is.DockerBuild`: need `-tags=docker` present
@@ -472,6 +472,13 @@ To create a [Color](https://pkg.go.dev/github.com/hedzr/is@v0.8.31/term/color#Co
 - by [NewSGR](https://pkg.go.dev/github.com/hedzr/is@v0.8.31/term/color#NewSGR) or use [CSIsgr](https://pkg.go.dev/github.com/hedzr/is@v0.8.31/term/color#CSIsgr) constants directly like [SGRdim](https://pkg.go.dev/github.com/hedzr/is@v0.8.31/term/color#SGRdim), [SGRstrike](https://pkg.go.dev/github.com/hedzr/is@v0.8.31/term/color#SGRstrike), ...
 - by [NewStyle](https://pkg.go.dev/github.com/hedzr/is@v0.8.31/term/color#NewStyle) to make a compounded object
 - ...
+
+As to v0.8.53, a `Color` object can wrap itself arroubd the given text:
+
+```go
+color.BgBold.Wrap(color.FgRed.Wrap("ERROR!"))
+color.BgDim.Wrap(color.FgDarkGray.Wrap("debug message here."))
+```
 
 ## 与 `cmdr` 相集成 [#integrated-with-cmdr]
 
