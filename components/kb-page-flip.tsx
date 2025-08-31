@@ -29,7 +29,9 @@ export default function HandlingKeyboardLeftAndRight({
         event.preventDefault();
         console.log("onKeyDown, right");
         const q = document.body;
-        let e = q.querySelector("a > div > svg.lucide"); // docs
+        let e = q.querySelector(
+          "a > div > svg.lucide > path[d='m9 18 6-6-6-6']",
+        ); // docs
         if (!e) e = q.querySelector("a > div > svg.lucide-chevron-right"); // docs
         if (e) e.parentElement?.parentElement?.click();
         else {
@@ -53,7 +55,9 @@ export default function HandlingKeyboardLeftAndRight({
         event.preventDefault();
         console.log("onKeyDown, left");
         const q = document.body;
-        let e = q.querySelector("a > div > svg.lucide"); // docs
+        let e = q.querySelector(
+          "a > div > svg.lucide > path[d='m15 18-6-6 6-6']",
+        ); // docs
         if (!e) e = q.querySelector("a > div > svg.lucide-chevron-left"); // docs
         if (e) e.parentElement?.parentElement?.click();
         else {
