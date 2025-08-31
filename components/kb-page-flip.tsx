@@ -29,7 +29,8 @@ export default function HandlingKeyboardLeftAndRight({
         event.preventDefault();
         console.log("onKeyDown, right");
         const q = document.body;
-        const e = q.querySelector("a > div > svg.lucide-chevron-right"); // docs
+        let e = q.querySelector("a > div > svg.lucide"); // docs
+        if (!e) e = q.querySelector("a > div > svg.lucide-chevron-right"); // docs
         if (e) e.parentElement?.parentElement?.click();
         else {
           // blog list
@@ -52,7 +53,8 @@ export default function HandlingKeyboardLeftAndRight({
         event.preventDefault();
         console.log("onKeyDown, left");
         const q = document.body;
-        const e = q.querySelector("a > div > svg.lucide-chevron-left"); // docs
+        let e = q.querySelector("a > div > svg.lucide"); // docs
+        if (!e) e = q.querySelector("a > div > svg.lucide-chevron-left"); // docs
         if (e) e.parentElement?.parentElement?.click();
         else {
           // blog list
