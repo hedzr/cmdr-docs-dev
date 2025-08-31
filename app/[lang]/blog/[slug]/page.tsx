@@ -286,7 +286,7 @@ export default async function BlogPage(props: {
               blockquote: Callout as unknown as FC<
                 ComponentProps<"blockquote">
               >,
-              APIPage: openapi.APIPage,
+              // APIPage: openapi.APIPage,
               DocsCategory: () => <DocsCategory page={page} from={source} />,
 
               File,
