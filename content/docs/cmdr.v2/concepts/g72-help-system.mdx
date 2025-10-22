@@ -39,7 +39,7 @@ Type 'quit' to end this session and back to Shell.
 
 (cmdr): help
 Human says:  help
-...help screen skiped...
+...help screen skipped...
 
 (cmdr): preset
 ...help screen for `preset` subcmd skipped...
@@ -57,13 +57,16 @@ $
 
 这意味着你可以在帮助子系统的提示符下连续执行多条子命令，直到你 `quit` 退出帮助子系统为止。
 
-如果你的 app 需要一个沉重的启动环节，例如连接到数据库服务等，那么帮助子系统或许是一种另类的节省（启动）时间并发出多条命令的方法。
+如果你的 app 需要一个沉重的启动环节，例如连接到数据库服务等，那么帮助子系统或许是一种另类的节省（启动）时间并持续发出多条命令的方法。
 
 除此而外，由于你只需要输入子命令即可显示帮助屏或者执行相应子命令，所以查询一系列子命令所带有的标志项可能会较为方便。
 
-### TODO
+### DONE
 
 - 帮助子系统具有上下方向键翻滚历史条目的功能
+
+### TODO
+
 - 帮助子系统尚未能支持 <kbd>TAB</kbd> 自动补全的功能，暂未纳入路线图
 
 <include>../../headless/cmdr-guide-concepts-command.mdx</include>
