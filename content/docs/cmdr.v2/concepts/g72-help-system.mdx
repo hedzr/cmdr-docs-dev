@@ -1,0 +1,69 @@
+---
+title: 帮助子系统
+description: Help Screen and Help subsystem
+---
+
+## 帮助屏
+
+cmdr 有一个有力的帮助屏，其中自动罗列了当前命令的所属信息，这包括其子命令列表，标志列表，也包括在该子命令的上下文中可以使用的上级命令的标志清单。
+
+如果当前命令还有下级子命令，那么 `app cmd` 将会自动显示帮助屏，除非你在该命令上显式绑定了 `OnAction(yourHandler)`——但这并不是良好的做法，不被推荐。
+
+始终可以使用 `app --help`, `app cmd --help`, `HELP=1 app cmd` 等几种方式来要求显示帮助屏。
+
+一些特殊的命令（例如命令别名），标志（例如必选项、可翻转选项组）在帮助屏中有较为明显的区别，这有助于你通过帮助屏获得它们的特质。
+
+对于开发者来说，使用子命令的 `LongDescription` 和 `Examples` 字段来提供较为冗长的说明信息，是值得推荐的。尽管更多情况下，精心设计具备自我说明能力的命令和选项的名称，令使用者一目了然地获得符合惯例的指引。例如子命令 `compile` 和 `test` 总是没有歧义地代表了编译和测试一个文件或项目。
+
+## 帮助子系统
+
+:::note
+
+帮助子系尚未达到最完善的程度，属于一种实验性功能。
+
+:::
+
+如果你输入命令行 `app help cmd [subcmd...]`，这将会显示相应命令的帮助屏，如同 `app cmd [subcmd...] --help` 所做的工作一样。
+
+如果你不提供子命令列表，则 `app help` 将会启动一个交互模式的帮助子系统。使用者将会在该交互对话的提示符模式下直接执行命令，直到输入 `quit` 命令退出交互模式返回 Shell 环境。
+
+在这个交互对话的提示符模式中，输入 `cmd` 将会显示它的帮助屏，如果它具有下级子命令的话，否则，将会执行该 `cmd` 所绑定的 `OnAction(handler)` 功能。执行完成后提示符模式将会继续。
+
+在提示符模式下，直接使用 `cmd [subcmd...] [--flags...] [positional args...]` 格式而不再需要输入 `app` 名称。
+
+```bash
+$ go run ./examples/blueprint help
+
+Type 'help' to print Help Screen, 'help cmd...' for a specified cmd.
+Type 'quit' to end this session and back to Shell.
+
+(cmdr): help
+Human says:  help
+...help screen skiped...
+
+(cmdr): preset
+...help screen for `preset` subcmd skipped...
+
+(cmdr): preset c --help
+...help screen for `preset c` subcmd skipped...
+
+(cmdr): quit
+Bye!
+
+$
+```
+
+当你在 `(cmdr)` 提示符下输入子命令以及标志参数时，帮助子系统会尝试运行你给出的子命令，随后返回 `(cmdr)` 继续待命。
+
+这意味着你可以在帮助子系统的提示符下连续执行多条子命令，直到你 `quit` 退出帮助子系统为止。
+
+如果你的 app 需要一个沉重的启动环节，例如连接到数据库服务等，那么帮助子系统或许是一种另类的节省（启动）时间并发出多条命令的方法。
+
+除此而外，由于你只需要输入子命令即可显示帮助屏或者执行相应子命令，所以查询一系列子命令所带有的标志项可能会较为方便。
+
+### TODO
+
+- 帮助子系统具有上下方向键翻滚历史条目的功能
+- 帮助子系统尚未能支持 <kbd>TAB</kbd> 自动补全的功能，暂未纳入路线图
+
+<include>../../headless/cmdr-guide-concepts-command.mdx</include>
