@@ -1,6 +1,6 @@
 {
   "title": "cmdr(-go) v2.x",
-  "description": "Commandline args parsing framework",
+  "description": "Commandline args parser",
   "icon": "MonitorCog",
   "root": true,
   "defaultOpen": true,
