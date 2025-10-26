@@ -1,11 +1,11 @@
 ---
-title: 可共享共存的 app 实例
+title: Shared App
 description: multiple app instances
 ---
 
 ## 多个 app 实例
 
-自 cmdr v2.1.11 起，我们支持声明多个 app 实例，彼此互不相干。
+We provide new `Shared App` instance since cmdr v2.1.11, which allowes multiple app instances living at same time.
 
 ```go title="examples/shared/main.go"
 package main
@@ -39,7 +39,7 @@ func main() {
 
 	ctx := context.Background()
 
-// [!code highlight:9]
+	// [!code highlight:9]
 	// declare a shared app.
 	//
 	// In a shared app, cmdr.App() doesn't point to the first
@@ -173,7 +173,7 @@ func (presetCmd) Add(app cli.App) {
 }
 ```
 
-注意到 line 40 完成了 `shared.cmdr.app` 宣告，这是全局有效的：
+The notabled codes at line 40 did the declaration of a `shared.cmdr.app`, which will take effect globally:
 
 ```go
 	// [!code highlight:9]
@@ -188,11 +188,11 @@ func (presetCmd) Add(app cli.App) {
 	ctx = context.WithValue(ctx, "shared.cmdr.app", true)
 ```
 
-一个 `shard.cmdr.app` 实例不再被登记为全局的 Unique App Object，因此很多顶级命令将不再可用。
+A `shard.cmdr.app` would never be recorded as a global `Unique App Object`, so some top-level functions depended on it will not be available any more.
 
-例如 `cmdr.App()` 及其衍生函数是为了从 Unique App Object 获得 app 实例对象，然后据此取得一系列的关联对象。
+As a sample, `cmdr.App()` and its descendants get the unique app instance from `Unique App Object` and many others associated objects.
 
-但现在它们不再有意义了。这时候，你必须通过 `cmd.App()` 从 `OnAction` 中取得你的 app 对象，然后自行提取关联对象。如同下面的示例代码所显示的那样：
+But now they are no longer meaningful. You must have to retrieve the associated objects via `cmd.App()`, inside a `OnAction` handler. The following codes show the new way for you:
 
 ```go
 func (toCmd) Add(app cli.App) {
@@ -213,7 +213,7 @@ func (toCmd) Add(app cli.App) {
 }
 ```
 
-### 额外的话题
+### Extra Topics
 
 <Cards>
   <Card title="With Options" href="../g71-with-options" />
