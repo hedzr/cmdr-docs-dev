@@ -1,5 +1,5 @@
 ---
-title: Builtin Commands & Flags
+title: 内建命令和标志
 description: provided by cmdr
 ---
 
@@ -31,7 +31,7 @@ import { DynamicLink } from "fumadocs-core/dynamic-link";
 
 请参考下一节：<DynamicLink href="/[lang]/docs/cmdr.v2/concepts/g72-help-system">Help Subsystem</DynamicLink>
 
-{/* [Help Subsystem](../g72-help-system/) */}
+{/*[Help Subsystem](../g72-help-system/)*/}
 
 #### `version` Command
 
@@ -219,6 +219,14 @@ $ ./bin/blueprint gen sh
 - powershell
 
 理论上，这些 shell 中的自动完成特性将被正确激活。但遗憾的是，我们没有对诸如 fish，powershell 等环境做充分的测试。
+
+在 zsh 环境中，一个正在自动完成中的子命令选项如下图所示：
+
+![image-20251026212658280](/images/cmdr/v2/concepts/g72-builtin-commands/image-20251026212658280.png)
+
+类似的，一个正在自动完成中的多级子命令如下图所示：
+
+![image-20251026213546689](/images/cmdr/v2/concepts/g72-builtin-commands/image-20251026213546689.png)
 
 ### Flags
 
