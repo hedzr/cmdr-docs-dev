@@ -1,6 +1,6 @@
 {
   "title": "cmdr(-go) v1.x",
-  "description": "Commandline args parsing framework",
+  "description": "Commandline args parser",
   "icon": "Airplay",
   "pages": [
     "index",
