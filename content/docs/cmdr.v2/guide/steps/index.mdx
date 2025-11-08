@@ -10,7 +10,20 @@ description: 从这里开始
 1. 与 `hedzr/Store` 集成，获得配置管理能力
 2. 加入 `hedzr/cmdr-loaders` 插件，加载外部配置源
 3. 多级命令
-4. 大量的标志
+4. 快速建立大量的标志
+
+此外，我们也展示如何用多种不同的风格来构造你的命令层级系统。
+
+一般来说，构造根命令以及整个命令体系可以采用如下的方案：
+
+- 采用旧的链式调用风格 (例如 `app.Cmd("verbose", "v").Action(onVerbose)`)
+- 简明风格 (通过 `[Create]` 以及 cmd/xxcmd.go`)
+- config 传参风格 (通过 `[cmdr.NewAppWithConfig()]`)
+- 结构标签风格 (使用 `[cmdr.Create().BuildFrom()](https://pkg.go.dev/github.com/hedzr/cmdr/v2#Creator.BuildFrom)` 遍历结构成员标签来建立命令系统, 样例代码 [#example_Create_buildFromStructValue](https://pkg.go.dev/github.com/hedzr/cmdr/v2#example-Create-BuildFromAStructValue)
+
+总的来说，入手 cmdr 的第一步，是从 [New](https://pkg.go.dev/github.com/hedzr/cmdr/v2#New) 或者 [Create](https://pkg.go.dev/github.com/hedzr/cmdr/v2#Create) 调用开始的。
+
+请进一步阅读下级章节内容。
 
 <Cards>
   <Card title="With Store" href="./g10-with-store" />
