@@ -94,8 +94,8 @@ The help screen looks like,
 
 在这个微型示例程序中，我们没有使用标准的 `Store`，因此 cmdr 自行创建了一个隐含的 DummyStore，它废弃一切进入的操作。
 也因此 `cmd.Store().MustBool("full")` 无法取得 `--full` 的用户输入值。
-为此这里使用了变通的办法：通过检测 full 的 \*Flag 对象被终端用户触发的次数来确定它已经被输入了。
-如果用户在命令行输入了 `--full -f`，则触发次数将会是 2。
+为此这里使用了变通的办法：通过检测 `full` 的 \*Flag 对象被终端用户触发的次数非零来确定它已经被输入了。
+注意，如果用户在命令行输入了 `--full -f`，则触发次数将会是 2。
 
 `cmd.FlagBy("full")` 可以按照选项参数的长标题来找到对应的 \*Flag 对象。
 类似地，`cmd.SubCmdBy("xxx")` 可以用来找到子命令。
@@ -127,6 +127,8 @@ The help screen looks like,
 - [从结构与 Tag 构建命令体系 (in docs)](/docs/cmdr.v2/guide/steps/g13-build-from-struct/)
 
 ## Learn More
+
+Github 上的 repos：
 
 <Cards>
   <Card
