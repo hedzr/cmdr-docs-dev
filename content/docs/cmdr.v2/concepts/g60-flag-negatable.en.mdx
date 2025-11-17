@@ -11,6 +11,7 @@ description: Negatable Flag with `--no-` prefix
 b.Flg("warning", "w").
 	Description("negatable flag: <code>--no-warning</code> is available", "").
 	Group("Negatable").
+  // [!code highlight:2]
 	Negatable(true).
 	Default(false).
 	Build()
@@ -33,6 +34,7 @@ This new feature starts since cmdr v2.1.16.
 parent.Flg("warnings", "W").
   Description("gcc-style negatable flag: <code>-Wunused-variable</code> and -Wno-unused-variable", "").
   Group("Negatable").
+  // [!code highlight:2]
   Negatable(true, "unused-variable", "unused-parameter", "unused-function", "unused-but-set-variable", "unused-private-field", "unused-label").
   Default(false).
   Build()
@@ -44,10 +46,99 @@ cmdr will create a pair of toggable group flags for these child items. For examp
 
 This `-W`-style negatable flag is covered from `gcc -Waddress -Wno-address` of GNU GCC command line options.
 
-### De
+```bash
+$ go run ./examples/negatable --warnings.unused-function
+...
+--warnings, -W:
+    > TG: "false"
+    > TG.selected: ["warnings.no-unused-function"]
+        unused-variable:                false, (no-): true
+        unused-parameter:               false, (no-): true
+        unused-function:                true, (no-): false
+        unused-but-set-variable:        false, (no-): true
+        unused-private-field:           false, (no-): true
+        unused-label:                   false, (no-): true
+...
 
-`.Negatable(true).Default(false)` 可以为标志设置 Negatable 风格。
-`.Negatable(true, "a","b","c").Default(false)` 可以为标志设置 `-W` Style Negatable 风格。
+$ go run ./examples/negatable --warnings.no-unused-function
+...
+--warnings, -W:
+    > TG: "false"
+    > TG.selected: ["warnings.no-unused-function"]
+        unused-variable:                false, (no-): true
+        unused-parameter:               false, (no-): true
+        unused-function:                false, (no-): true
+        unused-but-set-variable:        false, (no-): true
+        unused-private-field:           false, (no-): true
+        unused-label:                   false, (no-): true
+...
+```
+
+End-user can pass command-line arguments with `-Wunused-variable` to enable `warnings.unused-variable` option (_above_), or disable it with `-Wno-unused-variable`. Another way is using short flag `-Wunused-variable` and `-Wno-unused-variable`.
+
+In the latest version of cmdr.v2, we also improved the help screen of a negatable flag, just like the following sample:
+
+```bash
+$ go run ./examples/negatable --help -w
+00:04:15.042866Z| c/[cmdr][1] [WRN] FlagBy() return nil                  querying title="warnings" ./cli/worker/pre.go:301 worker.(*workerS).commandsToStoreR.func3.1
+negatable v2.1.63 ~ Copyright © 2025 by negatable Authors ~ All Rights Reserved.
+
+Usage:
+
+  $ negatable  [Options...][files...]
+
+Description:
+
+  a sample to demo negatable flag.
+
+Examples:
+
+  Try to use negatable flag,
+
+    $ negatable --no-warning
+      cmd.Store().MustBool("no-warning") will be 'true'.
+    $ negatable --warning
+      cmd.Store().MustBool("warning") will be 'true'.
+    $ negatable -Wunused-variable -Wno-unused-parameter
+      1. cmd.Store().MustBool("warnings.unused-variable") will be 'true',
+      2. cmd.Store().MustBool("warnings.no-unused-parameter") will be 'true'.
+         cmd.Store().MustBool("warnings.unused-parameter") will be 'false'.
+    $ negatable -Wno-unused-function -Wunused-but-set-variable
+      1. cmd.Store().MustBool("warnings.unused-function") will be 'false',
+         cmd.Store().MustBool("warnings.no-unused-function") will be 'true',
+      2. cmd.Store().MustBool("warnings.unused-but-set-variable") will be 'true'.
+    $ negatable +warning
+      cmd.Store().MustBool("warning") will be 'true'.
+
+Global Flags:
+
+  [Negatable]
+    -w,  --warning                            [x] negatable flag: --no-warning is available (Default: true)(negatable)
+    -W,  --warnings                           [ ] gcc-style negatable flag: -Wunused-variable and -Wno-unused-variable (Default: false)(negatable)
+         - unused-variable, no-unused-variable
+         - unused-parameter, no-unused-parameter
+         - unused-function, no-unused-function
+         - unused-but-set-variable, no-unused-but-set-variable
+         - unused-private-field, no-unused-private-field
+         - unused-label, no-unused-label
+  [Misc]
+    -h,  --help,--info,--usage                Show this help screen (-?) [Env: HELP] (Default: true)
+
+Type '-h'/'-?' or '--help' to get this help screen (254x25/46).
+More: '-D'/'--debug', '-V'/'--version', '-#'/'--build-info', '--no-color'...
+
+```
+
+You've seen `-W` flag has the extra lines to list all of its sub-items.
+
+:::tip
+
+**Tip**  
+When displaying a help screen (`--help`), specifying some flags and you've get their updated default-values to show there.  
+For example like above, we specified `-w` in the command-line, so its default-value has been updated to `true` in the help screen.  
+BTW, since a negatable flag would be implemented as a togglable flag internally, its right-part description will be leading with `[x]` or `[ ]`, which the first form means a true-state choiced, and the last form means a false-state kept.
+
+:::
 
 ### Define
 
