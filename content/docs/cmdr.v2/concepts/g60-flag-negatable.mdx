@@ -11,6 +11,7 @@ description: Negatable Flag with `--no-` prefix
 b.Flg("warning", "w").
 	Description("negatable flag: <code>--no-warning</code> is available", "").
 	Group("Negatable").
+  // [!code highlight:2]
 	Negatable(true).
 	Default(false).
 	Build()
@@ -35,6 +36,7 @@ cmdr 将会为 `--warning` 自动生成一个隐性的标志对象 `--no-warning
 parent.Flg("warnings", "W").
   Description("gcc-style negatable flag: <code>-Wunused-variable</code> and -Wno-unused-variable", "").
   Group("Negatable").
+  // [!code highlight:2]
   Negatable(true, "unused-variable", "unused-parameter", "unused-function", "unused-but-set-variable", "unused-private-field", "unused-label").
   Default(false).
   Build()
@@ -47,6 +49,99 @@ cmdr 将会为这些后缀自动建立一对正反对应的可翻转标志，例
 熟悉 gcc 开发的你将会对此毫无意外，这种 `-W` 风格几乎完全模仿 `gcc -Waddress -Wno-address` 标志风格。
 
 你所需要做的只是声明一个主条目，然后在 `.Negatable(true, ...)` 调用中插入需要拓展的子条目项。
+
+```bash
+$ go run ./examples/negatable --warnings.unused-function
+...
+--warnings, -W:
+    > TG: "false"
+    > TG.selected: ["warnings.no-unused-function"]
+        unused-variable:                false, (no-): true
+        unused-parameter:               false, (no-): true
+        unused-function:                true, (no-): false
+        unused-but-set-variable:        false, (no-): true
+        unused-private-field:           false, (no-): true
+        unused-label:                   false, (no-): true
+...
+
+$ go run ./examples/negatable --warnings.no-unused-function
+...
+--warnings, -W:
+    > TG: "false"
+    > TG.selected: ["warnings.no-unused-function"]
+        unused-variable:                false, (no-): true
+        unused-parameter:               false, (no-): true
+        unused-function:                false, (no-): true
+        unused-but-set-variable:        false, (no-): true
+        unused-private-field:           false, (no-): true
+        unused-label:                   false, (no-): true
+...
+```
+
+如上所示，终端用户可以通过 `-Wunused-variable` 来启用 `warnings.unused-variable` 标志，通过 `-Wno-unused-variable` 来禁用它。或者也可以使用短标志方式 `-Wunused-variable` 和 `-Wno-unused-variable`。
+
+在最新版本的 cmdr 中，我们改善了帮助屏幕的显示效果，使其更清晰地展示了这些自动生成的标志。如下例所示：
+
+```bash
+$ go run ./examples/negatable --help -w
+00:04:15.042866Z| c/[cmdr][1] [WRN] FlagBy() return nil                  querying title="warnings" ./cli/worker/pre.go:301 worker.(*workerS).commandsToStoreR.func3.1
+negatable v2.1.63 ~ Copyright © 2025 by negatable Authors ~ All Rights Reserved.
+
+Usage:
+
+  $ negatable  [Options...][files...]
+
+Description:
+
+  a sample to demo negatable flag.
+
+Examples:
+
+  Try to use negatable flag,
+
+    $ negatable --no-warning
+      cmd.Store().MustBool("no-warning") will be 'true'.
+    $ negatable --warning
+      cmd.Store().MustBool("warning") will be 'true'.
+    $ negatable -Wunused-variable -Wno-unused-parameter
+      1. cmd.Store().MustBool("warnings.unused-variable") will be 'true',
+      2. cmd.Store().MustBool("warnings.no-unused-parameter") will be 'true'.
+         cmd.Store().MustBool("warnings.unused-parameter") will be 'false'.
+    $ negatable -Wno-unused-function -Wunused-but-set-variable
+      1. cmd.Store().MustBool("warnings.unused-function") will be 'false',
+         cmd.Store().MustBool("warnings.no-unused-function") will be 'true',
+      2. cmd.Store().MustBool("warnings.unused-but-set-variable") will be 'true'.
+    $ negatable +warning
+      cmd.Store().MustBool("warning") will be 'true'.
+
+Global Flags:
+
+  [Negatable]
+    -w,  --warning                            [x] negatable flag: --no-warning is available (Default: true)(negatable)
+    -W,  --warnings                           [ ] gcc-style negatable flag: -Wunused-variable and -Wno-unused-variable (Default: false)(negatable)
+         - unused-variable, no-unused-variable
+         - unused-parameter, no-unused-parameter
+         - unused-function, no-unused-function
+         - unused-but-set-variable, no-unused-but-set-variable
+         - unused-private-field, no-unused-private-field
+         - unused-label, no-unused-label
+  [Misc]
+    -h,  --help,--info,--usage                Show this help screen (-?) [Env: HELP] (Default: true)
+
+Type '-h'/'-?' or '--help' to get this help screen (254x25/46).
+More: '-D'/'--debug', '-V'/'--version', '-#'/'--build-info', '--no-color'...
+
+```
+
+可以看到，如果采用 `-W` 风格的自动否定标志，帮助屏幕会列出所有相关的子标志，方便用户查看和理解。
+
+:::tip
+
+**提示**  
+如果在显示帮助屏幕（`--help`）时，同时也指定某些标志，则这些标志的 default value 将会被命令行参数所更新，从而反映在帮助屏幕中。  
+如上例中的 `-w` 标志被指定为 `true`，因此在帮助屏幕中显示其默认值为 `true`。同时也因为 negatable 标志被实现为一个 Toggleable Group，所以它的右侧描述中还会显示 `[x]` 也表示选中状态，反之则为 `[ ]` 表示非选中状态，此外尾部也会显示 `(negatable)` 字样，以提示用户该标志具有自动否定的特性。
+
+:::
 
 ### 定义
 
