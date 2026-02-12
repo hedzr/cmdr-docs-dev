@@ -1,154 +1,35 @@
-// import { source } from '@/lib/source';
-// import { createFromSource } from 'fumadocs-core/search/server';
-//
-// export const { GET } = createFromSource(source);
-
-// -----------------------------------------------------
-
 import { source } from '@/lib/source';
-// import { createFromSource } from 'fumadocs-core/search/server';
-import { createI18nSearchAPI } from 'fumadocs-core/search/server';
-import { i18n } from '@/lib/i18n';
+import { createFromSource } from 'fumadocs-core/search/server';
 import { createTokenizer } from '@orama/tokenizers/mandarin';
-import { stopwords as mandarinStopwords } from "@orama/stopwords/mandarin";
 
-////////////////////////////////////////////////////////
-
-// import { createTokenizerJP } from '@orama/tokenizers/japanese';
-// import { stopwords as japaneseStopwords } from "@orama/stopwords/japanese";
-
-// const db = create({
-//     schema: {
-//         name: "string",
-//     },
-//     components: {
-//         tokenizer: createTokenizer({
-//             stopWords: japaneseStopwords,
-//         }),
-//     },
+// export const { GET } = createFromSource(source, {
+//   // https://docs.orama.com/docs/orama-js/supported-languages
+//   language: 'english',
 // });
 
-// insert(db, { name: "東京" }); // Tokyo
-// insert(db, { name: "大阪" }); // Osaka
-// insert(db, { name: "京都" }); // Kyoto
-// insert(db, { name: "横浜" }); // Yokohama
-// insert(db, { name: "札幌" }); // Sapporo
-// insert(db, { name: "仙台" }); // Sendai
-// insert(db, { name: "広島" }); // Hiroshima
-// insert(db, { name: "東京大学" }); // University of Tokyo
-// insert(db, { name: "京都大学" }); // Kyoto University
-// insert(db, { name: "大阪大学" }); // Osaka University
-
-// const results = search(db, {
-//     term: "大阪",
-//     threshold: 0,
-// });
-
-// console.log(results);
-
-////////////////////////////////////////////////////////
-
-// const db = create({
-//   schema: {
-//     name: "string",
-//   },
-//   components: {
-//     tokenizer: createTokenizer({
-//       stopWords: mandarinStopwords,
-//     }),
-//   },
-// });
-
-// insert(db, { name: "北京" }); // Beijing
-// insert(db, { name: "上海" }); // Shanghai
-// insert(db, { name: "广州" }); // Guangzhou
-// insert(db, { name: "深圳" }); // Shenzhen
-// insert(db, { name: "成都" }); // Chengdu
-// insert(db, { name: "杭州" }); // Hangzhou
-// insert(db, { name: "南京" }); // Nanjing
-// insert(db, { name: "北京大学" }); // Peking University
-// insert(db, { name: "上海交通大学" }); // Shanghai Jiao Tong University
-// insert(db, { name: "广州中医药大学" }); // Guangzhou University of Chinese Medicine
-
-// const results = search(db, {
-//   term: "广州",
-//   threshold: 0,
-// });
-
-// console.log(results);
-
-////////////////////////////////////////////////////////
-
-export const { GET } = createI18nSearchAPI('advanced', {
-  i18n,
+export const { GET } = createFromSource(source, {
   localeMap: {
-    // the prop name should be its locale code in your i18n config, (e.g. `cn`)
+    // [locale]: Orama options
     cn: {
-      // options for the language
-      tokenizer: createTokenizer({
-        stopWords: mandarinStopwords,
-        language: 'mandarin'
-      }),
+      components: {
+        tokenizer: createTokenizer(),
+      },
       search: {
         threshold: 0,
         tolerance: 0,
       },
     },
     tw: {
-      // options for the language
-      tokenizer: createTokenizer(),
+      components: {
+        tokenizer: createTokenizer(),
+      },
       search: {
         threshold: 0,
         tolerance: 0,
       },
     },
-    // jp: {
-    //     // options for the language
-    //     tokenizer: await createTokenizerJP({
-    //         stopWords: japaneseStopwords,
-    //     }),
-    //     search: {
-    //         threshold: 0,
-    //         tolerance: 0,
-    //     },
-    // },
+
+    // ru: { language: 'russian' },
+    en: { language: 'english' },
   },
-  // using `entry` instead of deconstrcuted `{language,pages}`:
-  // indexes: source.getLanguages().flatMap((entry) => {
-  //   entry.pages.map((page) => ({
-  //     title: page.data.title,
-  //     description: page.data.description,
-  //     structuredData: page.data.structuredData,
-  //     id: page.url,
-  //     url: page.url,
-  //     locale: entry.language,
-  //   })),
-  // },
-  indexes: source.getLanguages().flatMap(({ language, pages }) => {
-    // console.log('searching page entry', pages);
-
-    // for example:
-    //    pages {
-    //      language: 'en',
-    //      pages: [
-    //        {
-    //          file: [Object],
-    //          url: '/en/docs',
-    //          slugs: [],
-    //          data: [Object],
-    //          locale: 'en'
-    //        },
-
-    return pages.
-      filter((page) => !page.url.includes('/cmdr.v1/')). // excludes docs of cmdr.v1
-      map((page) => ({
-        title: page.data.title,
-        description: page.data.description,
-        structuredData: page.data.structuredData,
-        id: page.url,
-        url: page.url,
-        locale: language,
-      }));
-  }
-  ),
 });

@@ -2,8 +2,12 @@
 // import { twMerge } from "tailwind-merge";
 // import { EachRoute, getRoutesForVersion, Version } from "./routes-config";
 
-import path from 'path'
-import getConfig from 'next/config'
+import path from 'path';
+
+// In Next.js 14, next/config had been removed.
+// import getConfig from 'next/config';
+
+// import nextConfig, { shouldInjectToolbar } from "../next.config";
 
 // prodMode or dev/preview mode ------------------------
 
@@ -137,16 +141,16 @@ export function stringToDatetime(date: string | Date) {
   }
 }
 
-export function safe(s: any, defval: string = ''): string {
-  if (!s) return defval;
+export function safe(s: any, defVal: string = ''): string {
+  if (!s) return defVal;
   if (typeof s === 'string') return s;
   return s.toString();
 }
 
-export function safeget<T>(cont: any, prop: string, defval: T): T {
-  if (!cont) return defval;
+export function safeget<T>(cont: any, prop: string, defVal: T): T {
+  if (!cont) return defVal;
   if (prop in cont) return cont[prop];
-  return defval;
+  return defVal;
 }
 
 export function isFieldValid(cont: any, prop: string): boolean {
@@ -155,10 +159,11 @@ export function isFieldValid(cont: any, prop: string): boolean {
   return false;
 }
 
-const serverPublicPath = (staticFilePath: string): string => {
-  // const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
 
-  return path.join(getConfig().publicRuntimeConfig.staticFolder, staticFilePath)
-}
-
-export default serverPublicPath
+// const serverPublicPath = (staticFilePath: string): string => {
+//   // const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
+//
+//   return path.join(nextConfig.publicRuntimeConfig.staticFolder, staticFilePath)
+// }
+//
+// export default serverPublicPath

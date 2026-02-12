@@ -1,7 +1,9 @@
 ---
-title: 文档
-description: cmdr 是一个命令行参数处理框架，同时还提供应用程序设置集的集成能力
+title: 首页
+description: 文档中心 - 开源项目
 ---
+
+{/* Welcome to the docs! You can start writing documents in `/content/docs`. */}
 
 ## 文档中心
 
@@ -18,13 +20,32 @@ description: cmdr 是一个命令行参数处理框架，同时还提供应用�
 {/* <Card title="Learn more about Fumadocs" href="https://fumadocs.vercel.app" /> */}
 {/* </Cards> */}
 
+## 变化
+
+### [2026-02-11]
+
+最近，快春节了，重构了 hzDocs 这个文档网站，主要的变化是：
+
+- 升级了新版本 fumadocs。由于大版本跳动，fumadocs 和 nextjs 的变化都太大，所以我是推倒后重新建立的。
+  - 这就是为什么我几乎不做前端的代码，每一年你的代码都会完全失效，无法渐进更新。
+  - 这一次 fumadocs 累积改进了很多东西，对自建文档站的人更友好了，相比去年我首次搭建省力多了。
+  - 上次的网站开发时候改写的代码很多，几乎是翻尽了 fuma 当时的源代码去寻找 hack 的各种方法，来满足我的需求，但今次很多都省掉了。
+  - 最大的变化，一是基础代码支持跳转到 LLM 问答，另一个是主题更多，所以我换了一个。
+- 由于完全重写，所以以往有的细节可能就没能填上了
+  - 上一版中有一个 blog 子分区，是实验性的；今次摘除了，既然 [hedzr.com](https://hedzr.com/) 一直工作良好
+  - 继续支持方向键翻页功能，暂时没有发现问题 
+- 现在文档页面乃至于每一段文字都支持提供 feedback 到 github Discussions 中
+  - 当前是匿名的。暂无计划做双选（匿名或者 github 账户登录）
+  - 对于有心人，可以匿名发一句，然后跟进到讨论区中以 github 身份继续追加发言
+- 因为今次省掉了很多 hacks，所以理论上网页的渲染速度有相当的提升，因为无需额外多一次或者数次 PageTree metadatas 的扫描和分组排序了。
+
 ## 开源项目们
 
 ### Golang Libraries
 
 <Cards>
-  <Card title="cmdr 参考手册 (Go)" href="./cmdr.v2/" />
-  <Card title="Store 参考手册 (Go)" href="./store/" />
+  <Card title="cmdr 参考手册 (Go)" href="../docs/cmdr/v2/" />
+  <Card title="Store 参考手册 (Go)" href="../docs/store/" />
 </Cards>
 
 #### cmdr
@@ -124,3 +145,14 @@ Store 也支持内建的 `/[id]/` 路由解析和匹配功能。
 ### more
 
 还有很多。
+
+## References
+
+<Cards>
+  <Card title="Learn more about Next.js" href="https://nextjs.org/docs">
+    Next.js Official Documentations
+  </Card>
+  <Card title="Learn more about Fumadocs" href="https://fumadocs.dev">
+    Fumadocs Official Site
+  </Card>
+</Cards>

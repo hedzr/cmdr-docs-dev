@@ -1,88 +1,38 @@
-import { DocsLayout, type DocsLayoutProps } from "fumadocs-ui/layouts/docs";
-// import { DocsLayout, type DocsLayoutProps } from "@/components/docs";
-import type { ReactNode } from "react";
-import { baseOptions, linkItems } from "../../layout.config";
 import { source } from "@/lib/source";
-import { baseUrl, createMetadata, site } from "@/lib/metadata";
-import "katex/dist/katex.min.css";
-import { previewMode } from "@/lib/utils";
-
-const preview = previewMode ? " [Preview]" : "";
-
-export const metadata = createMetadata({
-  metadataBase: baseUrl,
-  title: {
-    template: `%s | ${site.title}${preview}`,
-    default: `${site.title}${preview}`,
-  },
-  description: site.desc,
-  robots: {
-    follow: true,
-    index: true,
-  },
-  // "a command-line arguments parser and app framework with hierarchical settings supporting",
-
-  // metadataBase: new URL('https://acme.com'),
-  alternates: {
-    canonical: "/",
-    languages: {
-      // "en-US": "/en-US",
-      // // "de-DE": "/de-DE",
-      // "zh-CN": "/zh-CN",
-      // "zh-TW": "/zh-TW",
-      en: "/en",
-      zh: "/cn",
-      "zh-TW": "/tw",
-    },
-  },
-  openGraph: {
-    images: "/docs-og/og-image.png",
-  },
-});
+import { DocsLayout } from "fumadocs-ui/layouts/docs";
+import { baseOptions } from "@/lib/layout.shared";
 
 export default async function Layout({
   params,
   children,
-}: {
-  params: Promise<{ lang: string }>;
-  children: ReactNode;
-}) {
-  // return (
-  //   <DocsLayout tree={source.pageTree[(await params).lang]} {...baseOptions}>
-  //     {children}
-  //   </DocsLayout>
-  // );
-
-  const tree = source.pageTree[(await params).lang];
-
-  const docsOptions: DocsLayoutProps = {
-    ...baseOptions,
-    tree: tree, // source.pageTree['zh'],
-    links: [linkItems[linkItems.length - 1]],
-    sidebar: {
-      tabs: {
-        transform(option, node) {
-          const meta = source.getNodeMeta(node);
-          if (!meta) return option;
-
-          return {
-            ...option,
-            icon: (
-              <div
-                className="rounded-md border bg-gradient-to-t from-fd-background/80 p-1 shadow-md [&_svg]:size-5"
-                style={{
-                  color: `var(--${meta.file.dirname}-color)`,
-                  backgroundColor: `color-mix(in oklab, var(--${meta.file.dirname}-color) 40%, transparent)`,
-                }}
-              >
-                {node.icon}
-              </div>
-            ),
-          };
-        },
-      },
-    },
-  };
-
-  return <DocsLayout {...docsOptions}>{children}</DocsLayout>;
+}: LayoutProps<"/[lang]/docs">) {
+  const { lang } = await params;
+  return (
+    <DocsLayout
+      tree={source.getPageTree(lang)}
+      // sidebar={{
+      //   tabs: [
+      //     {
+      //       title: "Components",
+      //       description: "Hello World!",
+      //       // active for `/docs/components` and sub routes like `/docs/components/button`
+      //       url: "/docs/components",
+      //       // optionally, you can specify a set of urls which activates the item
+      //       // urls: new Set(['/docs/test', '/docs/components']),
+      //     },
+      //   ],
+      // }}
+      {...baseOptions(lang)}
+    >
+      {children}
+    </DocsLayout>
+  );
 }
+
+// export default function Layout({ children }: LayoutProps<'/docs'>) {
+//   return (
+//     <DocsLayout tree={source.getPageTree()} {...baseOptions()}>
+//       {children}
+//     </DocsLayout>
+//   );
+// }
