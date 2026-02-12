@@ -75,11 +75,11 @@ export default async function Page(
     const first = safeget<string>(params.slug, 0, "");
     if (first === "cmdr.v2") {
       params.slug?.shift();
-      redirect(`../../docs/cmdr/v2/${params.slug?.join("/") || ""}`);
+      redirect(`/docs/cmdr/v2/${params.slug?.join("/") || ""}`);
     }
     if (first == "is") {
       params.slug?.shift();
-      redirect(`../../docs/is/v1/${params.slug?.join("/") || ""}`);
+      redirect(`/docs/is/v1/${params.slug?.join("/") || ""}`);
     }
     console.error(
       `Page not found: slug=[${params.slug}], lang=${params.lang}.`,
