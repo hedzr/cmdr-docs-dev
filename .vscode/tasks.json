@@ -5,7 +5,15 @@
       "type": "npm",
       "script": "dev",
       "problemMatcher": [],
-      "label": "npm: dev",
+      "label": "npm: dev --port 7313",
+      "options": {
+        "env": {
+          "PORT": "7313",
+          "HTTP_PROXY": "http://127.0.0.1:7890",
+          "HTTPS_PROXY": "http://127.0.0.1:7890"
+        }
+      },
+      "runOptions": {},
       "detail": "npm dev (pnpm dev / next dev)"
     }
   ]
