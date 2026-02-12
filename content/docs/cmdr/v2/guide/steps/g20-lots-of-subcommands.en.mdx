@@ -1,0 +1,117 @@
+---
+title: Creating Lots of Subcommands
+description: Commands, Lots of Commands
+---
+
+## Creating nested subcommands
+
+We mentioned a subcommand should be created inside its parent's `.With(cb)` code block. You may create a lots of them with this way. The nested subcommands would be done.
+
+The following sample shows the concrete steps,
+
+```go title="./examples/lots-subcmds/main.go"
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+
+	"github.com/hedzr/cmdr-loaders/local"
+	"github.com/hedzr/cmdr-tests/examples/common"
+	"github.com/hedzr/cmdr-tests/examples/common/cmd"
+	"github.com/hedzr/cmdr/v2"
+	"github.com/hedzr/cmdr/v2/cli"
+	logz "github.com/hedzr/logg/slog"
+	"github.com/hedzr/store"
+)
+
+const (
+	appName = "lots-subcmds"
+)
+
+func main() {
+	app := chain(common.PrepareApp(
+		appName,
+
+		// use an option store explicitly, or a dummy store by default
+		cmdr.WithStore(store.New()),
+
+		// import "github.com/hedzr/cmdr-loaders/local" to get in advanced external loading features
+		cmdr.WithExternalLoaders(
+			local.NewConfigFileLoader(
+				local.WithAlternateWriteBack(false), // disable write-back the modified state into alternative config file
+				local.WithAlternateDotPrefix(false), // use '<app-name>.toml' instead of '.<app-name>.toml'
+			),
+			local.NewEnvVarLoader(),
+		),
+	)(cmd.Commands...))
+
+	ctx := context.Background() // with cancel can be passed thru in your actions
+	if err := app.Run(ctx); err != nil {
+		logz.ErrorContext(ctx, "Application Error:", "err", err) // stacktrace if in debug mode/build
+		os.Exit(app.SuggestRetCode())
+	} else if rc := app.SuggestRetCode(); rc != 0 {
+		os.Exit(rc)
+	}
+}
+
+// [!code highlight:18]
+func chain(app cli.App) cli.App {
+	app.Cmd("subcmd").
+		Description("subcommands here").
+		With(func(b cli.CommandBuilder) {
+			for i := 0; i < 5; i++ {
+				b.Cmd(fmt.Sprintf("sub-%d", i)).
+					Description(fmt.Sprintf("subcommand-%d here", i)).
+					With(func(b cli.CommandBuilder) {
+						for j := 0; j < 3; j++ {
+							b.Cmd(fmt.Sprintf("sub-%d-sub-%d", i, j)).
+								Description(fmt.Sprintf("sub-%d-subcommand=%d here", i, j)).
+								With(func(b cli.CommandBuilder) {})
+						}
+					})
+			}
+		})
+	return app
+}
+```
+
+Now run it with command line option `~~tree`, which is a builtin option with `cmdr.v2`, to dump all commands hierarchy as following:
+
+```bash
+$ FORCE_DEFAULT_ACTION=1 go run ./examples/lots-subcmds/ ~~tree
+...
+```
+
+So the result would be like,
+
+![image-20250217213824849](/images/cmdr/v2/guide/_assets/g10-lots-of-subcommands/image-20250217213824849.png)
+
+### Remarks
+
+The environment variable with value `FORCE_DEFAULT_ACTION=1` makes `cmdr.v2` ignore your custom `OnAction` to invoke a builtin responsed callback function, which will display a debug list for the hit command and the hit flags of its.
+
+This would be useful for debugging.
+
+As like `jump` command, which marked by `.Deprecated("v1.2.3")`, it will be shown with through-line and dim effect.
+
+A hidden command or flag (with `.Hidden(true)`) will be shown in help screen with dim effect, while you gave an extra option `--verbose` in command line to force it visible. In normal mode, the hidden them are invisble.
+
+A vendor-hidden command or flag (with `.Hidden(true, true)`) can be shown in help screen only if you gave triple verbose option by `--verbose --verbose --verbose` or `-vvv`.
+
+cmdr.v2 also have more builtin commands and options, such as `--version`, `--debug`, `--quite`, and so on. You can query its visible in help screen by `-vvv`.
+
+Therefore, as like `~~tree` and `~~debug`, which called as `TILDE-option`, some special meanings are assumed.
+
+The `~~tree` will show the commands hierarchical structure, with or without its flags.
+
+The `~~debug` will print the builtin `Store` state, which named as `Option Store` in `cmdr.v1`, a settings manager or a hierarchical key-value store.
+
+<Callout title="Tip">
+
+NOTE that `~~debug` is different with `--debug`/`-D`, which assumed enabling or disabling debug mode (application working mode).
+
+</Callout>
+
+### Extra Topics

@@ -2,23 +2,32 @@
   "pages": [
     "index",
 
-    "cmdr.v2",
+    "---cmdr series---",
+    "cmdr",
     "cmdr-cxx",
     "cmdr-dotnetcore",
     "cmdr-zig",
     "cmdr-rs",
 
+    "---cmdr supports---",
     "store",
     "evendeep",
     "logg",
     "is",
     "errors.v3",
 
+    "cmdr-addons",
+    "cmdr-loaders",
+    "cmdr-go-starter",
+
+    "---others---",
     "z...a",
 
     "archived",
 
-    "[On Github](https://github.com/hedzr/cmdr)",
+    "---links---",
+    "external:[On Github](https://github.com/hedzr/cmdr)",
+    "!internal-tests",
     "!headless"
   ]
 }

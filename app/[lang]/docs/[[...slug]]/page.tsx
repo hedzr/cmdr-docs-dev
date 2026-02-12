@@ -1,112 +1,158 @@
-import { source } from "@/lib/source";
-import { prodMode } from "@/lib/utils";
-import { notFound } from "next/navigation";
-// import {
-//   DocsPage,
-//   DocsTitle,
-//   DocsDescription,
-//   DocsBody,
-//   DocsCategory,
-// } from "@/components/page";
+import { getPageImage, source } from "@/lib/source";
 import {
+  DocsBody,
+  DocsDescription,
   DocsPage,
   DocsTitle,
-  DocsDescription,
-  DocsBody,
-  DocsPageProps,
-  withArticle,
-} from "fumadocs-ui/page";
+  PageLastUpdate,
+} from "fumadocs-ui/layouts/docs/page";
+import { notFound } from "next/navigation";
+import { getMDXComponents } from "@/mdx-components";
+import type { Metadata } from "next";
+import { createRelativeLink } from "fumadocs-ui/mdx";
+import { LLMCopyButton, ViewOptions } from "@/components/ai/page-actions";
 
-import { openapi } from "@/lib/source";
-import { metadataImage } from "@/lib/metadata";
-import defaultMdxComponents from "fumadocs-ui/mdx";
-import { Callout } from "@/components/callout";
-import { Card, Cards } from "@/components/card";
-import { CodeBlock, Pre } from "@/components/codeblock";
-import { File, Files, Folder } from "@/components/files";
-import { Tab, Tabs } from "@/components/tabs";
-import { Accordion, Accordions } from "@/components/accordion";
-import { TypeTable } from "@/components/type-table";
-import {
-  Popover,
-  PopoverClose,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { InlineTOC } from "@/components/inline-toc";
-import { Wrapper } from "@/components/preview/wrapper";
-import { ImageZoom } from "@/components/image-zoom";
-import { Step, Steps } from "@/components/steps";
-import { Mermaid } from "@theguild/remark-mermaid/mermaid"; // pnpm install @theguild/remark-mermaid remark-math fumadocs-twoslash fumadocs-docgen rehype-katex
-import { ComponentProps, FC } from "react";
+import { previewMode, prodMode } from "@/lib/utils";
+import { gitConfig, siteConfig } from "@/lib/repo";
+
 import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
+import { getPageTreePeers } from "fumadocs-core/page-tree";
+import { Feedback, FeedbackBlock } from "@/components/feedback/client";
+import { onBlockFeedbackAction, onPageFeedbackAction } from "@/lib/github";
 
-import { Rate } from "@/components/rate";
-import { APIPage } from "fumadocs-openapi/ui";
-import { AutoTypeTable } from 'fumadocs-typescript/ui';
-import {getPageTreePeers} from "fumadocs-core/server";
-import {createGenerator} from "fumadocs-typescript";
+import { FC, ComponentProps } from "react";
+import { Card, Cards } from "fumadocs-ui/components/card";
+import { Callout } from "fumadocs-ui/components/callout";
+// import { TypeTable } from "fumadocs-ui/components/type-table";
+// import { ImageZoom } from "@/components/mdx/image-zoom";
+import { ImageZoom } from "fumadocs-ui/components/image-zoom";
+import { CodeBlock, Pre } from "fumadocs-ui/components/codeblock";
+// import { File, Files, Folder } from "@/components/mdx/files";
+// import { Mermaid } from "@theguild/remark-mermaid/mermaid"; // pnpm install @theguild/remark-mermaid remark-math fumadocs-twoslash fumadocs-docgen rehype-katex
+// // import { Mermaid } from "@/components/mdx/mermaid";
+// import { InlineTOC } from "@/components/mdx/inline-toc";
+// import { Wrapper } from "@/components/preview/wrapper";
+
+// import * as Preview from '@/components/preview';
+//
+// function PreviewRenderer({ preview }: { preview: string }): ReactNode {
+//   if (preview && preview in Preview) {
+//     const Comp = Preview[preview as keyof typeof Preview];
+//     return <Comp />;
+//   }
+
+//   return null;
+// }
 
 const get = (fm: any, v: string) => {
   return v in fm ? fm[v] : "";
 };
 
-export default async function Page(props: {
-  params: Promise<{ lang: string; slug?: string[] }>;
-}) {
+// export default async function Page({
+//                                      params,
+//                                    }: {
+//   params: Promise<{ lang: string; slug?: string[] }>;
+// }) {
+//   const { slug, lang } = await params;
+//   // get page
+//   source.getPage(slug);
+//   source.getPage(slug, lang);
+//   // get pages
+//   source.getPages();
+//   source.getPages(lang);
+// }
+
+export const revalidate = false;
+
+const preview = previewMode ? " [Preview]" : "";
+
+export default async function Page(
+  props: PageProps<"/[lang]/docs/[[...slug]]">,
+) {
   const params = await props.params;
   const page = source.getPage(params.slug, params.lang);
-  if (!page) notFound();
+  if (!page) {
+    console.error(
+      `Page not found: slug=[${params.slug}], lang=${params.lang}.`,
+    );
+    notFound();
+  }
 
-  // const { body: MDX, toc, lastModified } = await page.data.load();
-  // page.data.tags
+  // if (!page)
+  //   return (
+  //     <NotFound
+  //       getSuggestions={async () => (params.slug ? getSuggestions(params.slug.join(' ')) : [])}
+  //     />
+  //   );
+
+  // if (page.data.type === 'openapi') {
+  //   const { APIPage } = await import('@/components/api-page');
+  //   return (
+  //     <DocsPage full>
+  //       <h1 className="text-[1.75em] font-semibold">{page.data.title}</h1>
+
+  //       <DocsBody>
+  //         <APIPage {...page.data.getAPIPageProps()} />
+  //       </DocsBody>
+  //     </DocsPage>
+  //   );
+  // }
+
+  // const { body: Mdx, toc, lastModified } = await page.data.load();
+
   const MDX = page.data.body;
-  const toc = page.data.toc;
+
   const lastModified =
     page.data.lastModified || get(page.data, "last_modified_at");
 
-  // const path = `apps/docs/content/docs/${page.file.path}`;
-  const path = `content/docs/${page.file.path}`;
-  // const preview = page.data.preview;
-  // const { body: MDX, toc, lastModified } = await page.data.load();
-
   if (!prodMode)
-    console.log(`--- docs page ${params.lang} / ${params.slug} ---`);
+    console.log(
+      `  - rendering page: ${page.url}, path: ${page.path}, abs: ${page.absolutePath}, slugs: [${page.slugs}], locale: ${page.locale}`,
+    );
+
+  // const mdxUrl = `/docs/${page.path}`; // page.absolutePath?.replace(/content\/docs\//, "");
+  // const mdxUrl = /^\/docs\//.test(page.url)
+  //   ? `/${params.lang}${page.url}.mdx`
+  //   : `${page.url}.mdx`;
+  const mdxUrl = `${page.url}.mdx`;
 
   return (
     <DocsPage
-      toc={toc}
+      toc={page.data.toc}
       full={page.data.full}
-      lastUpdate={lastModified}
       tableOfContent={{
         style: "clerk", // normal, clerk
         single: false,
       }}
-      editOnGithub={{
-        repo: "cmdr-docs-dev",
-        owner: "hedzr",
-        sha: "master",
-        path,
+      tableOfContentPopover={{}}
+      breadcrumb={{
+        enabled: true,
       }}
-      article={{
-        className: "max-sm:pb-16",
-      }}
+      className="max-sm:pb-16"
     >
       <DocsTitle>{page.data.title}</DocsTitle>
-      <DocsDescription>{page.data.description}</DocsDescription>
-      <DocsBody
-        className={`prose-zinc1 dark:prose-invert md:prose-md lg:prose-lg prose-headings:a:underline:none w-[85vw] sm:w-full sm:mx-auto prose-code:text-sm prose-code:leading-6 prose-headings:scroll-m-20 prose-code:font-code prose-code:p-1 prose-code:rounded-md prose-pre:border pt-2 prose-code:before:content-none prose-code:after:content-none !min-w-full prose-img:rounded-md prose-img:border`}
-      >
-        {/* className="text-fd-foreground/80"
-
-        dark:prose-invert prose-code:font-code dark:prose-code:bg-${ref}-900 dark:prose-pre:bg-${ref}-800 prose-code:bg-${ref}-100 prose-pre:bg-${ref}-100 prose-headings:scroll-m-20 w-[85vw] sm:w-full sm:mx-auto prose-code:text-sm prose-code:leading-6 dark:prose-code:text-${base}-300 prose-code:text-${ref}-700 prose-code:p-1 prose-code:rounded-md prose-pre:border pt-2 prose-code:before:content-none prose-code:after:content-none !min-w-full prose-img:rounded-md prose-img:border
-
-        */}
-        {/*{preview ? <PreviewRenderer preview={preview} /> : null}*/}
+      <DocsDescription className="mb-0">
+        {page.data.description}
+      </DocsDescription>
+      <div className="flex flex-row gap-2 items-center border-b pb-6">
+        <LLMCopyButton markdownUrl={`${mdxUrl}`} />
+        <ViewOptions
+          markdownUrl={`${mdxUrl}`}
+          // update it to match your repo
+          githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/docs/${page.path}`}
+        />
+      </div>
+      <DocsBody>
+        {/* {page.data.preview && <PreviewRenderer preview={page.data.preview} />} */}
         <MDX
-          components={{
-            ...defaultMdxComponents,
+          components={getMDXComponents({
+            // ...Twoslash,
 
+            // this allows you to link to other pages with relative file paths
+            a: createRelativeLink(source, page),
+            blockquote: Callout as unknown as FC<ComponentProps<"blockquote">>,
+            // img: (props) => <BaseImage {...(props as ImageProps)} />,
+            img: (props) => <ImageZoom {...(props as any)} />,
             // HTML `ref` attribute conflicts with `forwardRef`
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             pre: ({ ref: _ref, ...props }) => (
@@ -114,55 +160,47 @@ export default async function Page(props: {
                 <Pre>{props.children}</Pre>
               </CodeBlock>
             ),
-            // img: (props) => <BaseImage {...(props as ImageProps)} />,
-            img: (props) => <ImageZoom {...(props as any)} />,
 
-            Mermaid,
-            // Popup,
-            // PopupContent,
-            // PopupTrigger,
-            Popover,
-            PopoverTrigger,
-            PopoverContent,
-            PopoverClose,
-            TypeTable,
-            // AutoTypeTable,
-            Accordion,
-            Accordions,
-            // Wrapper,
-            File,
-            Folder,
-            Files,
-            Tabs,
-            Tab,
-            Steps,
-            Step,
-            Card,
-            Cards,
-            InlineTOC,
-            // Code,
-            // CodeWithTabs,
-            // blockquote: Callout as unknown as FC<ComponentProps<"blockquote">>,
-            // APIPage: openapi.APIPage,
-            // DocsCategory: () => <DocsCategory page={page} from={source} />,
-            AutoTypeTable: (props) => (
-              <AutoTypeTable generator={generator} {...props} />
+            FeedbackBlock: ({ children, ...props }) => (
+              <FeedbackBlock {...props} onSendAction={onBlockFeedbackAction}>
+                {children}
+              </FeedbackBlock>
             ),
-            Wrapper,
-            blockquote: Callout as unknown as FC<ComponentProps<'blockquote'>>,
-            APIPage: (props) => <APIPage {...openapi.getAPIPageProps(props)} />,
-            DocsCategory: ({ url }) => {
-              return <DocsCategory url={url ?? page.url} locale={params.lang} />;
-            },
-            // UiOverview,
 
-            // ...(await import('@/content/docs/ui/components/tabs.client')),
-            // ...(await import('@/content/docs/ui/theme.client')),
-          }}
+            // Banner,
+            // Mermaid,
+            // TypeTable,
+            // Wrapper,
+
+            // DocsCategory: ({ url }) => {
+            //   return <DocsCategory url={url ?? page.url} />;
+            // },
+            // Installation,
+            // Customisation,
+          })}
         />
-        {/*{page.data.index ? <DocsCategory page={page} from={source} /> : null}*/}
+        <h2>What is Next?</h2>
+        <Cards>
+          {getPageTreePeers(source.getPageTree(params.lang), "/docs").map(
+            (peer) => (
+              <Card key={peer.url} title={peer.name} href={peer.url}>
+                {peer.description}
+              </Card>
+            ),
+          )}
+        </Cards>
       </DocsBody>
-      <Rate
+      <Feedback onSendAction={onPageFeedbackAction} />
+      {lastModified && (
+        <PageLastUpdate date={lastModified} className="my-8 text-right" />
+      )}
+      {/* <Feedback
+        onSendAction={async (feedback) => {
+          "use server";
+          await posthog.capture("on_rate_docs", feedback);
+        }}
+      /> */}
+      {/* <Rate
         onRateAction={async (url, feedback) => {
           "use server";
         }}
@@ -173,43 +211,69 @@ export default async function Page(props: {
         //   // see also: https://us.posthog.com/project/130354/onboarding/web_analytics?step=install
         // }}
       />
+       */}
       <HandlingKeyboardLeftAndRight />
     </DocsPage>
   );
 }
 
-const generator = createGenerator();
-
-function DocsCategory({ url, locale }: { url: string; locale: string }) {
-  return (
-    <Cards>
-      {getPageTreePeers(source.getPageTree(locale), url).map((peer) => (
-        <Card key={peer.url} title={peer.name?.toLocaleString()} href={peer.url}>
-          {peer.description}
-        </Card>
-      ))}
-    </Cards>
-  );
-}
-
 export async function generateStaticParams() {
-  return [...source.generateParams()];
+  return source.generateParams("slug", "lang");
 }
 
-export async function generateMetadata(props: {
-  params: Promise<{ slug?: string[]; lang: string }>;
-}) {
+export async function generateMetadata(
+  props: PageProps<"/[lang]/docs/[[...slug]]">,
+): Promise<Metadata> {
   const params = await props.params;
   const page = source.getPage(params.slug, params.lang);
   if (!page) notFound();
 
-  // return {
-  //   title: page.data.title,
-  //   description: page.data.description,
-  // };
-  return metadataImage.withImage(page.slugs, {
-    title: page.data.title,
-    description: page.data.description,
-    // icons:[page.data.icon,],
-  });
+  return {
+    // title: page.data.title,
+    // title: {
+    //   template: `%s | ${siteConfig.title}${preview}`,
+    //   default: `${siteConfig.title}${preview}`,
+    // },
+    title: `${page.data.title} | ${siteConfig.title}${preview}`,
+    description: page.data.description || siteConfig.desc,
+    metadataBase: new URL(gitConfig.site),
+    robots: {
+      follow: true,
+      index: true,
+    },
+    alternates: {
+      canonical: "/",
+      languages: {
+        // "en-US": "/en-US",
+        // // "de-DE": "/de-DE",
+        // "zh-CN": "/zh-CN",
+        // "zh-TW": "/zh-TW",
+        en: "/en",
+        zh: "/cn",
+        "zh-TW": "/tw",
+      },
+    },
+    openGraph: {
+      images: getPageImage(page).url,
+    },
+    // openGraph: {
+    //   title: "My Website",
+    //   description: "Welcome to my website!",
+    //   url: "https://www.yourwebsite.com", // Optional, will be resolved with metadataBase
+    //   images: [
+    //     {
+    //       url: "/og-image.jpg", // Relative URL will be resolved to absolute URL
+    //       width: 1200,
+    //       height: 630,
+    //       alt: "My Website Open Graph Image",
+    //     },
+    //   ],
+    // },
+    // twitter: {
+    //   card: "summary_large_image",
+    //   title: "My Website",
+    //   description: "Welcome to my website!",
+    //   images: ["/twitter-image.jpg"], // Relative URL will be resolved to absolute URL
+    // },
+  };
 }

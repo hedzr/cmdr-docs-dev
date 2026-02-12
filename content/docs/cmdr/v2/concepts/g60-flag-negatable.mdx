@@ -1,0 +1,432 @@
+---
+title: 标志：自动否定
+description: Negatable Flag with `--no-` prefix
+---
+
+## Negatable 自动否定
+
+### 常规方式
+
+```go
+b.Flg("warning", "w").
+	Description("negatable flag: <code>--no-warning</code> is available", "").
+	Group("Negatable").
+  // [!code highlight:2]
+	Negatable(true).
+	Default(false).
+	Build()
+```
+
+一个带有自动否定风格的标志 `--warning`，自动配套一个反向标志 `--no-warning`。
+两个标志的作用是相反的。
+
+cmdr 将会为 `--warning` 自动生成一个隐性的标志对象 `--no-warning`，从而支持对两者的正确解析。
+
+如果终端用户输入了 `--no-warning`，则相应的 Store 条目 `app.cmd.no-warning` 会被置为 `true`，同时 `--warning` 对应的条目 `app.cmd.warning` 将被置为 `false`；反之亦然。
+
+> 在内部，这两条标志被隐性地组织为一个 Toggleable Group，从而具有自动翻转的效果。
+
+通常来说，带有自动否定风格的标志必须具有 bool 默认值。
+
+### `-W` 风格
+
+这一特性自 v2.1.16 开始加入。
+
+```go
+parent.Flg("warnings", "W").
+  Description("gcc-style negatable flag: <code>-Wunused-variable</code> and -Wno-unused-variable", "").
+  Group("Negatable").
+  // [!code highlight:2]
+  Negatable(true, "unused-variable", "unused-parameter", "unused-function", "unused-but-set-variable", "unused-private-field", "unused-label").
+  Default(false).
+  Build()
+```
+
+一个具有 `-W` 风格的自动否定标志，允许你指定一组条目作为其后缀。
+
+cmdr 将会为这些后缀自动建立一对正反对应的可翻转标志，例如 `--warnings.unused-variable`/`-Wunused-variable` 和 `--warnings.no-unused-variable`/`-Wno-unused-variable`。如是类推之。
+
+熟悉 gcc 开发的你将会对此毫无意外，这种 `-W` 风格几乎完全模仿 `gcc -Waddress -Wno-address` 标志风格。
+
+你所需要做的只是声明一个主条目，然后在 `.Negatable(true, ...)` 调用中插入需要拓展的子条目项。
+
+```bash
+$ go run ./examples/negatable --warnings.unused-function
+...
+--warnings, -W:
+    > TG: "false"
+    > TG.selected: ["warnings.no-unused-function"]
+        unused-variable:                false, (no-): true
+        unused-parameter:               false, (no-): true
+        unused-function:                true, (no-): false
+        unused-but-set-variable:        false, (no-): true
+        unused-private-field:           false, (no-): true
+        unused-label:                   false, (no-): true
+...
+
+$ go run ./examples/negatable --warnings.no-unused-function
+...
+--warnings, -W:
+    > TG: "false"
+    > TG.selected: ["warnings.no-unused-function"]
+        unused-variable:                false, (no-): true
+        unused-parameter:               false, (no-): true
+        unused-function:                false, (no-): true
+        unused-but-set-variable:        false, (no-): true
+        unused-private-field:           false, (no-): true
+        unused-label:                   false, (no-): true
+...
+```
+
+如上所示，终端用户可以通过 `-Wunused-variable` 来启用 `warnings.unused-variable` 标志，通过 `-Wno-unused-variable` 来禁用它。或者也可以使用短标志方式 `-Wunused-variable` 和 `-Wno-unused-variable`。
+
+在最新版本的 cmdr 中，我们改善了帮助屏幕的显示效果，使其更清晰地展示了这些自动生成的标志。如下例所示：
+
+```bash
+$ go run ./examples/negatable --help -w
+00:04:15.042866Z| c/[cmdr][1] [WRN] FlagBy() return nil                  querying title="warnings" ./cli/worker/pre.go:301 worker.(*workerS).commandsToStoreR.func3.1
+negatable v2.1.63 ~ Copyright © 2025 by negatable Authors ~ All Rights Reserved.
+
+Usage:
+
+  $ negatable  [Options...][files...]
+
+Description:
+
+  a sample to demo negatable flag.
+
+Examples:
+
+  Try to use negatable flag,
+
+    $ negatable --no-warning
+      cmd.Store().MustBool("no-warning") will be 'true'.
+    $ negatable --warning
+      cmd.Store().MustBool("warning") will be 'true'.
+    $ negatable -Wunused-variable -Wno-unused-parameter
+      1. cmd.Store().MustBool("warnings.unused-variable") will be 'true',
+      2. cmd.Store().MustBool("warnings.no-unused-parameter") will be 'true'.
+         cmd.Store().MustBool("warnings.unused-parameter") will be 'false'.
+    $ negatable -Wno-unused-function -Wunused-but-set-variable
+      1. cmd.Store().MustBool("warnings.unused-function") will be 'false',
+         cmd.Store().MustBool("warnings.no-unused-function") will be 'true',
+      2. cmd.Store().MustBool("warnings.unused-but-set-variable") will be 'true'.
+    $ negatable +warning
+      cmd.Store().MustBool("warning") will be 'true'.
+
+Global Flags:
+
+  [Negatable]
+    -w,  --warning                            [x] negatable flag: --no-warning is available (Default: true)(negatable)
+    -W,  --warnings                           [ ] gcc-style negatable flag: -Wunused-variable and -Wno-unused-variable (Default: false)(negatable)
+         - unused-variable, no-unused-variable
+         - unused-parameter, no-unused-parameter
+         - unused-function, no-unused-function
+         - unused-but-set-variable, no-unused-but-set-variable
+         - unused-private-field, no-unused-private-field
+         - unused-label, no-unused-label
+  [Misc]
+    -h,  --help,--info,--usage                Show this help screen (-?) [Env: HELP] (Default: true)
+
+Type '-h'/'-?' or '--help' to get this help screen (254x25/46).
+More: '-D'/'--debug', '-V'/'--version', '-#'/'--build-info', '--no-color'...
+
+```
+
+可以看到，如果采用 `-W` 风格的自动否定标志，帮助屏幕会列出所有相关的子标志，方便用户查看和理解。
+
+<Callout title="Tip">
+
+**提示**  
+如果在显示帮助屏幕（`--help`）时，同时也指定某些标志，则这些标志的 default value 将会被命令行参数所更新，从而反映在帮助屏幕中。  
+如上例中的 `-w` 标志被指定为 `true`，因此在帮助屏幕中显示其默认值为 `true`。同时也因为 negatable 标志被实现为一个 Toggleable Group，所以它的右侧描述中还会显示 `[x]` 也表示选中状态，反之则为 `[ ]` 表示非选中状态，此外尾部也会显示 `(negatable)` 字样，以提示用户该标志具有自动否定的特性。
+
+</Callout>
+
+### 定义
+
+`.Negatable(true).Default(false)` 可以为标志设置 Negatable 风格。
+`.Negatable(true, "a","b","c").Default(false)` 可以为标志设置 `-W` Style Negatable 风格。
+
+<Tabs items={['main.go', 'negatable.go']}>
+
+<Tab key="main.go">
+
+```go title="main.go"
+package main
+
+import (
+	"context"
+	"os"
+
+	"github.com/hedzr/cmdr/v2"
+	"github.com/hedzr/cmdr/v2/cli"
+	"github.com/hedzr/cmdr/v2/examples/common"
+	"github.com/hedzr/cmdr/v2/examples/devmode"
+	// logz "github.com/hedzr/logg/slog"
+)
+
+const (
+	appName = "negatable"
+	desc    = `a sample to demo negatable flag.`
+	version = cmdr.Version
+	author  = ``
+)
+
+func main() {
+	app := cmdr.Create(appName, version, author, desc).
+		With(func(app cli.App) { logz.Debug("in dev mode?", "mode", devmode.InDevelopmentMode()) }).
+		WithBuilders(common.AddNegatableFlag).
+		WithAdders().
+		// override the onAction defined in common.AddNegatableFlag()
+		OnAction(func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+			// logz.PrintlnContext(ctx, cmd.Set().Dump())
+
+			// v := cmd.Store().MustBool("warning")
+			// w := cmd.Store().MustBool("no-warning")
+			// println("warning flag: ", v)
+			// println("no-warning flag: ", w)
+
+			// wf := cmd.FlagBy("warning")
+			// if wf != nil && wf.LeadingPlusSign() {
+			// 	println("warning flag with leading plus sign: +w FOUND.")
+			// }
+			// return
+
+			println("Dumping Store ----------\n", cmdr.Set().Dump())
+
+			cmd.App().DoBuiltinAction(ctx, cli.ActionDefault)
+
+			cs := cmd.Store()
+
+			v := cs.MustBool("warning")
+			w := cs.MustBool("no-warning")
+			println("warning toggle group: ", cs.MustString("warning"))
+			println("  warning flag: ", v)
+			println("  no-warning flag: ", w)
+
+			wf := cmd.FlagBy("warning")
+			if wf != nil && wf.LeadingPlusSign() {
+				println()
+				println("NOTABLE: a flag with leading plus sign: +w FOUND.")
+			} else {
+				logz.WarnContext(ctx, "cannot found flag 'warning'")
+			}
+
+			sw1 := cs.MustBool("warnings.unused-variable")
+			sw2 := cs.MustBool("warnings.unused-parameter")
+			sw3 := cs.MustBool("warnings.unused-function")
+			sw4 := cs.MustBool("warnings.unused-but-set-variable")
+			sw5 := cs.MustBool("warnings.unused-private-field")
+			sw6 := cs.MustBool("warnings.unused-label")
+			fmt.Printf(`
+
+--warnings, -W:
+    > TG: %q
+    > TG.selected: %q
+	unused-variable:		%v, (no-): %v
+	unused-parameter:		%v, (no-): %v
+	unused-function:		%v, (no-): %v
+	unused-but-set-variable:	%v, (no-): %v
+	unused-private-field:		%v, (no-): %v
+	unused-label:			%v, (no-): %v
+	selected items:			%v
+`,
+				cs.MustString("warnings"),
+				cs.MustStringSlice("warnings.selected"),
+				sw1, cs.MustBool("warnings.no-unused-variable"),
+				sw2, cs.MustBool("warnings.no-unused-parameter"),
+				sw3, cs.MustBool("warnings.no-unused-function"),
+				sw4, cs.MustBool("warnings.no-unused-but-set-variable"),
+				sw5, cs.MustBool("warnings.no-unused-private-field"),
+				sw6, cs.MustBool("warnings.no-unused-label"),
+				cs.MustStringSlice("warnings.selected"),
+			)
+
+			return
+		}).
+		Build()
+
+	ctx := context.Background()
+	if err := app.Run(ctx); err != nil {
+		logz.ErrorContext(ctx, "Application Error:", "err", err) // stacktrace if in debug mode/build
+		os.Exit(app.SuggestRetCode())
+	} else if rc := app.SuggestRetCode(); rc != 0 {
+		os.Exit(rc)
+	}
+}
+```
+
+</Tab>
+
+<Tab key="negatable.go">
+
+```go title="negatable.go"
+package examples
+
+import (
+	"context"
+
+	"github.com/hedzr/cmdr/v2/cli"
+)
+
+func AddNegatableFlag(parent cli.CommandBuilder)           { AddNegatableFlagImpl(parent) }
+func AddNegatableFlagWithoutCmd(parent cli.CommandBuilder) { AddNegatableFlagImpl(parent, true) }
+
+func AddNegatableFlagImpl(parent cli.CommandBuilder, dontHandlingParentCmd ...bool) { //nolint:revive
+	parent.Flg("warning", "w").
+		Description("negatable flag: <code>--no-warning</code> is available", "").
+		Group("Negatable").
+		LeadingPlusSign(true).
+		Negatable(true).
+		Default(false).
+		Build()
+
+	parent.Flg("warnings", "W").
+		Description("gcc-style negatable flag: <code>-Wunused-variable</code> and -Wno-unused-variable", "").
+		Group("Negatable").
+		Negatable(true, "unused-variable", "unused-parameter", "unused-function", "unused-but-set-variable", "unused-private-field", "unused-label").
+		Default(false).
+		Build()
+
+	var noHpc bool
+	for _, p := range dontHandlingParentCmd {
+		if p {
+			noHpc = true
+		}
+	}
+	if !noHpc {
+		// give root command an action to handle it
+		action := func(ctx context.Context, cmd cli.Cmd, args []string) (err error) {
+			println("Dumping Store\n", cmd.App().Store().Dump())
+
+			cs := cmd.Store()
+
+			v := cs.MustBool("warning")
+			w := cs.MustBool("no-warning")
+			println("warning flag: ", v)
+			println("no-warning flag: ", w)
+			wf := cmd.FlagBy("warning")
+			if wf != nil && wf.LeadingPlusSign() {
+				println("warning flag with leading plus sign: +w FOUND.")
+			}
+
+			sw1 := cs.MustBool("warnings.unused-variable")
+			sw2 := cs.MustBool("warnings.unused-parameter")
+			sw3 := cs.MustBool("warnings.unused-function")
+			sw4 := cs.MustBool("warnings.unused-but-set-variable")
+			sw5 := cs.MustBool("warnings.unused-private-field")
+			sw6 := cs.MustBool("warnings.unused-label")
+			fmt.Printf(`
+
+--warnings, -W:
+	unused-variable:			%v, (no-): %v
+	unused-parameter:			%v, (no-): %v
+	unused-function:			%v, (no-): %v
+	unused-but-set-variable:	%v, (no-): %v
+	unused-private-field:		%v, (no-): %v
+	unused-label:				%v, (no-): %v
+	selected items:				%v
+`,
+				sw1, cs.MustBool("warnings.no-unused-variable"),
+				sw2, cs.MustBool("warnings.no-unused-parameter"),
+				sw3, cs.MustBool("warnings.no-unused-function"),
+				sw4, cs.MustBool("warnings.no-unused-but-set-variable"),
+				sw5, cs.MustBool("warnings.no-unused-private-field"),
+				sw6, cs.MustBool("warnings.no-unused-label"),
+				cs.MustStringSlice("warnings.selected"),
+			)
+			return
+		}
+
+		parent.OnAction(action)
+	}
+
+	parent.Examples(`Try to use negatable flag,
+
+	  $ $APP --no-warning
+	    <code>cmd.Store().MustBool("no-warning")</code> will be 'true'.
+	  $ $APP --warning
+	    <code>cmd.Store().MustBool("warning")</code> will be 'true'.
+	`)
+}
+```
+
+</Tab>
+</Tabs>
+
+### 运行时
+
+上面的示例程序的运行时效果如同这样：
+
+```bash
+$ go run ./examples/negatable --no-warning
+warning toggle group:  no-warning
+  warning flag:  false
+  no-warning flag:  true
+...
+$ go run ./examples/negatable --warning
+warning toggle group:  true
+  warning flag:  true
+  no-warning flag:  false
+...
+$
+$ go run ./examples/negatable +w -Wunused-variable -Wunused-function -h
+negatable v2.1.16 ~ Copyright © 2025 by negatable Authors ~ All Rights Reserved.
+
+Usage:
+
+  $ negatable  [Options...][files...]
+
+Description:
+
+  a sample to demo negatable flag.
+
+Examples:
+
+  Try to use negatable flag,
+
+    $ negatable --no-warning
+      cmd.Store().MustBool("no-warning") will be 'true'.
+    $ negatable --warning
+      cmd.Store().MustBool("warning") will be 'true'.
+
+Global Flags:
+
+  [Negatable]
+    -w, --warning                             [x] negatable flag: --no-warning is available (Default: true)
+    -W, --warnings                            [ ] gcc-style negatable flag: -Wunused-variable and -Wno-unused-variable (Default: false)
+  [Misc]
+    -h, --help,--info,--usage                 Show this help screen (-?) [Env: HELP] (Default: false)
+
+Type '-h'/'-?' or '--help' to get command help screen.
+More: '-D'/'--debug', '-V'/'--version', '-#'/'--build-info', '--no-color'...
+
+$
+$ go run ./examples/negatable +w -Wunused-variable -Wunused-function
+...
+--warnings, -W:
+    > TG: "false"
+    > TG.selected: ["warnings.unused-variable" "warnings.unused-function"]
+        unused-variable:                true, (no-): false
+        unused-parameter:               false, (no-): true
+        unused-function:                true, (no-): false
+        unused-but-set-variable:        false, (no-): true
+        unused-private-field:           false, (no-): true
+        unused-label:                   false, (no-): true
+$
+$ go run ./examples/negatable +w -Wunused-variable -Wno-unused-function --warnings.unused-label
+...
+--warnings, -W:
+    > TG: "false"
+    > TG.selected: ["warnings.unused-variable" "warnings.no-unused-function" "warnings.unused-label"]
+        unused-variable:                true, (no-): false
+        unused-parameter:               false, (no-): true
+        unused-function:                false, (no-): true
+        unused-but-set-variable:        false, (no-): true
+        unused-private-field:           false, (no-): true
+        unused-label:                   true, (no-): false
+$
+```
+
+<include>../../headless/cmdr-guide-concepts-flag.mdx</include>
