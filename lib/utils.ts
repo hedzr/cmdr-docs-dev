@@ -147,7 +147,7 @@ export function safe(s: any, defVal: string = ''): string {
   return s.toString();
 }
 
-export function safeget<T>(cont: any, prop: string, defVal: T): T {
+export function safeget<T>(cont: any, prop: string | number, defVal: T): T {
   if (!cont) return defVal;
   if (prop in cont) return cont[prop];
   return defVal;
