@@ -1,4 +1,9 @@
-"use client";
+/**
+ * NEVER USED,
+ * replaced with "fumadocs-ui/components/image-zoom" now.
+ */
+0;
+("use client");
 
 import Image, { type ImageProps } from "next/image";
 import { type ImgHTMLAttributes } from "react";
@@ -13,8 +18,10 @@ import {
 } from "next/dist/shared/lib/get-img-props";
 
 // Define the component's props with some restrictions on ImageProps
-export interface SafeImageProps
-  extends Omit<ImageProps, "src" | "width" | "height"> {
+export interface SafeImageProps extends Omit<
+  ImageProps,
+  "src" | "width" | "height"
+> {
   src: string | StaticImport; // Primary image source
   fallbackSrc?: string; // Default image source (optional)
   alt: string; // Alt text for accessibility
