@@ -6,13 +6,13 @@ import {
   DocsTitle,
   PageLastUpdate,
 } from "fumadocs-ui/layouts/docs/page";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getMDXComponents } from "@/mdx-components";
 import type { Metadata } from "next";
 import { createRelativeLink } from "fumadocs-ui/mdx";
 import { LLMCopyButton, ViewOptions } from "@/components/ai/page-actions";
 
-import { previewMode, prodMode } from "@/lib/utils";
+import { previewMode, prodMode, safeget } from "@/lib/utils";
 import { gitConfig, siteConfig } from "@/lib/repo";
 
 import HandlingKeyboardLeftAndRight from "@/components/kb-page-flip";
@@ -72,6 +72,10 @@ export default async function Page(
   const params = await props.params;
   const page = source.getPage(params.slug, params.lang);
   if (!page) {
+    if (safeget<string>(params.slug, 0, "") === "cmdr.v2") {
+      params.slug?.shift();
+      redirect(`../../docs/cmdr/v2/${params.slug?.join("/") || ""}`);
+    }
     console.error(
       `Page not found: slug=[${params.slug}], lang=${params.lang}.`,
     );
