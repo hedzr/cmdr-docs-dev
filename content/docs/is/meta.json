@@ -1,7 +1,0 @@
-{
-  "description": "`is` detectors and its basic supports in golang",
-  "icon": "MonitorCog",
-  "root": true,
-  "defaultOpen": true,
-  "pages": ["index", "---Guide---", "...guide", "..."]
-}

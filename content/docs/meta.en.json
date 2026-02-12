@@ -1,7 +1,5 @@
 {
   "pages": [
-    "index",
-
     "---cmdr series---",
     "cmdr",
     "cmdr-cxx",
@@ -27,7 +25,7 @@
 
     "---links---",
     "external:[On Github](https://github.com/hedzr/cmdr)",
-    "!internal-tests",
-    "!headless"
+    "!headless",
+    "!internal-tests"
   ]
 }

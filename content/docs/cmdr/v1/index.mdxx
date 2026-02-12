@@ -1,15 +1,17 @@
 ---
-title: Hello
-description: Your first document
+title: Documentations
+description: To cmdr-go v1
 ---
 
-## Hello World
+<Callout title="Tip">
+
+1. cmdr v1 已经不再被支持，请使用新的版本：[cmdr v2](../v2)
+
+</Callout>
+
+## Intro to cmdr v1.x
 
 Welcome to the docs! You can start writing documents in `/content/docs`.
-
-```ts twoslash
-console.log("Hello World");
-```
 
 ```js
 const lorem = ipsum(dolor, sit);
@@ -22,14 +24,7 @@ lorem.adipiscing((sed, elit) => {
 });
 ```
 
-{/* ## What is Next? */}
-
 ## Learn More
-
-<Cards>
-  <Card title="Learn more about Next.js" href="https://nextjs.org/docs" />
-  <Card title="Learn more about Fumadocs" href="https://fumadocs.dev" />
-</Cards>
 
 <Cards>
   <Card title="Learn more about Code Hike" href="https://codehike.org/docs" />
