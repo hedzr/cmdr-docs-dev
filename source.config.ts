@@ -7,19 +7,44 @@ import { rehypeCodeDefaultOptions, remarkMdxMermaid } from 'fumadocs-core/mdx-pl
 
 import rehypeKatex from 'rehype-katex';
 import remarkMath from 'remark-math';
+import z from 'zod';
 
 // You can customise Zod schemas for frontmatter and `meta.json` here
 // see https://fumadocs.dev/docs/mdx/collections
 export const docs = defineDocs({
   dir: 'content/docs',
   docs: {
-    schema: pageSchema,
+    schema: pageSchema.extend(
+      {
+        // preview: z.string().optional(),
+        // index: z.boolean().default(true),
+        // /**
+        //  * API routes only
+        //  */
+        // method: z.string().optional(),
+        date: z.union([
+          z.string().date(),
+          z.string().datetime({ offset: true }),
+          z.date()]).optional(),
+        // // date: z.string().datetime({ offset: true }).or(z.date()).optional(),
+        // last_modified_at: z.string().datetime({ offset: true }).or(z.date()).optional(), // z.string().date().or(z.date()).optional(),
+        // // last_modified_at: z.string().date().or(z.date()).optional(),
+        // // last_modified_at: z.string().datetime({ offset: true }).optional(), // z.string().date().or(z.date()).optional(),
+        draft: z.boolean().default(false),
+        feedback: z.boolean().default(false),
+        excerpt: z.string().optional(),
+        tags: z.array(z.string()).optional(),
+        categories: z.string().optional(),
+      }
+    ),
     postprocess: {
       includeProcessedMarkdown: true,
     },
   },
   meta: {
-    schema: metaSchema,
+    schema: metaSchema.extend({
+      // description: z.string().optional(),
+    }),
   },
 });
 
