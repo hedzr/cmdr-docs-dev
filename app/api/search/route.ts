@@ -7,6 +7,7 @@ import { createTokenizer } from '@orama/tokenizers/mandarin';
 //   language: 'english',
 // });
 
+// https://www.fumadocs.dev/docs/headless/search/orama
 export const { GET } = createFromSource(source, {
   localeMap: {
     // [locale]: Orama options
@@ -32,4 +33,15 @@ export const { GET } = createFromSource(source, {
     // ru: { language: 'russian' },
     en: { language: 'english' },
   },
+  // buildIndex(page) {
+  //   return {
+  //     title: page.data.title,
+  //     description: page.data.description,
+  //     url: page.url,
+  //     id: page.url,
+  //     structuredData: page.data.structuredData,
+  //     // use your desired value, like page.slugs[0]
+  //     tag: '<value>',
+  //   };
+  // },
 });
