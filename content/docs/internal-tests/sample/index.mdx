@@ -7,24 +7,79 @@ description: md sample page
 
 Hi, there.
 
-```ts title="lint.ts"
+## Twoslash
+
+Twoslash is a tool designed primarily for TypeScript to generate rich, statically-analyzed code samples for documentation and websites. It uses the TypeScript compiler to provide features like inline type information, error messages, and hover tooltips within code blocks.
+
+Twoslash is not natively supported for Go (Golang), C++, and others. The Go programming language uses a different compiler and type system, which is incompatible with Twoslash's underlying TypeScript infrastructure.
+
+```ts title="lint.ts" twoslash lineNumbers
 console.log("This should shows the logo of TypeScript");
+const hi = "Hello";
+const msg = `${hi}, world`;
+//      ^?
 ```
 
-```cpp title="main.cc"
+```c++ title="main.cc" twoslash lineNumbers
 #include <print>
 
 int main() {
-  std::println("Hello!");
+  auto const msg = "World";
+  //          ^?
+  std::println("Hello, {}!", msg);
 }
 ```
 
-```go title="main.go"
+```go twoslash title="main.go"
 package main
 
 import "fmt"
 
 func main() {
-  fmt.Println("Hello!")
+  var msg = "World"
+  //    ^?
+  fmt.Printf("Hello, %v!", msg)
+//^^^
 }
 ```
+
+### Example
+
+Learn more about [Twoslash notations](https://twoslash.netlify.app/refs/notations).
+
+```ts twoslash title="Test" lineNumbers
+type Player = {
+  /**
+   * The player name
+   * @default 'user'
+   */
+  name: string;
+};
+
+// ---cut---
+// @noErrors
+console.g;
+//       ^|
+
+const player: Player = { name: "Hello World" };
+//    ^?
+```
+
+```ts twoslash
+const a = "123";
+
+console.log(a);
+//      ^^^
+```
+
+```ts twoslash
+// @errors: 2588
+const a = "123";
+
+a = 132;
+```
+
+## References
+
+- [Shiki Twoslash: Static Code Samples for JS Projects](https://shikijs.github.io/twoslash/)
+- [Notation References | Twoslash](https://twoslash.netlify.app/refs/notations)
