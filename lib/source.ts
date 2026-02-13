@@ -4,6 +4,7 @@ import { lucideIconsPlugin } from 'fumadocs-core/source/lucide-icons';
 import { i18n } from '@/lib/i18n';
 
 // See https://fumadocs.dev/docs/headless/source-api for more info
+//     https://www.fumadocs.dev/docs/headless/search/orama
 export const source = loader({
   baseUrl: '/docs',
   source: docs.toFumadocsSource(),
