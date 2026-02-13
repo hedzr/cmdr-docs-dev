@@ -38,7 +38,27 @@ export default defineConfig({
       transformers: [...(rehypeCodeDefaultOptions.transformers ?? []), transformerTwoslash()],
       // important: Shiki doesn't support lazy loading languages for codeblocks in Twoslash popups
       // make sure to define them first (e.g. the common ones)
-      langs: ['js', 'jsx', 'ts', 'tsx'],
+      langs: [
+        'js', 'jsx', 'ts', 'tsx',
+        'go',
+        'angular-ts', 'asm',
+        'bash', 'zsh', 'fish', 'shell', 'shellscript',
+        'c', 'c#', 'c++', 'c3',
+        'diff', 'docker', 'dockerfile',
+        'hjson',
+        'jinja',
+        'kotlin',
+        'latex', 'llvm', 'lua',
+        'make', 'makefile', 'md', 'mdx', 'mermaid',
+        'protobuf', 'ps1', 'python',
+        'riscv', 'rust',
+        'sass', 'swift', 'ssh-config', 'sql',
+        'toml',
+        'verilog', 'vim',
+        'wasm', 'wiki',
+        'xml', 'xsl', 'yaml', 'yml',
+        'zig',
+      ],
     },
   },
 });
