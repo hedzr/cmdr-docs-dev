@@ -14,7 +14,11 @@ cmdr allows you define a flag has the same behavior.
 
 Generally the default value of a head-like flag must be a positive number. Then the end user typing `-number` can be converted to `--flag number` semantic meaning.
 
-> In a single app, only one head-like flag can be declared.
+> ~~In a single app, only one head-like flag can be declared.~~
+
+We've rewritten the parsing logic in cmdr.v2, so `head -1` style had been expanding to each (sub-)command now:
+
+For the user's input `app cmd1 cmd2 -5`, supposing `-5` is associated with a number flag such as `--count 5`, the parser will try matching with the command `cmd2`. If not matched, the parser lookup the command chain and go on with the command `cmd1`, and _Root_ command; or a matching ok, for instance `cmd2`'s `--count 5`.
 
 ### Define
 
