@@ -11,6 +11,11 @@ const withMDX = createMDX();
 const config = {
   reactStrictMode: true,
 
+  // for FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory
+  experimental: {
+    webpackMemoryOptimizations: true,
+  },
+
   serverExternalPackages: ["typescript", "twoslash"],
 
   // i18n: {

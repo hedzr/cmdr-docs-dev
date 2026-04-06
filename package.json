@@ -10,7 +10,7 @@
   "author": "hedzr <hedzr@duck.com>",
   "license": "Apache-2.0",
   "engines": {
-    "node": "^24.0.0"
+    "node": ">=24.0.0"
   },
   "packageManager": "pnpm@10.32.1",
   "scripts": {
@@ -26,7 +26,8 @@
     "build:with-mem-dbg": "next build --experimental-debug-memory-usage",
     "build:docs": "node ./scripts/generate-docs.mjs",
     "serve:dist": "python3 -m http.server --directory out -b 0.0.0.0 80 # after pnpm build",
-    "build": "next build",
+    "build": "NODE_OPTIONS='--max-old-space-size=4096' next build",
+    "build:debug": "NODE_OPTIONS='--max-old-space-size=4096' next build --debug-prerender",
     "dev": "next dev",
     "start": "next start",
     "types:check": "fumadocs-mdx && next typegen && tsc --noEmit",
